@@ -63,10 +63,19 @@ public class UserRepositoryTest
     }
 
     [Fact]
-    public async Task CreateUser_ShouldThrowArgumentNullException_WhenPasswordIsEmpty()
+    public async Task CreateUser_ShouldThrowArgumentException_WhenPasswordIsEmpty()
     {
         // Arrange
         var user = new User { name = "testuser", password = "", type = 1 };
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.AddUser(user));
+    }
+
+    [Fact]
+    public async Task CreateUser_ShouldThrowArgumentException_WhenUserNameIsEmpty()
+    {
+        // Arrange
+        var user = new User { name = "", password = "testpassword", type = 1 };
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.AddUser(user));
     }
