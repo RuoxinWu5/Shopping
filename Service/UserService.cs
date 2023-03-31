@@ -1,5 +1,6 @@
 using Data.Model;
 using Data.Repository;
+using Data.Exceptions;
 
 namespace Service
 {
@@ -12,9 +13,18 @@ namespace Service
             _repository = repository;
         }
 
-        public Task<string> AddUser(User user)
+        public async Task<string> AddUser(User user)
         {
-            throw new NotImplementedException();
+            try{
+                await _repository.AddUser(user);
+                return "Registered successfully";
+            }
+            catch(DuplicateUserNameException exception){
+                return exception.Message;
+            }
+            catch(ArgumentException exception){
+                return exception.Message;
+            }
         }
     }
 }
