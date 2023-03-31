@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shopping", "Shopping\Shopping.csproj", "{9DE4886C-7AAD-4515-B34C-CA6B6640E2BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controller", "Controller\Controller.csproj", "{919E7F4C-7C6D-4611-BE21-1AF2982BE07B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{9DE4886C-7AAD-4515-B34C-CA6B6640E2BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DE4886C-7AAD-4515-B34C-CA6B6640E2BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DE4886C-7AAD-4515-B34C-CA6B6640E2BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{919E7F4C-7C6D-4611-BE21-1AF2982BE07B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{919E7F4C-7C6D-4611-BE21-1AF2982BE07B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{919E7F4C-7C6D-4611-BE21-1AF2982BE07B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{919E7F4C-7C6D-4611-BE21-1AF2982BE07B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
