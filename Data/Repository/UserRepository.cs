@@ -24,7 +24,7 @@ namespace Data.Repository
                 throw new ArgumentException("User name cannot be empty.", nameof(user.name));
             }
             var buyer_type = 1;
-            if (user.type.Equals(null))
+            if (!user.type.HasValue)
             {
                 user.type = buyer_type;
             }

@@ -1,5 +1,7 @@
 using Data.Model;
 using Microsoft.EntityFrameworkCore;
+using Data.Repository;
+using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,9 @@ builder.Services.AddDbContext<UserContext>(opt =>
     var serverVersion = ServerVersion.AutoDetect(connectionString);
     opt.UseMySql(connectionString, serverVersion);
 });
+
+builder.Services.AddScoped<IUserRepository,UserRepository>();
+builder.Services.AddScoped<IUserService,UserService>();
 
 var app = builder.Build();
 

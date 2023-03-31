@@ -2,7 +2,7 @@ using Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 
-namespace Controller
+namespace Shopping.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
