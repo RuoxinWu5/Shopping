@@ -12,12 +12,17 @@ namespace Controller
 
         public UserController(IUserService userService)
         {
-            _userService=userService;
+            _userService = userService;
         }
 
         [HttpPost]
-        public Task<ActionResult> AddUser(User user){
-            throw new NotImplementedException();
+        public async Task<ActionResult> AddUser(User user)
+        {
+            var result = await _userService.AddUser(user);
+            if (result == "Registered successfully"){
+                return Ok(result);
+            }
+            return BadRequest(result);
         }
     }
 }
