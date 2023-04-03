@@ -1,0 +1,9 @@
+using Data.Model;
+
+namespace Data.Repository
+{
+    public interface IProductRepository
+    {
+        Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId);
+    }
+}
