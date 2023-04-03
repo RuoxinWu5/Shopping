@@ -53,7 +53,7 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsNull()
+        public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
         {
             // Arrange
             var user = new User { name = "test", password = "", type = UserType.BUYER };
@@ -71,10 +71,10 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task CreateUser_ShouldReturnBadRequest_WhenUserNameIsNull()
+        public async Task CreateUser_ShouldReturnBadRequest_WhenUserNameIsEmpty()
         {
             // Arrange
-            var user = new User { name = "test", password = "test123123", type = UserType.BUYER };
+            var user = new User { name = "", password = "test123123", type = UserType.BUYER };
             _userServiceMock
                 .Setup(service => service.AddUser(user))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)

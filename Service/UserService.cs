@@ -28,13 +28,6 @@ namespace Service
                     Content = new StringContent(exception.Message.ToString())
                 };
             }
-            catch (ArgumentException exception)
-            {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent(exception.Message.ToString())
-                };
-            }
         }
     }
 }

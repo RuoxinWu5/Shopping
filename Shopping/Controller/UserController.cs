@@ -23,16 +23,20 @@ namespace Shopping.Controller
             {
                 return BadRequest("Type can only be 0 AS Buyer and 1 AS Seller.");
             }
+            if (string.IsNullOrWhiteSpace(user.password))
+            {
+                return BadRequest("Password cannot be empty.");
+            }
+            if (string.IsNullOrWhiteSpace(user.name))
+            {
+                return BadRequest("User name cannot be empty.");
+            }
             var result = await _userService.AddUser(user);
             if (result.StatusCode == HttpStatusCode.Created)
             {
                 return CreatedAtAction(nameof(AddUser), new { id = user.id }, "Registered successfully.");
             }
-            else if (result.StatusCode == HttpStatusCode.Conflict)
-            {
-                return Conflict(await result.Content.ReadAsStringAsync());
-            }
-            return BadRequest(await result.Content.ReadAsStringAsync());
+            return Conflict(await result.Content.ReadAsStringAsync());
         }
     }
 }

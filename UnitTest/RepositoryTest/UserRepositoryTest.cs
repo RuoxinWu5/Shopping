@@ -72,25 +72,4 @@ public class UserRepositoryTest
         // Act & Assert
         await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddUser(user));
     }
-
-    [Fact]
-    public async Task CreateUser_ShouldThrowArgumentException_WhenPasswordIsEmpty()
-    {
-        // Arrange
-        var users = AddUsers();
-        var user = new User { name = "testuser", password = "", type = UserType.BUYER };
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.AddUser(user));
-    }
-
-    [Fact]
-    public async Task CreateUser_ShouldThrowArgumentException_WhenUserNameIsEmpty()
-    {
-        // Arrange
-        var users = AddUsers();
-        var user = new User { name = "", password = "testpassword", type = UserType.BUYER };
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.AddUser(user));
-    }
-
 }

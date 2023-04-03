@@ -15,14 +15,6 @@ namespace Data.Repository
         }
         public async Task AddUser(User user)
         {
-            if (string.IsNullOrWhiteSpace(user.password))
-            {
-                throw new ArgumentException("Password cannot be empty.");
-            }
-            if (string.IsNullOrWhiteSpace(user.name))
-            {
-                throw new ArgumentException("User name cannot be empty.");
-            }
             if (!user.type.HasValue)
             {
                 user.type = UserType.BUYER;

@@ -45,33 +45,5 @@ namespace UnitTest.ServiceTest
             // Assert
             Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
         }
-
-        [Fact]
-        public async Task CreateUser_ShouldReturnArgumentExceptionMessage_WhenPasswordIsEmpty()
-        {
-            // Arrange
-            var user = new User { name = "testuser", password = "", type = UserType.BUYER };
-            _userRepositoryMock
-                .Setup(repository => repository.AddUser(user))
-                .Throws(new ArgumentException("Password cannot be empty."));
-            // Act
-            var result = await _userService.AddUser(user);
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
-
-        [Fact]
-        public async Task CreateUser_ShouldReturnArgumentExceptionMessage_WhenUserNameIsEmpty()
-        {
-            // Arrange
-            var user = new User { name = "", password = "testpassword", type = UserType.BUYER };
-            _userRepositoryMock
-                .Setup(repository => repository.AddUser(user))
-                .Throws(new ArgumentException("User name cannot be empty."));
-            // Act
-            var result = await _userService.AddUser(user);
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
     }
 }
