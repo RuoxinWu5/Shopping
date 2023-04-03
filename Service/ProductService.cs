@@ -1,5 +1,7 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
+using System.Net;
 
 namespace Service
 {
@@ -12,9 +14,26 @@ namespace Service
             _repository = repository;
         }
 
-        public Task<HttpResponseMessage> AddProduct(Product product)
+        public async Task<HttpResponseMessage> AddProduct(Product product)
         {
-            throw new NotImplementedException();
+            try{
+                await _repository.AddProduct(product);
+                return new HttpResponseMessage(HttpStatusCode.Created);
+            }
+            catch (DuplicateUserNameException exception)
+            {
+                return new HttpResponseMessage(HttpStatusCode.Conflict)
+                {
+                    Content = new StringContent(exception.Message.ToString())
+                };
+            }
+            catch (DllNotFoundException exception)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound)
+                {
+                    Content = new StringContent(exception.Message.ToString())
+                };
+            }
         }
 
         public async Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId)
