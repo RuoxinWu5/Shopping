@@ -8,15 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<UserContext>(opt =>
-{
-    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    var serverVersion = ServerVersion.AutoDetect(connectionString);
-    opt.UseMySql(connectionString, serverVersion);
-});
 
-builder.Services.AddScoped<IUserRepository,UserRepository>();
-builder.Services.AddScoped<IUserService,UserService>();
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var serverVersion = ServerVersion.AutoDetect(connectionString);
+builder.Services.AddDbContext<UserContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
+builder.Services.AddDbContext<ProductContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
