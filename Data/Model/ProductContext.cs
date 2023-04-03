@@ -1,3 +1,4 @@
+using Data.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Model
@@ -8,5 +9,10 @@ namespace Data.Model
         {
         }
         public DbSet<Product>? Products { get; set; }
+
+        public static implicit operator ProductContext(ProductRepository v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
