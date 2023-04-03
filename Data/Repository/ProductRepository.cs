@@ -17,5 +17,10 @@ namespace Data.Repository
             var result = await _context.Products.Where(product => product.sellerId == sellerId).ToListAsync();
             return result;
         }
+        
+        public Task AddProduct(Product product)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

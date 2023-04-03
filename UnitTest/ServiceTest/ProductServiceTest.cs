@@ -1,3 +1,5 @@
+using System.Net;
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 using Moq;
@@ -30,6 +32,48 @@ namespace UnitTest.ServiceTest
             var result = await _productService.GetProductListBySellerId(sellerId);
             // Assert
             Assert.Equal(resultItem, result);
+        }
+
+        [Fact]
+        public async Task AddProduct_ShouldReturnSuccessMessage_WhenProductIsValid()
+        {
+            // Arrange
+            var product = new Product { name = "Apple", quantity = 100, sellerId = 1 };
+            _productRepositoryMock
+                .Setup(repository => repository.AddProduct(product))
+                .Returns(Task.CompletedTask);
+            // Act
+            var result = await _productService.AddProduct(product);
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task AddProduct_ShouldReturnDuplicateUserNameExceptionMessage_WhenProductNameExists()
+        {
+            // Arrange
+             var product = new Product { name = "Apple", quantity = 100, sellerId = 1 };
+            _productRepositoryMock
+                .Setup(repository => repository.AddProduct(product))
+                .Throws(new DuplicateUserNameException("Product name 'Apple' already exists."));
+            // Act
+            var result = await _productService.AddProduct(product);
+            // Assert
+            Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task AddProduct_ShouldReturnNotFoundExceptionMessage_WhenSellerIdNotExists()
+        {
+            // Arrange
+             var product = new Product { name = "Apple", quantity = 100, sellerId = 1 };
+            _productRepositoryMock
+                .Setup(repository => repository.AddProduct(product))
+                .Throws(new DllNotFoundException("The seller doesn't exist."));
+            // Act
+            var result = await _productService.AddProduct(product);
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
         }
     }
 }
