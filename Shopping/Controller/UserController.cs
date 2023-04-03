@@ -21,7 +21,7 @@ namespace Shopping.Controller
         {
             if (user.type != UserType.BUYER && user.type != UserType.SELLER)
             {
-                return BadRequest();
+                return BadRequest("Type can only be 0 AS Buyer and 1 AS Seller.");
             }
             var result = await _userService.AddUser(user);
             if (result.StatusCode == HttpStatusCode.Created)
