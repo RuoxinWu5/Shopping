@@ -66,7 +66,7 @@ namespace UnitTest.ControllerTest
             var result = await _productController.AddProduct(product);
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
-            Assert.Equal("User name 'test' already exists.", conflictResult.Value);
+            Assert.Equal("Product name 'Apple' already exists.", conflictResult.Value);
         }
 
         [Fact]
