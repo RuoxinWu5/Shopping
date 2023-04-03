@@ -111,11 +111,11 @@ namespace UnitTest.ControllerTest
         public async Task AddProduct_ShouldReturnNotFound_WhenSellerIdNotExists()
         {
             // Arrange
-            var product = new Product { name = "Apple", quantity = 100, sellerId = 89101233 };
+            var product = new Product { name = "Apple", quantity = 100, sellerId = 1 };
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound)
                 {
                     Content = new StringContent("The seller doesn't exist.")
                 });
