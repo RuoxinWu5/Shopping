@@ -21,5 +21,11 @@ namespace Shopping.Controller
             var result = await _productService.GetProductListBySellerId(sellerId);
             return Ok(result);
         }
+
+        [HttpPost]
+        public async Task<ActionResult> AddProduct(Product product)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
