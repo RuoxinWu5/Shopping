@@ -25,8 +25,8 @@ public class UserRepositoryTest
     {
         var users = new List<User>
         {
-            new User { name = "Lisa", password = "lisa123", type = 1 },
-            new User { name = "Jack", password = "Jack123", type = 2 }
+            new User { name = "Lisa", password = "lisa123", type = UserType.BUYER },
+            new User { name = "Jack", password = "Jack123", type = UserType.SELLER }
         };
         await _context.AddRangeAsync(users);
         await _context.SaveChangesAsync();
@@ -38,7 +38,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "test", password = "test123123", type = 2 };
+        var user = new User { name = "test", password = "test123123", type = UserType.SELLER };
         // Act
         await _repository.AddUser(user);
         // Assert
@@ -54,14 +54,13 @@ public class UserRepositoryTest
         // Arrange
         var users = AddUsers();
         var user = new User { name = "noType", password = "noType123123" };
-        var buyer_type = 1;
         // Act
         await _repository.AddUser(user);
         // Assert
         var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.name == user.name);
         Assert.NotNull(savedUser);
         Assert.Equal(user.password, savedUser.password);
-        Assert.Equal(buyer_type, savedUser.type);
+        Assert.Equal(UserType.BUYER, savedUser.type);
     }
 
     [Fact]
@@ -69,7 +68,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "Lisa", password = "test123123", type = 1 };
+        var user = new User { name = "Lisa", password = "test123123", type = UserType.BUYER };
         // Act & Assert
         await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddUser(user));
     }
@@ -79,7 +78,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "testuser", password = "", type = 1 };
+        var user = new User { name = "testuser", password = "", type = UserType.BUYER };
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.AddUser(user));
     }
@@ -89,7 +88,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "", password = "testpassword", type = 1 };
+        var user = new User { name = "", password = "testpassword", type = UserType.BUYER };
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.AddUser(user));
     }

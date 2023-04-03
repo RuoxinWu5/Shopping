@@ -1,6 +1,7 @@
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Service;
+using System.Net;
 
 namespace Shopping.Controller
 {
@@ -18,11 +19,20 @@ namespace Shopping.Controller
         [HttpPost]
         public async Task<ActionResult> AddUser(User user)
         {
-            var result = await _userService.AddUser(user);
-            if (result == "Registered successfully"){
-                return Ok(result);
+            if (user.type != UserType.BUYER && user.type != UserType.SELLER)
+            {
+                return BadRequest();
             }
-            return BadRequest(result);
+            var result = await _userService.AddUser(user);
+            if (result.StatusCode == HttpStatusCode.Created)
+            {
+                return CreatedAtAction(nameof(AddUser), new { id = user.id }, "Registered successfully.");
+            }
+            else if (result.StatusCode == HttpStatusCode.Conflict)
+            {
+                return Conflict(await result.Content.ReadAsStringAsync());
+            }
+            return BadRequest(await result.Content.ReadAsStringAsync());
         }
     }
 }

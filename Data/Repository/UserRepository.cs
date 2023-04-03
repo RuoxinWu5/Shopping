@@ -17,16 +17,15 @@ namespace Data.Repository
         {
             if (string.IsNullOrWhiteSpace(user.password))
             {
-                throw new ArgumentException("Password cannot be empty.", nameof(user.password));
+                throw new ArgumentException("Password cannot be empty.");
             }
             if (string.IsNullOrWhiteSpace(user.name))
             {
-                throw new ArgumentException("User name cannot be empty.", nameof(user.name));
+                throw new ArgumentException("User name cannot be empty.");
             }
-            var buyer_type = 1;
             if (!user.type.HasValue)
             {
-                user.type = buyer_type;
+                user.type = UserType.BUYER;
             }
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.name == user.name);
             if (existingUser != null)

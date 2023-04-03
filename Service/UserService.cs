@@ -1,6 +1,7 @@
 using Data.Model;
 using Data.Repository;
 using Data.Exceptions;
+using System.Net;
 
 namespace Service
 {
@@ -13,17 +14,26 @@ namespace Service
             _repository = repository;
         }
 
-        public async Task<string> AddUser(User user)
+        public async Task<HttpResponseMessage> AddUser(User user)
         {
-            try{
+            try
+            {
                 await _repository.AddUser(user);
-                return "Registered successfully";
+                return new HttpResponseMessage(HttpStatusCode.Created);
             }
-            catch(DuplicateUserNameException exception){
-                return exception.Message;
+            catch (DuplicateUserNameException exception)
+            {
+                return new HttpResponseMessage(HttpStatusCode.Conflict)
+                {
+                    Content = new StringContent(exception.Message.ToString())
+                };
             }
-            catch(ArgumentException exception){
-                return exception.Message;
+            catch (ArgumentException exception)
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent(exception.Message.ToString())
+                };
             }
         }
     }
