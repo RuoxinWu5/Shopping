@@ -20,7 +20,8 @@ namespace Service
 
         public async Task<BuyerProduct> GetProductByProductId(int productId)
         {
-            throw new NotImplementedException();
+            var result = await _buyerRepository.GetProductByProductId(productId);
+            return result;
         }
     }
 }
