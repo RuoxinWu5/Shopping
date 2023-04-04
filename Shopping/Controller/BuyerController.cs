@@ -3,7 +3,9 @@ using Service;
 
 namespace Shopping.Controller
 {
-    public class BuyerController
+    [Route("api/[controller]")]
+    [ApiController]
+    public class BuyerController : ControllerBase
     {
         private readonly IBuyerService _buyerService;
         public BuyerController(IBuyerService buyerService)
@@ -12,9 +14,10 @@ namespace Shopping.Controller
         }
 
         [HttpGet]
-        public Task<ActionResult> AllProduct()
+        public async Task<ActionResult> AllProduct()
         {
-            throw new NotImplementedException();
+            var result = await _buyerService.AllProduct();
+            return Ok(result);
         }
     }
 }
