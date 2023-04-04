@@ -17,5 +17,10 @@ namespace Service
             var result = await _buyerRepository.AllProduct();
             return result;
         }
+
+        public Task<BuyerProduct> GetProductByProductId(int productId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

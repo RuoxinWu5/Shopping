@@ -28,5 +28,27 @@ namespace UnitTest.ControllerTest
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(resultItem, okObjectResult.Value);
         }
+
+        [Fact]
+        public async Task GetProductByProductId_ShouldReturnOk_WhenProductsIsfound()
+        {
+            var resultItem = new BuyerProduct() { id = 1, name = "Apple",quantity=100, sellerName = "Lisa" };
+            _buyerServiceMock.Setup(x => x.GetProductByProductId(It.IsAny<int>())).ReturnsAsync(resultItem);
+            // Act
+            var result = await _buyerController.GetProductByProductId(1);
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(resultItem, okObjectResult.Value);
+        }
+        
+        [Fact]
+        public async Task GetProductByProductId_ShouldReturnNotFoundException_WhenProductsIsNotfound()
+        {
+            _buyerServiceMock.Setup(x => x.GetProductByProductId(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            // Act
+            var result = await _buyerController.GetProductByProductId(1);
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
     }
 }
