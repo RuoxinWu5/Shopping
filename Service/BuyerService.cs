@@ -12,9 +12,10 @@ namespace Service
             _buyerRepository = buyerRepository;
         }
 
-        public Task<IEnumerable<BuyerProduct>> AllProduct()
+        public async Task<IEnumerable<BuyerProduct>> AllProduct()
         {
-            throw new NotImplementedException();
+            var result = await _buyerRepository.AllProduct();
+            return result;
         }
     }
 }
