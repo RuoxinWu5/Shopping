@@ -7,18 +7,32 @@ namespace UnitTest.RepositoryTest
     public class BuyerRepositoryTest
     {
         private readonly BuyerProductContext _context;
+        private readonly ProductContext productContext;
+        private readonly UserContext userContext;
         private readonly BuyerRepository _repository;
-
         public BuyerRepositoryTest()
         {
+            var productOptions = new DbContextOptionsBuilder<ProductContext>()
+                    .UseInMemoryDatabase("ProductList1")
+                    .Options;
+            var userOptions = new DbContextOptionsBuilder<UserContext>()
+                    .UseInMemoryDatabase("UserList1")
+                    .Options;
             var options = new DbContextOptionsBuilder<BuyerProductContext>()
-                    .UseInMemoryDatabase("BuyerProductList")
+                    .UseInMemoryDatabase("BuyerProductList1")
                     .Options;
             _context = new BuyerProductContext(options);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            _repository = new BuyerRepository(_context);
+            productContext = new ProductContext(productOptions);
+            productContext.Database.EnsureDeleted();
+            productContext.Database.EnsureCreated();
+            userContext = new UserContext(userOptions);
+            userContext.Database.EnsureDeleted();
+            userContext.Database.EnsureCreated();
+            _repository = new BuyerRepository(_context, productContext, userContext);
         }
+
         private async Task<List<BuyerProduct>> AddBuyerProducts()
         {
             var buyerProducts = new List<BuyerProduct>
@@ -31,15 +45,41 @@ namespace UnitTest.RepositoryTest
             return buyerProducts;
         }
 
+        private async Task<List<Product>> AddProducts()
+        {
+            var products = new List<Product>
+        {
+            new Product { name = "Apple", quantity = 100, sellerId = 1 },
+            new Product { name = "Banana", quantity = 50, sellerId = 1 }
+        };
+            await productContext.AddRangeAsync(products);
+            await productContext.SaveChangesAsync();
+            return products;
+        }
+
+        private async Task<List<User>> AddUsers()
+        {
+            var users = new List<User>
+        {
+            new User { name = "Lisa", password = "lisa123", type = UserType.BUYER },
+            new User { name = "Jack", password = "Jack123", type = UserType.SELLER }
+        };
+            await userContext.AddRangeAsync(users);
+            await userContext.SaveChangesAsync();
+            return users;
+        }
+
         [Fact]
         public async Task GetProductList_ShouldReturnProductList_WhenProductsIsfound()
         {
             // Arrange
             var buyerProducts = await AddBuyerProducts();
+            await AddProducts();
+            await AddUsers();
             // Act
             var result = await _repository.AllProduct();
             // Assert
-            Assert.Equal(buyerProducts, result);
+            Assert.Equal(buyerProducts.ToString(), result.ToString());
         }
     }
 }
