@@ -13,11 +13,14 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 var serverVersion = ServerVersion.AutoDetect(connectionString);
 builder.Services.AddDbContext<UserContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
 builder.Services.AddDbContext<ProductContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
+builder.Services.AddDbContext<BuyerProductContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBuyerRepository, BuyerRepository>();
+builder.Services.AddScoped<IBuyerService, BuyerService>();
 
 var app = builder.Build();
 
