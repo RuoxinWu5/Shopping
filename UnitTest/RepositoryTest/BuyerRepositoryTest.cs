@@ -84,5 +84,30 @@ namespace UnitTest.RepositoryTest
             // Assert
             Assert.Equal(buyerProducts.ToString(), result.ToString());
         }
+
+        [Fact]
+        public async Task GetProductByProductId_ShouldReturnProduct_WhenProductsIsfound()
+        {
+            // Arrange
+            var buyerProducts = await AddBuyerProducts();
+            await AddProducts();
+            await AddUsers();
+            var detail = buyerProducts.First();
+            // Act
+            var result = await _repository.GetProductByProductId(1);
+            // Assert
+            Assert.Equal(detail.ToString(), result.ToString());
+        }
+
+        [Fact]
+        public async Task GetProductByProductId_ShouldReturnNotFoundException_WhenProductsIsfound()
+        {
+            // Arrange
+            var buyerProducts = await AddBuyerProducts();
+            await AddProducts();
+            await AddUsers();
+            // Act $ Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductByProductId(3));
+        }
     }
 }

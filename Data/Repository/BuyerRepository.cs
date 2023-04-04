@@ -28,9 +28,20 @@ namespace Data.Repository
             return result;
         }
 
-        public Task<BuyerProduct> GetProductByProductId(int productId)
+        public async Task<BuyerProduct> GetProductByProductId(int productId)
         {
-            throw new NotImplementedException();
+            var productResult = await _productContext.Products.FindAsync(productId);
+            if (productResult == null)
+            {
+                throw new KeyNotFoundException($"User name '{productId}' already exists.");
+            }
+            var seller = await _userContext.Users.FindAsync(productResult.sellerId);
+            BuyerProduct result = new BuyerProduct();
+            result.id = productResult.id;
+            result.name = productResult.name;
+            result.quantity = productResult.quantity;
+            result.sellerName = seller.name;
+            return result;
         }
     }
 }
