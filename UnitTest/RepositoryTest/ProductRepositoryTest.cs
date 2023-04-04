@@ -8,6 +8,7 @@ namespace UnitTest.RepositoryTest
     public class ProductRepositoryTest
     {
         private readonly ProductContext _context;
+        private readonly UserContext userContext;
         private readonly ProductRepository _repository;
 
         public ProductRepositoryTest()
@@ -15,10 +16,16 @@ namespace UnitTest.RepositoryTest
             var options = new DbContextOptionsBuilder<ProductContext>()
                     .UseInMemoryDatabase("ProductList")
                     .Options;
+            var userOptions = new DbContextOptionsBuilder<UserContext>()
+                    .UseInMemoryDatabase("UserLists")
+                    .Options;
             _context = new ProductContext(options);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            _repository = new ProductRepository(_context);
+            userContext = new UserContext(userOptions);
+            userContext.Database.EnsureDeleted();
+            userContext.Database.EnsureCreated();
+            _repository = new ProductRepository(_context, userContext);
         }
 
         private async Task<List<Product>> AddProducts()
@@ -31,6 +38,18 @@ namespace UnitTest.RepositoryTest
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
             return products;
+        }
+
+        private async Task<List<User>> AddUsers()
+        {
+            var users = new List<User>
+        {
+            new User { name = "Lisa", password = "lisa123", type = UserType.BUYER },
+            new User { name = "Jack", password = "Jack123", type = UserType.SELLER }
+        };
+            await userContext.AddRangeAsync(users);
+            await userContext.SaveChangesAsync();
+            return users;
         }
 
         [Fact]
@@ -50,7 +69,8 @@ namespace UnitTest.RepositoryTest
         {
             // Arrange
             var products = await AddProducts();
-            var product = new Product { name = "Watermelon", quantity = 70, sellerId = 1 };
+            var users = await AddUsers();
+            var product = new Product { name = "melon", quantity = 90, sellerId = 2 };
             // Act
             await _repository.AddProduct(product);
             // Assert

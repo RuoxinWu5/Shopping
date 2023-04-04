@@ -53,7 +53,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "noType", password = "noType123123" };
+        var user = new User { name = "noType", password = "noType123123", type = null };
         // Act
         await _repository.AddUser(user);
         // Assert
