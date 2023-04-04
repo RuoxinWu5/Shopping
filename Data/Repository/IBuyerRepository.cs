@@ -4,6 +4,6 @@ namespace Data.Repository
 {
     public interface IBuyerRepository
     {
-        Task<IEnumerable<BuyerProduct>> AllProduct();
+        Task<IEnumerable<string>> AllProduct();
     }
 }

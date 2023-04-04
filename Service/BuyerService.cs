@@ -12,7 +12,7 @@ namespace Service
             _buyerRepository = buyerRepository;
         }
 
-        public async Task<IEnumerable<BuyerProduct>> AllProduct()
+        public async Task<IEnumerable<string>> AllProduct()
         {
             var result = await _buyerRepository.AllProduct();
             return result;

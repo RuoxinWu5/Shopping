@@ -73,9 +73,12 @@ namespace UnitTest.RepositoryTest
         public async Task GetProductList_ShouldReturnProductList_WhenProductsIsfound()
         {
             // Arrange
-            var buyerProducts = await AddBuyerProducts();
-            await AddProducts();
-            await AddUsers();
+            var products = await AddProducts();
+            List<string> buyerProducts = new List<string>();
+            foreach (Product product in products)
+            {
+                buyerProducts.Add(product.name);
+            }
             // Act
             var result = await _repository.AllProduct();
             // Assert

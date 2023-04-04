@@ -16,19 +16,13 @@ namespace Data.Repository
             _userContext = userContext;
         }
 
-        public async Task<IEnumerable<BuyerProduct>> AllProduct()
+        public async Task<IEnumerable<string>> AllProduct()
         {
             var productResult = await _productContext.Products.ToListAsync();
-            List<BuyerProduct> result = new List<BuyerProduct>();
+            List<string> result = new List<string>();
             for (int i = 0; i < productResult.Count; i++)
             {
-                BuyerProduct product = new BuyerProduct();
-                var sellerId = productResult[i].sellerId;
-                var seller = await _userContext.Users.Where(user => user.id == sellerId).ToListAsync();
-                product.id = productResult[i].id;
-                product.name = productResult[i].name;
-                product.quantity = productResult[i].quantity;
-                product.sellerName = seller.First().name;
+                var product = productResult[i].name;
                 result.Add(product);
             }
             return result;

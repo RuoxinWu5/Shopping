@@ -19,10 +19,7 @@ namespace UnitTest.ServiceTest
         [Fact]
         public async Task GetProductList_ShouldReturnProductList_WhenProductsIsfound()
         {
-            var resultItem = new List<BuyerProduct>{
-                new BuyerProduct() { id = 1, name = "Apple",quantity=100, sellerName = "Lisa" },
-                new BuyerProduct() { id = 2, name = "Banana",quantity=50, sellerName = "Lisa" }
-            };
+            var resultItem = new List<string> { "Apple", "Banana" };
             _buyerRepositoryMock.Setup(repository => repository.AllProduct()).ReturnsAsync(resultItem);
             // Act
             var result = await _buyerService.AllProduct();
