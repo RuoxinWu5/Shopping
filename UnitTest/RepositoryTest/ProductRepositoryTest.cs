@@ -53,7 +53,7 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task GetProductListBySellerId_ShouldReturnProductList_WhenTypeIsNull()
+        public async Task GetProductListBySellerId_ShouldReturnProductList_WhenProductsIsfound()
         {
             // Arrange
             var products = await AddProducts();
