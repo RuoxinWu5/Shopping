@@ -18,7 +18,7 @@ namespace Service
             return result;
         }
 
-        public Task<BuyerProduct> GetProductByProductId(int productId)
+        public async Task<BuyerProduct> GetProductByProductId(int productId)
         {
             throw new NotImplementedException();
         }

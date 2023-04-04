@@ -27,5 +27,10 @@ namespace Data.Repository
             }
             return result;
         }
+
+        public Task<BuyerProduct> GetProductByProductId(int productId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
