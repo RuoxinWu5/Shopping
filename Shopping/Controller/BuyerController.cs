@@ -19,11 +19,19 @@ namespace Shopping.Controller
             var result = await _buyerService.AllProduct();
             return Ok(result);
         }
-
+        
         [HttpGet("{sellerId}")]
         public async Task<ActionResult> GetProductByProductId(int productId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _buyerService.GetProductByProductId(productId);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }
