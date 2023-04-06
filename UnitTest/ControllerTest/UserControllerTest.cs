@@ -87,5 +87,23 @@ namespace UnitTest.ControllerTest
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("User name cannot be empty.", badRequestObjectResult.Value);
         }
+
+        [Fact]
+        public async Task CreateUser_ShouldReturnBadRequest_WhenUserTypeIsInvalid()
+        {
+            // Arrange
+            var user = new User("test", "test123123", (UserType)2);
+            _userServiceMock
+                .Setup(service => service.AddUser(user))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent("Type can only be 0 AS Buyer and 1 AS Seller.")
+                });
+            // Act
+            var result = await _userController.AddUser(user);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Type can only be 0 AS Buyer and 1 AS Seller.", badRequestObjectResult.Value);
+        }
     }
 }

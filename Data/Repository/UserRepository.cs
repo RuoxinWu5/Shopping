@@ -19,10 +19,6 @@ namespace Data.Repository
             {
                 user.Type = UserType.BUYER;
             }
-            if (user.Type != UserType.BUYER && user.Type != UserType.SELLER)
-            {
-                user.Type = UserType.BUYER;
-            }
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
             if (existingUser != null)
             {
