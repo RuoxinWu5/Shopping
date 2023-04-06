@@ -9,9 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
-string connectionString = builder.Configuration.GetConnectionString("MyDb");
+string connectionString = builder.Configuration.GetConnectionString("MyDb") ?? throw new ArgumentNullException(nameof(connectionString));
 var serverVersion = ServerVersion.AutoDetect(connectionString);
-builder.Services.AddDbContext<MyDbContext>(options => options.UseMySql(connectionString,serverVersion));
+builder.Services.AddDbContext<MyDbContext>(options => options.UseMySql(connectionString, serverVersion));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();

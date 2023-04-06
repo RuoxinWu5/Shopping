@@ -5,7 +5,6 @@ namespace Data.Repository
 {
     public class BuyerRepository : IBuyerRepository
     {
-        private readonly BuyerProductContext _buyerProductContext;
         private readonly MyDbContext _context;
 
         public BuyerRepository(MyDbContext context)
@@ -41,7 +40,7 @@ namespace Data.Repository
             result.id = productResult.Id;
             result.name = productResult.Name;
             result.quantity = productResult.Quantity;
-            result.sellerName = seller.Name;
+            result.sellerName = seller?.Name;
             return result;
         }
     }

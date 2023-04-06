@@ -26,6 +26,5 @@
     <ProjectReference Include="..\Data\Data.csproj"/>
     <ProjectReference Include="..\Service\Service.csproj"/>
     <ProjectReference Include="..\Shopping\Shopping.csproj"/>
-    <ProjectReference Include="..\Controller\Controller.csproj"/>
   </ItemGroup>
 </Project>
