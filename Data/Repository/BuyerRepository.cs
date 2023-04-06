@@ -22,6 +22,9 @@ namespace Data.Repository
             List<string> result = new List<string>();
             for (int i = 0; i < productResult.Count; i++)
             {
+                if(productResult[i].quantity==0){
+                    continue;
+                }
                 var product = productResult[i].name;
                 result.Add(product);
             }
@@ -33,7 +36,7 @@ namespace Data.Repository
             var productResult = await _productContext.Products.FindAsync(productId);
             if (productResult == null)
             {
-                throw new KeyNotFoundException($"User name '{productId}' already exists.");
+                throw new KeyNotFoundException($"Product id '{productId}' doesn't exist.");
             }
             var seller = await _userContext.Users.FindAsync(productResult.sellerId);
             BuyerProduct result = new BuyerProduct();

@@ -37,8 +37,7 @@ namespace UnitTest.RepositoryTest
         {
             var buyerProducts = new List<BuyerProduct>
         {
-            new BuyerProduct() {name = "Apple",quantity=100, sellerName = "Lisa" },
-            new BuyerProduct() {name = "Banana",quantity=50, sellerName = "Lisa" }
+            new BuyerProduct() {name = "Apple",quantity=100, sellerName = "Lisa" }
         };
             await _context.AddRangeAsync(buyerProducts);
             await _context.SaveChangesAsync();
@@ -50,7 +49,7 @@ namespace UnitTest.RepositoryTest
             var products = new List<Product>
         {
             new Product { name = "Apple", quantity = 100, sellerId = 1 },
-            new Product { name = "Banana", quantity = 50, sellerId = 1 }
+            new Product { name = "Banana", quantity = 0, sellerId = 1 }
         };
             await productContext.AddRangeAsync(products);
             await productContext.SaveChangesAsync();

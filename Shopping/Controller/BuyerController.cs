@@ -20,7 +20,7 @@ namespace Shopping.Controller
             return Ok(result);
         }
         
-        [HttpGet("{sellerId}")]
+        [HttpGet("{productId}")]
         public async Task<ActionResult> GetProductByProductId(int productId)
         {
             try
@@ -28,9 +28,9 @@ namespace Shopping.Controller
                 var result = await _buyerService.GetProductByProductId(productId);
                 return Ok(result);
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
         }
     }

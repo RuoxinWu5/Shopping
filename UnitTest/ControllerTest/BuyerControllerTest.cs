@@ -48,7 +48,7 @@ namespace UnitTest.ControllerTest
             // Act
             var result = await _buyerController.GetProductByProductId(1);
             // Assert
-            Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<NotFoundObjectResult>(result);
         }
     }
 }
