@@ -23,9 +23,9 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var resultItem = new List<Product>{
-                new Product() { id = 1, name = "Apple",quantity=100, sellerId = 1 },
-                new Product() { id = 2, name = "Banana",quantity=50, sellerId = 1 }
-            };
+                new Product("Apple", 100, 1),
+                new Product("Banana", 50, 1)
+                };
             _productServiceMock.Setup(x => x.GetProductListBySellerId(It.IsAny<int>())).ReturnsAsync(resultItem);
             // Act
             var result = await _productController.GetProductListBySellerId(1);
@@ -38,7 +38,7 @@ namespace UnitTest.ControllerTest
         public async Task AddProduct_ShouldReturnOk_WhenProductIsValid()
         {
             // Arrange
-            var product = new Product { name = "Apple", quantity = 100, sellerId = 1 };
+            var product = new Product("Apple", 100, 1);
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
@@ -54,13 +54,13 @@ namespace UnitTest.ControllerTest
         public async Task AddProduct_ShouldReturnBadRequest_WhenProductNameExists()
         {
             // Arrange
-            var product = new Product { name = "Apple", quantity = 100, sellerId = 1 };
+            var product = new Product("Apple", 100, 1);
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict)
                 {
-                    Content = new StringContent($"Product name '{product.name}' already exists.")
+                    Content = new StringContent($"Product name '{product.Name}' already exists.")
                 });
             // Act
             var result = await _productController.AddProduct(product);
@@ -73,7 +73,7 @@ namespace UnitTest.ControllerTest
         public async Task AddProduct_ShouldReturnBadRequest_WhenProductNameIsEmpty()
         {
             // Arrange
-            var product = new Product { name = "", quantity = 100, sellerId = 1 };
+            var product = new Product("", 100, 1);
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
@@ -92,7 +92,7 @@ namespace UnitTest.ControllerTest
         public async Task AddProduct_ShouldReturnBadRequest_WhenQuantityLessThanZero()
         {
             // Arrange
-            var product = new Product { name = "Apple", quantity = -1, sellerId = 1 };
+            var product = new Product("Apple", -1, 1);
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
@@ -111,7 +111,7 @@ namespace UnitTest.ControllerTest
         public async Task AddProduct_ShouldReturnNotFound_WhenSellerIdNotExists()
         {
             // Arrange
-            var product = new Product { name = "Apple", quantity = 100, sellerId = 1 };
+            var product = new Product("Apple", 100, 1);
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))

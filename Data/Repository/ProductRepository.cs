@@ -6,30 +6,28 @@ namespace Data.Repository
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly ProductContext _context;
-        private readonly UserContext _userContext;
+        private readonly MyDbContext _context;
 
-        public ProductRepository(ProductContext context, UserContext userContext)
+        public ProductRepository(MyDbContext context)
         {
             _context = context;
-            _userContext = userContext;
         }
 
         public async Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId)
         {
-            var result = await _context.Products.Where(product => product.sellerId == sellerId).ToListAsync();
+            var result = await _context.Products.Where(product => product.SellerId == sellerId).ToListAsync();
             return result;
         }
 
         public async Task AddProduct(Product product)
         {
-            var existingProduct = await _context.Products.FirstOrDefaultAsync(u => u.name == product.name);
+            var existingProduct = await _context.Products.FirstOrDefaultAsync(u => u.Name == product.Name);
             if (existingProduct != null)
             {
-                throw new DuplicateUserNameException($"User name '{product.name}' already exists.");
+                throw new DuplicateUserNameException($"User name '{product.Name}' already exists.");
             }
-            var existingSeller = await _userContext.Users.FirstOrDefaultAsync(u => u.id == product.sellerId);
-            if (existingSeller == null || existingSeller.type == UserType.BUYER)
+            var existingSeller = await _context.Users.FirstOrDefaultAsync(u => u.Id == product.SellerId);
+            if (existingSeller == null || existingSeller.Type == UserType.BUYER)
             {
                 throw new DllNotFoundException("The seller doesn't exist.");
             }

@@ -7,26 +7,26 @@ namespace UnitTest.RepositoryTest;
 
 public class UserRepositoryTest
 {
-    private readonly UserContext _context;
+    private readonly MyDbContext _context;
     private readonly UserRepository _repository;
 
     public UserRepositoryTest()
-    {
-        var options = new DbContextOptionsBuilder<UserContext>()
+        {
+            var options = new DbContextOptionsBuilder<MyDbContext>()
                 .UseInMemoryDatabase("UserList")
                 .Options;
-        _context = new UserContext(options);
-        _context.Database.EnsureDeleted();
-        _context.Database.EnsureCreated();
-        _repository = new UserRepository(_context);
-    }
+            _context = new MyDbContext(options);
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+            _repository = new UserRepository(_context);
+        }
 
     private async Task<List<User>> AddUsers()
     {
         var users = new List<User>
         {
-            new User { name = "Lisa", password = "lisa123", type = UserType.BUYER },
-            new User { name = "Jack", password = "Jack123", type = UserType.SELLER }
+            new User ( "Lisa", "lisa123", UserType.BUYER ),
+            new User  ( "Jack", "Jack123", UserType.SELLER )
         };
         await _context.AddRangeAsync(users);
         await _context.SaveChangesAsync();
@@ -38,14 +38,14 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "test", password = "test123123", type = UserType.SELLER };
+        var user = new User("test", "test123123", UserType.SELLER);
         // Act
         await _repository.AddUser(user);
         // Assert
-        var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.name == user.name);
+        var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
         Assert.NotNull(savedUser);
-        Assert.Equal(user.name, savedUser.name);
-        Assert.Equal(user.password, savedUser.password);
+        Assert.Equal(user.Name, savedUser.Name);
+        Assert.Equal(user.Password, savedUser.Password);
     }
 
     [Fact]
@@ -53,14 +53,14 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "noType", password = "noType123123", type = null };
+        var user = new User("noType", "noType123123");
         // Act
         await _repository.AddUser(user);
         // Assert
-        var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.name == user.name);
+        var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
         Assert.NotNull(savedUser);
-        Assert.Equal(user.password, savedUser.password);
-        Assert.Equal(UserType.BUYER, savedUser.type);
+        Assert.Equal(user.Password, savedUser.Password);
+        Assert.Equal(UserType.BUYER, savedUser.Type);
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User { name = "Lisa", password = "test123123", type = UserType.BUYER };
+        var user = new User("Lisa", "test123123", UserType.BUYER);
         // Act & Assert
         await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddUser(user));
     }

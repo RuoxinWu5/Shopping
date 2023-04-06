@@ -7,22 +7,26 @@ namespace Data.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly UserContext _context;
+        private readonly MyDbContext _context;
 
-        public UserRepository(UserContext context)
+        public UserRepository(MyDbContext context)
         {
             _context = context;
         }
         public async Task AddUser(User user)
         {
-            if (!user.type.HasValue)
+            if (!user.Type.HasValue)
             {
-                user.type = UserType.BUYER;
+                user.Type = UserType.BUYER;
             }
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.name == user.name);
+            if (user.Type != UserType.BUYER && user.Type != UserType.SELLER)
+            {
+                user.Type = UserType.BUYER;
+            }
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
             if (existingUser != null)
             {
-                throw new DuplicateUserNameException($"User name '{user.name}' already exists.");
+                throw new DuplicateUserNameException($"User name '{user.Name}' already exists.");
             }
             _context.Users.Add(user);
             await _context.SaveChangesAsync();

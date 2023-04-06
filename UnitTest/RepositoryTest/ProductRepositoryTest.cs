@@ -7,33 +7,26 @@ namespace UnitTest.RepositoryTest
 {
     public class ProductRepositoryTest
     {
-        private readonly ProductContext _context;
-        private readonly UserContext userContext;
+        private readonly MyDbContext _context;
         private readonly ProductRepository _repository;
 
         public ProductRepositoryTest()
         {
-            var options = new DbContextOptionsBuilder<ProductContext>()
-                    .UseInMemoryDatabase("ProductList")
-                    .Options;
-            var userOptions = new DbContextOptionsBuilder<UserContext>()
-                    .UseInMemoryDatabase("UserLists")
-                    .Options;
-            _context = new ProductContext(options);
+            var options = new DbContextOptionsBuilder<MyDbContext>()
+                .UseInMemoryDatabase("ProductList")
+                .Options;
+            _context = new MyDbContext(options);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            userContext = new UserContext(userOptions);
-            userContext.Database.EnsureDeleted();
-            userContext.Database.EnsureCreated();
-            _repository = new ProductRepository(_context, userContext);
+            _repository = new ProductRepository(_context);
         }
 
         private async Task<List<Product>> AddProducts()
         {
             var products = new List<Product>
         {
-            new Product { name = "Apple", quantity = 100, sellerId = 1 },
-            new Product { name = "Banana", quantity = 50, sellerId = 1 }
+            new Product ("Apple", 100, 1 ),
+            new Product ("Banana", 0, 1 )
         };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
@@ -44,14 +37,13 @@ namespace UnitTest.RepositoryTest
         {
             var users = new List<User>
         {
-            new User { name = "Lisa", password = "lisa123", type = UserType.BUYER },
-            new User { name = "Jack", password = "Jack123", type = UserType.SELLER }
+            new User ( "Lisa", "lisa123", UserType.BUYER ),
+            new User  ( "Jack", "Jack123", UserType.SELLER )
         };
-            await userContext.AddRangeAsync(users);
-            await userContext.SaveChangesAsync();
+            await _context.AddRangeAsync(users);
+            await _context.SaveChangesAsync();
             return users;
         }
-
         [Fact]
         public async Task GetProductListBySellerId_ShouldReturnProductList_WhenProductsIsfound()
         {
@@ -70,16 +62,16 @@ namespace UnitTest.RepositoryTest
             // Arrange
             var products = await AddProducts();
             var users = await AddUsers();
-            var product = new Product { name = "melon", quantity = 90, sellerId = 2 };
+            var product = new Product("melon", 90, 2);
             // Act
             await _repository.AddProduct(product);
             // Assert
             Assert.NotNull(_context.Products);
-            var savedProduct = await _context.Products.FirstOrDefaultAsync(u => u.name == product.name);
+            var savedProduct = await _context.Products.FirstOrDefaultAsync(u => u.Name == product.Name);
             Assert.NotNull(savedProduct);
-            Assert.Equal(product.name, savedProduct.name);
-            Assert.Equal(product.quantity, savedProduct.quantity);
-            Assert.Equal(product.sellerId, savedProduct.sellerId);
+            Assert.Equal(product.Name, savedProduct.Name);
+            Assert.Equal(product.Quantity, savedProduct.Quantity);
+            Assert.Equal(product.SellerId, savedProduct.SellerId);
         }
 
         [Fact]
@@ -87,7 +79,7 @@ namespace UnitTest.RepositoryTest
         {
             // Arrange
             var products = await AddProducts();
-            var product = new Product { name = "Banana", quantity = 50, sellerId = 1 };
+            var product = new Product("Banana", 50, 2);
             // Act & Assert
             await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddProduct(product));
         }
@@ -97,7 +89,7 @@ namespace UnitTest.RepositoryTest
         {
             // Arrange
             var products = await AddProducts();
-            var product = new Product { name = "Watermelon", quantity = 70, sellerId = 2 };
+            var product = new Product("Watermelon", 70, 2);
             // Act & Assert
             await Assert.ThrowsAsync<DllNotFoundException>(async () => await _repository.AddProduct(product));
         }

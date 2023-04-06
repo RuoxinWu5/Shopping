@@ -9,11 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string connectionString = builder.Configuration.GetConnectionString("MyDb");
 var serverVersion = ServerVersion.AutoDetect(connectionString);
-builder.Services.AddDbContext<UserContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
-builder.Services.AddDbContext<ProductContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
-builder.Services.AddDbContext<BuyerProductContext>(opt => { opt.UseMySql(connectionString, serverVersion); });
+builder.Services.AddDbContext<MyDbContext>(options => options.UseMySql(connectionString,serverVersion));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();

@@ -22,7 +22,7 @@ namespace UnitTest.ControllerTest
         public async Task CreateUser_ShouldReturnOk_WhenUserIsValid()
         {
             // Arrange
-            var user = new User { name = "test", password = "test123123", type = UserType.BUYER };
+            var user = new User("test", "test123123", UserType.BUYER);
             Assert.NotNull(user);
             _userServiceMock
                 .Setup(service => service.AddUser(user))
@@ -38,12 +38,12 @@ namespace UnitTest.ControllerTest
         public async Task CreateUser_ShouldReturnBadRequest_WhenUserNameExists()
         {
             // Arrange
-            var user = new User { name = "test", password = "test123123", type = UserType.BUYER };
+            var user = new User("test", "test123123", UserType.BUYER);
             _userServiceMock
                 .Setup(service => service.AddUser(user))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict)
                 {
-                    Content = new StringContent($"User name '{user.name}' already exists.")
+                    Content = new StringContent($"User name '{user.Name}' already exists.")
                 });
             // Act
             var result = await _userController.AddUser(user);
@@ -56,7 +56,7 @@ namespace UnitTest.ControllerTest
         public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
         {
             // Arrange
-            var user = new User { name = "test", password = "", type = UserType.BUYER };
+            var user = new User("test", "", UserType.BUYER);
             _userServiceMock
                 .Setup(service => service.AddUser(user))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
@@ -74,7 +74,7 @@ namespace UnitTest.ControllerTest
         public async Task CreateUser_ShouldReturnBadRequest_WhenUserNameIsEmpty()
         {
             // Arrange
-            var user = new User { name = "", password = "test123123", type = UserType.BUYER };
+            var user = new User("", "test123123", UserType.BUYER);
             _userServiceMock
                 .Setup(service => service.AddUser(user))
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)

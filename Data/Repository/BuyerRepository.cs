@@ -5,27 +5,25 @@ namespace Data.Repository
 {
     public class BuyerRepository : IBuyerRepository
     {
-        private readonly BuyerProductContext _context;
-        private readonly ProductContext _productContext;
-        private readonly UserContext _userContext;
+        private readonly BuyerProductContext _buyerProductContext;
+        private readonly MyDbContext _context;
 
-        public BuyerRepository(BuyerProductContext context, ProductContext productContext, UserContext userContext)
+        public BuyerRepository(MyDbContext context)
         {
             _context = context;
-            _productContext = productContext;
-            _userContext = userContext;
         }
 
         public async Task<IEnumerable<string>> AllProduct()
         {
-            var productResult = await _productContext.Products.ToListAsync();
+            var productResult = await _context.Products.ToListAsync();
             List<string> result = new List<string>();
-            for (int i = 0; i < productResult.Count; i++)
+            for (int i = 0; i < _context.Products.Count(); i++)
             {
-                if(productResult[i].quantity==0){
+                if (productResult[i].Quantity == 0)
+                {
                     continue;
                 }
-                var product = productResult[i].name;
+                var product = productResult[i].Name;
                 result.Add(product);
             }
             return result;
@@ -33,17 +31,17 @@ namespace Data.Repository
 
         public async Task<BuyerProduct> GetProductByProductId(int productId)
         {
-            var productResult = await _productContext.Products.FindAsync(productId);
+            var productResult = await _context.Products.FindAsync(productId);
             if (productResult == null)
             {
                 throw new KeyNotFoundException($"Product id '{productId}' doesn't exist.");
             }
-            var seller = await _userContext.Users.FindAsync(productResult.sellerId);
+            var seller = await _context.Users.FindAsync(productResult.SellerId);
             BuyerProduct result = new BuyerProduct();
-            result.id = productResult.id;
-            result.name = productResult.name;
-            result.quantity = productResult.quantity;
-            result.sellerName = seller.name;
+            result.id = productResult.Id;
+            result.name = productResult.Name;
+            result.quantity = productResult.Quantity;
+            result.sellerName = seller.Name;
             return result;
         }
     }

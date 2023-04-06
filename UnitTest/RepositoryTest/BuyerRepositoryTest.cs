@@ -6,31 +6,24 @@ namespace UnitTest.RepositoryTest
 {
     public class BuyerRepositoryTest
     {
-        private readonly BuyerProductContext _context;
-        private readonly ProductContext productContext;
-        private readonly UserContext userContext;
+        private readonly BuyerProductContext _buyerProductContext;
+        private readonly MyDbContext _context;
         private readonly BuyerRepository _repository;
         public BuyerRepositoryTest()
         {
-            var productOptions = new DbContextOptionsBuilder<ProductContext>()
+            var productOptions = new DbContextOptionsBuilder<MyDbContext>()
                     .UseInMemoryDatabase("ProductList1")
-                    .Options;
-            var userOptions = new DbContextOptionsBuilder<UserContext>()
-                    .UseInMemoryDatabase("UserList1")
                     .Options;
             var options = new DbContextOptionsBuilder<BuyerProductContext>()
                     .UseInMemoryDatabase("BuyerProductList1")
                     .Options;
-            _context = new BuyerProductContext(options);
+            _buyerProductContext = new BuyerProductContext(options);
+            _buyerProductContext.Database.EnsureDeleted();
+            _buyerProductContext.Database.EnsureCreated();
+            _context = new MyDbContext(productOptions);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            productContext = new ProductContext(productOptions);
-            productContext.Database.EnsureDeleted();
-            productContext.Database.EnsureCreated();
-            userContext = new UserContext(userOptions);
-            userContext.Database.EnsureDeleted();
-            userContext.Database.EnsureCreated();
-            _repository = new BuyerRepository(_context, productContext, userContext);
+            _repository = new BuyerRepository(_context);
         }
 
         private async Task<List<BuyerProduct>> AddBuyerProducts()
@@ -39,8 +32,8 @@ namespace UnitTest.RepositoryTest
         {
             new BuyerProduct() {name = "Apple",quantity=100, sellerName = "Lisa" }
         };
-            await _context.AddRangeAsync(buyerProducts);
-            await _context.SaveChangesAsync();
+            await _buyerProductContext.AddRangeAsync(buyerProducts);
+            await _buyerProductContext.SaveChangesAsync();
             return buyerProducts;
         }
 
@@ -48,11 +41,11 @@ namespace UnitTest.RepositoryTest
         {
             var products = new List<Product>
         {
-            new Product { name = "Apple", quantity = 100, sellerId = 1 },
-            new Product { name = "Banana", quantity = 0, sellerId = 1 }
+            new Product ("Apple", 100, 1 ),
+            new Product ("Banana", 0, 1 )
         };
-            await productContext.AddRangeAsync(products);
-            await productContext.SaveChangesAsync();
+            await _context.AddRangeAsync(products);
+            await _context.SaveChangesAsync();
             return products;
         }
 
@@ -60,11 +53,11 @@ namespace UnitTest.RepositoryTest
         {
             var users = new List<User>
         {
-            new User { name = "Lisa", password = "lisa123", type = UserType.BUYER },
-            new User { name = "Jack", password = "Jack123", type = UserType.SELLER }
+            new User ( "Lisa", "lisa123", UserType.BUYER ),
+            new User  ( "Jack", "Jack123", UserType.SELLER )
         };
-            await userContext.AddRangeAsync(users);
-            await userContext.SaveChangesAsync();
+            await _context.AddRangeAsync(users);
+            await _context.SaveChangesAsync();
             return users;
         }
 
@@ -76,7 +69,7 @@ namespace UnitTest.RepositoryTest
             List<string> buyerProducts = new List<string>();
             foreach (Product product in products)
             {
-                buyerProducts.Add(product.name);
+                buyerProducts.Add(product.Name);
             }
             // Act
             var result = await _repository.AllProduct();

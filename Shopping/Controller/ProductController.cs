@@ -26,18 +26,18 @@ namespace Shopping.Controller
         [HttpPost]
         public async Task<ActionResult> AddProduct(Product product)
         {
-            if (string.IsNullOrWhiteSpace(product.name))
+            if (string.IsNullOrWhiteSpace(product.Name))
             {
                 return BadRequest("Product name cannot be empty.");
             }
-            if (product.quantity < 0)
+            if (product.Quantity < 0)
             {
                 return BadRequest("Quantity cannot be less than zero.");
             }
             var result = await _productService.AddProduct(product);
             if (result.StatusCode == HttpStatusCode.Created)
             {
-                return CreatedAtAction(nameof(AddProduct), new { id = product.id }, "Create product successfully.");
+                return CreatedAtAction(nameof(AddProduct), new { id = product.Id }, "Create product successfully.");
             }
             else if (result.StatusCode == HttpStatusCode.Conflict)
             {
