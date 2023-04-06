@@ -1,15 +1,22 @@
 namespace Data.Model
 {
-    public enum UserType : ushort
+    public enum UserType
     {
         BUYER = 0,
         SELLER = 1
     }
     public class User
     {
-        public int id { get; set; }
-        public string? name { get; set; }
-        public string? password { get; set; }
-        public UserType? type { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Password { get; set; }
+        public UserType Type { get; set; }
+        public User(int id, string name, string password, UserType type)
+        {
+            Id = id;
+            Name = name;
+            Password = password;
+            Type = type;
+        }
     }
 }
