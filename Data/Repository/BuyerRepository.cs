@@ -37,10 +37,10 @@ namespace Data.Repository
             }
             var seller = await _context.Users.FindAsync(productResult.SellerId);
             BuyerProduct result = new BuyerProduct();
-            result.id = productResult.Id;
-            result.name = productResult.Name;
-            result.quantity = productResult.Quantity;
-            result.sellerName = seller?.Name;
+            result.Id = productResult.Id;
+            result.Name = productResult.Name;
+            result.Quantity = productResult.Quantity;
+            result.SellerName = seller?.Name;
             return result;
         }
     }

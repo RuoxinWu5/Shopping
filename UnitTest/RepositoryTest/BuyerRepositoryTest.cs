@@ -6,7 +6,6 @@ namespace UnitTest.RepositoryTest
 {
     public class BuyerRepositoryTest
     {
-        private readonly BuyerProductContext _buyerProductContext;
         private readonly MyDbContext _context;
         private readonly BuyerRepository _repository;
         public BuyerRepositoryTest()
@@ -14,36 +13,19 @@ namespace UnitTest.RepositoryTest
             var productOptions = new DbContextOptionsBuilder<MyDbContext>()
                     .UseInMemoryDatabase("ProductList1")
                     .Options;
-            var options = new DbContextOptionsBuilder<BuyerProductContext>()
-                    .UseInMemoryDatabase("BuyerProductList1")
-                    .Options;
-            _buyerProductContext = new BuyerProductContext(options);
-            _buyerProductContext.Database.EnsureDeleted();
-            _buyerProductContext.Database.EnsureCreated();
             _context = new MyDbContext(productOptions);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
             _repository = new BuyerRepository(_context);
         }
 
-        private async Task<List<BuyerProduct>> AddBuyerProducts()
-        {
-            var buyerProducts = new List<BuyerProduct>
-        {
-            new BuyerProduct() {name = "Apple",quantity=100, sellerName = "Lisa" }
-        };
-            await _buyerProductContext.AddRangeAsync(buyerProducts);
-            await _buyerProductContext.SaveChangesAsync();
-            return buyerProducts;
-        }
-
         private async Task<List<Product>> AddProducts()
         {
             var products = new List<Product>
-        {
-            new Product ("Apple", 100, 1 ),
-            new Product ("Banana", 0, 1 )
-        };
+            {
+                new Product { Name = "Apple", Quantity = 100, SellerId = 1 },
+                new Product { Name = "Apple", Quantity = 0, SellerId = 1 }
+            };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
             return products;
@@ -53,12 +35,25 @@ namespace UnitTest.RepositoryTest
         {
             var users = new List<User>
         {
-            new User ( "Lisa", "lisa123", UserType.BUYER ),
-            new User  ( "Jack", "Jack123", UserType.SELLER )
+            new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
+            new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
         };
             await _context.AddRangeAsync(users);
             await _context.SaveChangesAsync();
             return users;
+        }
+
+        private async Task<List<BuyerProduct>> AddBuyerProducts()
+        {
+            var products = await AddProducts();
+            var users = await AddUsers();
+            var buyerProducts = new List<BuyerProduct>
+            {
+                new BuyerProduct() {Name = "Apple",Quantity=100, SellerName = users[0].Name, Id = products[0].Id }
+            };
+            await _context.AddRangeAsync(buyerProducts);
+            await _context.SaveChangesAsync();
+            return buyerProducts;
         }
 
         [Fact]
@@ -81,24 +76,35 @@ namespace UnitTest.RepositoryTest
         public async Task GetProductByProductId_ShouldReturnProduct_WhenProductsIsfound()
         {
             // Arrange
-            var buyerProducts = await AddBuyerProducts();
-            await AddProducts();
-            await AddUsers();
-            var detail = buyerProducts.First();
+            var products = await AddProducts();
+            var users = await AddUsers();
+            var expectedProduct = new BuyerProduct
+            {
+                Id = products[0].Id,
+                Name = products[0].Name,
+                Quantity = products[0].Quantity,
+                SellerName = users[1].Name
+            };
             // Act
-            var result = await _repository.GetProductByProductId(1);
+            var result = await _repository.GetProductByProductId(products[0].Id);
             // Assert
-            Assert.Equal(detail.ToString(), result.ToString());
+            Assert.Equal(expectedProduct.ToString(), result.ToString());
         }
 
         [Fact]
-        public async Task GetProductByProductId_ShouldReturnNotFoundException_WhenProductsIsfound()
+        public async Task GetProductByProductId_ShouldReturnNotFoundException_WhenProductsIsNotfound()
         {
             // Arrange
-            var buyerProducts = await AddBuyerProducts();
-            await AddProducts();
-            await AddUsers();
-            // Act $ Assert
+            var products = await AddProducts();
+            var users = await AddUsers();
+            var expectedProduct = new BuyerProduct
+            {
+                Id = products[0].Id,
+                Name = products[0].Name,
+                Quantity = products[0].Quantity,
+                SellerName = users[1].Name
+            };
+            // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductByProductId(3));
         }
     }

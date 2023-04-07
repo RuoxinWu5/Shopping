@@ -5,7 +5,7 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace Shopping.Controller
             _productService = productService;
         }
 
-        [HttpGet("{sellerId}")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProductListBySellerId(int sellerId)
         {
             var result = await _productService.GetProductListBySellerId(sellerId);

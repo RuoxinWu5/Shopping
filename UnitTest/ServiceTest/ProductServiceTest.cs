@@ -24,8 +24,8 @@ namespace UnitTest.ServiceTest
             // Arrange
             var SellerId = 1;
             var resultItem = new List<Product>{
-                new Product ("Apple", 100, 1 ),
-            new Product ("Banana", 0, 1 )
+                new Product { Name = "Apple", Quantity = 100, SellerId = 1 },
+                new Product { Name = "Apple", Quantity = 0, SellerId = 1 }
             };
             _productRepositoryMock.Setup(repository => repository.GetProductListBySellerId(1)).ReturnsAsync(resultItem);
             // Act
@@ -38,7 +38,7 @@ namespace UnitTest.ServiceTest
         public async Task AddProduct_ShouldReturnSuccessMessage_WhenProductIsValId()
         {
             // Arrange
-            var product = new Product ("Apple", 100, 1 );
+            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
             _productRepositoryMock
                 .Setup(repository => repository.AddProduct(product))
                 .Returns(Task.CompletedTask);
@@ -52,7 +52,7 @@ namespace UnitTest.ServiceTest
         public async Task AddProduct_ShouldReturnDuplicateUserNameExceptionMessage_WhenProductNameExists()
         {
             // Arrange
-            var product = new Product ("Apple", 100, 1 );
+            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
             _productRepositoryMock
                 .Setup(repository => repository.AddProduct(product))
                 .Throws(new DuplicateUserNameException("Product Name 'Apple' already exists."));
@@ -66,7 +66,7 @@ namespace UnitTest.ServiceTest
         public async Task AddProduct_ShouldReturnNotFoundExceptionMessage_WhenSellerIdNotExists()
         {
             // Arrange
-            var product = new Product ("Apple", 100, 1 );
+            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
             _productRepositoryMock
                 .Setup(repository => repository.AddProduct(product))
                 .Throws(new DllNotFoundException("The seller doesn't exist."));

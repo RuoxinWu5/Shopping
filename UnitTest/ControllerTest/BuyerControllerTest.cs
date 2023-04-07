@@ -32,7 +32,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task GetProductByProductId_ShouldReturnOk_WhenProductsIsfound()
         {
-            var resultItem = new BuyerProduct() { id = 1, name = "Apple", quantity = 100, sellerName = "Lisa" };
+            var resultItem = new BuyerProduct() { Id = 1, Name = "Apple", Quantity = 100, SellerName = "Lisa" };
             _buyerServiceMock.Setup(x => x.GetProductByProductId(It.IsAny<int>())).ReturnsAsync(resultItem);
             // Act
             var result = await _buyerController.GetProductByProductId(1);

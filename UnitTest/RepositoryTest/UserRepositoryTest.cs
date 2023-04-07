@@ -11,22 +11,22 @@ public class UserRepositoryTest
     private readonly UserRepository _repository;
 
     public UserRepositoryTest()
-        {
-            var options = new DbContextOptionsBuilder<MyDbContext>()
-                .UseInMemoryDatabase("UserList")
-                .Options;
-            _context = new MyDbContext(options);
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
-            _repository = new UserRepository(_context);
-        }
+    {
+        var options = new DbContextOptionsBuilder<MyDbContext>()
+            .UseInMemoryDatabase("UserList")
+            .Options;
+        _context = new MyDbContext(options);
+        _context.Database.EnsureDeleted();
+        _context.Database.EnsureCreated();
+        _repository = new UserRepository(_context);
+    }
 
     private async Task<List<User>> AddUsers()
     {
         var users = new List<User>
         {
-            new User ( "Lisa", "lisa123", UserType.BUYER ),
-            new User  ( "Jack", "Jack123", UserType.SELLER )
+            new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
+            new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
         };
         await _context.AddRangeAsync(users);
         await _context.SaveChangesAsync();
@@ -38,7 +38,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User("test", "test123123", UserType.SELLER);
+        var user = new User { Name = "test", Password = "test123123", Type = UserType.SELLER };
         // Act
         await _repository.AddUser(user);
         // Assert
@@ -53,7 +53,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User("noType", "noType123123");
+        var user = new User { Name = "noType", Password = "noType123123" };
         // Act
         await _repository.AddUser(user);
         // Assert
@@ -68,7 +68,7 @@ public class UserRepositoryTest
     {
         // Arrange
         var users = AddUsers();
-        var user = new User("Lisa", "test123123", UserType.BUYER);
+        var user = new User { Name = "Lisa", Password = "test123123", Type = UserType.SELLER };
         // Act & Assert
         await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddUser(user));
     }

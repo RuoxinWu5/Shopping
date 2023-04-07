@@ -22,7 +22,7 @@ namespace UnitTest.ServiceTest
         public async Task CreateUser_ShouldReturnSuccessMessage_WhenUserIsValid()
         {
             // Arrange
-            var user = new User("test", "test123123", UserType.BUYER);
+            var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
             _userRepositoryMock
                 .Setup(repository => repository.AddUser(user))
                 .Returns(Task.CompletedTask);
@@ -36,7 +36,7 @@ namespace UnitTest.ServiceTest
         public async Task CreateUser_ShouldReturnDuplicateUserNameExceptionMessage_WhenUserNameExists()
         {
             // Arrange
-            var user = new User("test", "test123123", UserType.BUYER);
+            var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
             _userRepositoryMock
                 .Setup(repository => repository.AddUser(user))
                 .Throws(new DuplicateUserNameException("User Name 'test' already exists."));

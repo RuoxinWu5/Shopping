@@ -3,7 +3,7 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api/[controller]/product")]
+    [Route("api/products")]
     [ApiController]
     public class BuyerController : ControllerBase
     {

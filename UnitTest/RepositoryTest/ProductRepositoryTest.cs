@@ -25,8 +25,8 @@ namespace UnitTest.RepositoryTest
         {
             var products = new List<Product>
         {
-            new Product ("Apple", 100, 1 ),
-            new Product ("Banana", 0, 1 )
+            new Product { Name = "Apple", Quantity = 100, SellerId = 1 },
+            new Product { Name = "Banana", Quantity = 10, SellerId = 1 }
         };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
@@ -37,8 +37,8 @@ namespace UnitTest.RepositoryTest
         {
             var users = new List<User>
         {
-            new User ( "Lisa", "lisa123", UserType.BUYER ),
-            new User  ( "Jack", "Jack123", UserType.SELLER )
+            new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
+            new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
         };
             await _context.AddRangeAsync(users);
             await _context.SaveChangesAsync();
@@ -62,7 +62,7 @@ namespace UnitTest.RepositoryTest
             // Arrange
             var products = await AddProducts();
             var users = await AddUsers();
-            var product = new Product("melon", 90, 2);
+            var product = new Product { Name = "melon", Quantity = 90, SellerId = 2 };
             // Act
             await _repository.AddProduct(product);
             // Assert
@@ -79,7 +79,7 @@ namespace UnitTest.RepositoryTest
         {
             // Arrange
             var products = await AddProducts();
-            var product = new Product("Banana", 50, 2);
+            var product = new Product { Name = "Banana", Quantity = 90, SellerId = 2 };
             // Act & Assert
             await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddProduct(product));
         }
@@ -89,7 +89,7 @@ namespace UnitTest.RepositoryTest
         {
             // Arrange
             var products = await AddProducts();
-            var product = new Product("Watermelon", 70, 2);
+            var product = new Product { Name = "melon", Quantity = 90, SellerId = 1 };
             // Act & Assert
             await Assert.ThrowsAsync<DllNotFoundException>(async () => await _repository.AddProduct(product));
         }

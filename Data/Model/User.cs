@@ -1,3 +1,7 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
 namespace Data.Model
 {
     public enum UserType
@@ -5,23 +9,18 @@ namespace Data.Model
         BUYER = 0,
         SELLER = 1
     }
+
+    [Index(nameof(User.Name), IsUnique = true)]
     public class User
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Password { get; set; }
+        [Required]
+        public string Name { get; set; } = null!;
+        [Required]
+        public string Password { get; set; } = null!;
         public UserType? Type { get; set; }
-        public User(string name, string password, UserType type)
-        {
-            Name = name;
-            Password = password;
-            Type = type;
-        }
-
-        public User(string name, string password)
-        {
-            Name = name;
-            Password = password;
-        }
+        public List<Product>? Products { get; set; }
     }
 }

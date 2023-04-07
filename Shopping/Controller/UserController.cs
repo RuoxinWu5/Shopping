@@ -5,7 +5,7 @@ using System.Net;
 
 namespace Shopping.Controller
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace Shopping.Controller
             _userService = userService;
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<ActionResult> AddUser(User user)
         {
             //ASP.net core validation优化
