@@ -32,8 +32,6 @@ namespace Data.Model
             modelBuilder.Entity<BuyerProduct>().Property(bp => bp.Quantity).HasColumnName("Quantity");
             modelBuilder.Entity<BuyerProduct>().Property(bp => bp.SellerName).HasColumnName("SellerName");
             modelBuilder.Entity<BuyerProduct>().HasQueryFilter(bp => bp.Quantity > 0);
-            modelBuilder.Entity<BuyerProduct>()
-                .HasQueryFilter(bp => bp.Quantity > 0);
         }
     }
 }

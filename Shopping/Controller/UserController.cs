@@ -20,7 +20,6 @@ namespace Shopping.Controller
         [HttpPost("register")]
         public async Task<ActionResult> AddUser(User user)
         {
-            //ASP.net core validation优化
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
