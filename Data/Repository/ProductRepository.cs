@@ -6,9 +6,9 @@ namespace Data.Repository
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly MyDbContext _context;
+        private readonly ShoppingDbContext _context;
 
-        public ProductRepository(MyDbContext context)
+        public ProductRepository(ShoppingDbContext context)
         {
             _context = context;
         }

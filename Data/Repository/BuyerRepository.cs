@@ -5,9 +5,9 @@ namespace Data.Repository
 {
     public class BuyerRepository : IBuyerRepository
     {
-        private readonly MyDbContext _context;
+        private readonly ShoppingDbContext _context;
 
-        public BuyerRepository(MyDbContext context)
+        public BuyerRepository(ShoppingDbContext context)
         {
             _context = context;
         }

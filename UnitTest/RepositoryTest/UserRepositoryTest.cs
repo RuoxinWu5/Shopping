@@ -7,15 +7,15 @@ namespace UnitTest.RepositoryTest;
 
 public class UserRepositoryTest
 {
-    private readonly MyDbContext _context;
+    private readonly ShoppingDbContext _context;
     private readonly UserRepository _repository;
 
     public UserRepositoryTest()
     {
-        var options = new DbContextOptionsBuilder<MyDbContext>()
+        var options = new DbContextOptionsBuilder<ShoppingDbContext>()
             .UseInMemoryDatabase("UserList")
             .Options;
-        _context = new MyDbContext(options);
+        _context = new ShoppingDbContext(options);
         _context.Database.EnsureDeleted();
         _context.Database.EnsureCreated();
         _repository = new UserRepository(_context);

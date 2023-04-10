@@ -6,14 +6,14 @@ namespace UnitTest.RepositoryTest
 {
     public class BuyerRepositoryTest
     {
-        private readonly MyDbContext _context;
+        private readonly ShoppingDbContext _context;
         private readonly BuyerRepository _repository;
         public BuyerRepositoryTest()
         {
-            var productOptions = new DbContextOptionsBuilder<MyDbContext>()
+            var productOptions = new DbContextOptionsBuilder<ShoppingDbContext>()
                     .UseInMemoryDatabase("ProductList1")
                     .Options;
-            _context = new MyDbContext(productOptions);
+            _context = new ShoppingDbContext(productOptions);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
             _repository = new BuyerRepository(_context);

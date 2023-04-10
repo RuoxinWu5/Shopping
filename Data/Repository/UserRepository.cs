@@ -7,9 +7,9 @@ namespace Data.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly MyDbContext _context;
+        private readonly ShoppingDbContext _context;
 
-        public UserRepository(MyDbContext context)
+        public UserRepository(ShoppingDbContext context)
         {
             _context = context;
         }

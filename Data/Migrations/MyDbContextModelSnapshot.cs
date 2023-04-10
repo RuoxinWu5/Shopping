@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
-    [DbContext(typeof(MyDbContext))]
+    [DbContext(typeof(ShoppingDbContext))]
     partial class MyDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

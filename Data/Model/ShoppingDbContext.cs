@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Model
 {
-    public class MyDbContext : DbContext
+    public class ShoppingDbContext : DbContext
     {
-        public MyDbContext(DbContextOptions<MyDbContext> options)
+        public ShoppingDbContext(DbContextOptions<ShoppingDbContext> options)
             : base(options)
         {
         }
