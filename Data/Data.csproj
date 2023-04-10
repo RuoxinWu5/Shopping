@@ -8,5 +8,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.4"/>
     <PackageReference Include="AltairCA.EntityFrameworkCore.PomeloMysql.Extensions" Version="6.0.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4"/>
   </ItemGroup>
 </Project>
