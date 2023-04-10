@@ -19,7 +19,7 @@ namespace Shopping.Controller
             var result = await _buyerService.AllProduct();
             return Ok(result);
         }
-        
+
         [HttpGet("{productId}")]
         public async Task<ActionResult> GetProductByProductId(int productId)
         {

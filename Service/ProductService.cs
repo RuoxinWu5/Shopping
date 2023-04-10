@@ -1,7 +1,5 @@
-using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
-using System.Net;
 
 namespace Service
 {

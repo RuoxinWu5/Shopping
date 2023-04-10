@@ -40,7 +40,7 @@ namespace Data.Repository
             result.Id = productResult.Id;
             result.Name = productResult.Name;
             result.Quantity = productResult.Quantity;
-            result.SellerName = seller?.Name;
+            result.SellerName = seller?.Name ?? "Unknown";
             return result;
         }
     }

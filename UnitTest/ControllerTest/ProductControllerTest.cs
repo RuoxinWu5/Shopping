@@ -1,4 +1,3 @@
-using System.Net;
 using Data.Exceptions;
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;

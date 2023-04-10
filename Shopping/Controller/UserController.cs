@@ -20,10 +20,6 @@ namespace Shopping.Controller
         [HttpPost("register")]
         public async Task<ActionResult> AddUser(User user)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             try
             {
                 await _userService.AddUser(user);
