@@ -5,6 +5,6 @@ namespace Service
     public interface IProductService
     {
         Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId);
-        Task<HttpResponseMessage> AddProduct(Product product);
+        Task AddProduct(Product product);
     }
 }

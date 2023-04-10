@@ -1,5 +1,3 @@
-using System.Net;
-using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 using Moq;
@@ -35,45 +33,15 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task AddProduct_ShouldReturnSuccessMessage_WhenProductIsValId()
+        public async Task AddProduct_ShouldCallAddProductMethodOfRepository()
         {
             // Arrange
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
-            _productRepositoryMock
-                .Setup(repository => repository.AddProduct(product))
-                .Returns(Task.CompletedTask);
+            var product = new Product { Name = "Banana", Quantity = 100, SellerId = 1 };
             // Act
-            var result = await _productService.AddProduct(product);
+            await _productService.AddProduct(product);
             // Assert
-            Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+            _productRepositoryMock.Verify(repository => repository.AddProduct(product), Times.Once);
         }
 
-        [Fact]
-        public async Task AddProduct_ShouldReturnDuplicateUserNameExceptionMessage_WhenProductNameExists()
-        {
-            // Arrange
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
-            _productRepositoryMock
-                .Setup(repository => repository.AddProduct(product))
-                .Throws(new DuplicateUserNameException("Product Name 'Apple' already exists."));
-            // Act
-            var result = await _productService.AddProduct(product);
-            // Assert
-            Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-        }
-
-        [Fact]
-        public async Task AddProduct_ShouldReturnNotFoundExceptionMessage_WhenSellerIdNotExists()
-        {
-            // Arrange
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
-            _productRepositoryMock
-                .Setup(repository => repository.AddProduct(product))
-                .Throws(new DllNotFoundException("The seller doesn't exist."));
-            // Act
-            var result = await _productService.AddProduct(product);
-            // Assert
-            Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
-        }
     }
 }

@@ -14,26 +14,9 @@ namespace Service
             _repository = repository;
         }
 
-        public async Task<HttpResponseMessage> AddProduct(Product product)
+        public async Task AddProduct(Product product)
         {
-            try{
-                await _repository.AddProduct(product);
-                return new HttpResponseMessage(HttpStatusCode.Created);
-            }
-            catch (DuplicateUserNameException exception)
-            {
-                return new HttpResponseMessage(HttpStatusCode.Conflict)
-                {
-                    Content = new StringContent(exception.Message.ToString())
-                };
-            }
-            catch (DllNotFoundException exception)
-            {
-                return new HttpResponseMessage(HttpStatusCode.NotFound)
-                {
-                    Content = new StringContent(exception.Message.ToString())
-                };
-            }
+            await _repository.AddProduct(product);
         }
 
         public async Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId)

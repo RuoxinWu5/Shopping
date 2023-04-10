@@ -1,4 +1,5 @@
 using System.Net;
+using Data.Exceptions;
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -42,7 +43,7 @@ namespace UnitTest.ControllerTest
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+                .Returns(Task.CompletedTask);
             // Act
             var result = await _productController.AddProduct(product);
             // Assert
@@ -58,10 +59,7 @@ namespace UnitTest.ControllerTest
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict)
-                {
-                    Content = new StringContent($"Product name '{product.Name}' already exists.")
-                });
+                .Throws(new DuplicateUserNameException($"Product name '{product.Name}' already exists."));
             // Act
             var result = await _productController.AddProduct(product);
             // Assert
@@ -77,10 +75,7 @@ namespace UnitTest.ControllerTest
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(product))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound)
-                {
-                    Content = new StringContent("The seller doesn't exist.")
-                });
+                .Throws(new KeyNotFoundException("The seller doesn't exist."));
             // Act
             var result = await _productController.AddProduct(product);
             // Assert

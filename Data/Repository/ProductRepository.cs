@@ -29,7 +29,7 @@ namespace Data.Repository
             var existingSeller = await _context.Users.FirstOrDefaultAsync(u => u.Id == product.SellerId);
             if (existingSeller == null || existingSeller.Type == UserType.BUYER)
             {
-                throw new DllNotFoundException("The seller doesn't exist.");
+                throw new KeyNotFoundException("The seller doesn't exist.");
             }
             _context.Products.Add(product);
             await _context.SaveChangesAsync();

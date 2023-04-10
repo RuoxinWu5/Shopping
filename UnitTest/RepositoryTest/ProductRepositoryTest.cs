@@ -91,7 +91,7 @@ namespace UnitTest.RepositoryTest
             var products = await AddProducts();
             var product = new Product { Name = "melon", Quantity = 90, SellerId = 1 };
             // Act & Assert
-            await Assert.ThrowsAsync<DllNotFoundException>(async () => await _repository.AddProduct(product));
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.AddProduct(product));
         }
     }
 }

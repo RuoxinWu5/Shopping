@@ -1,4 +1,4 @@
-using System.Net;
+using Data.Exceptions;
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Service;
@@ -26,16 +26,19 @@ namespace Shopping.Controller
         [HttpPost("add")]
         public async Task<ActionResult> AddProduct(Product product)
         {
-            var result = await _productService.AddProduct(product);
-            if (result.StatusCode == HttpStatusCode.Created)
+            try
             {
+                await _productService.AddProduct(product);
                 return CreatedAtAction(nameof(AddProduct), new { id = product.Id }, "Create product successfully.");
             }
-            else if (result.StatusCode == HttpStatusCode.Conflict)
+            catch (DuplicateUserNameException exception)
             {
-                return Conflict(await result.Content.ReadAsStringAsync());
+                return Conflict(exception.Message);
             }
-            return NotFound(await result.Content.ReadAsStringAsync());
+            catch (KeyNotFoundException exception)
+            {
+                return NotFound(exception.Message);
+            }
         }
     }
 }
