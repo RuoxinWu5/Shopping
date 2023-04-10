@@ -4,15 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Model
 {
-    [Index(nameof(Product.Name), IsUnique = true)]
     public class Product
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Product name cannot be empty.")]
         public string Name { get; set; } = null!;
-        [Required]
+        [Required(ErrorMessage = "Quantity cannot be empty.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Quantity must be greater than or equal to 0.")]
         public int Quantity { get; set; }
         public int SellerId { get; set; }
         public User User { get; set; } = null!;

@@ -3,7 +3,6 @@ using Shopping.Controller;
 using Moq;
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using Data.Exceptions;
 
 namespace UnitTest.ControllerTest
@@ -48,51 +47,6 @@ namespace UnitTest.ControllerTest
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
             Assert.Equal("User name 'test' already exists.", conflictResult.Value);
-        }
-
-        [Fact]
-        public async Task CreateUser_ShouldReturnBadRequest_WhenPasswordIsEmpty()
-        {
-            // Arrange
-            var user = new User { Name = "test", Password = "", Type = UserType.BUYER };
-            _userServiceMock
-                .Setup(service => service.AddUser(user))
-                .Returns(Task.CompletedTask);
-            // Act
-            var result = await _userController.AddUser(user);
-            // Assert
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Password cannot be empty.", badRequestObjectResult.Value);
-        }
-
-        [Fact]
-        public async Task CreateUser_ShouldReturnBadRequest_WhenUserNameIsEmpty()
-        {
-            // Arrange
-            var user = new User { Name = "", Password = "test123123", Type = UserType.BUYER };
-            _userServiceMock
-                .Setup(service => service.AddUser(user))
-                .Returns(Task.CompletedTask);
-            // Act
-            var result = await _userController.AddUser(user);
-            // Assert
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("User name cannot be empty.", badRequestObjectResult.Value);
-        }
-
-        [Fact]
-        public async Task CreateUser_ShouldReturnBadRequest_WhenUserTypeIsInvalid()
-        {
-            // Arrange
-            var user = new User { Name = "test", Password = "test123123", Type = (UserType)2 };
-            _userServiceMock
-                .Setup(service => service.AddUser(user))
-                .Returns(Task.CompletedTask);
-            // Act
-            var result = await _userController.AddUser(user);
-            // Assert
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Type can only be 0 AS Buyer and 1 AS Seller.", badRequestObjectResult.Value);
         }
     }
 }

@@ -70,44 +70,6 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task AddProduct_ShouldReturnBadRequest_WhenProductNameIsEmpty()
-        {
-            // Arrange
-            var product = new Product { Name = "", Quantity = 100, SellerId = 1 };
-            Assert.NotNull(product);
-            _productServiceMock
-                .Setup(service => service.AddProduct(product))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent("Product name cannot be empty.")
-                });
-            // Act
-            var result = await _productController.AddProduct(product);
-            // Assert
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Product name cannot be empty.", badRequestObjectResult.Value);
-        }
-
-        [Fact]
-        public async Task AddProduct_ShouldReturnBadRequest_WhenQuantityLessThanZero()
-        {
-            // Arrange
-            var product = new Product { Name = "Apple", Quantity = -1, SellerId = 1 };
-            Assert.NotNull(product);
-            _productServiceMock
-                .Setup(service => service.AddProduct(product))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent("Quantity cannot be less than zero.")
-                });
-            // Act
-            var result = await _productController.AddProduct(product);
-            // Assert
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Quantity cannot be less than zero.", badRequestObjectResult.Value);
-        }
-
-        [Fact]
         public async Task AddProduct_ShouldReturnNotFound_WhenSellerIdNotExists()
         {
             // Arrange

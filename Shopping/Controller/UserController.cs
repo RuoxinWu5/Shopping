@@ -21,17 +21,9 @@ namespace Shopping.Controller
         public async Task<ActionResult> AddUser(User user)
         {
             //ASP.net core validation优化
-            if (user.Type != UserType.BUYER && user.Type != UserType.SELLER)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Type can only be 0 AS Buyer and 1 AS Seller.");
-            }
-            if (string.IsNullOrWhiteSpace(user.Password))
-            {
-                return BadRequest("Password cannot be empty.");
-            }
-            if (string.IsNullOrWhiteSpace(user.Name))
-            {
-                return BadRequest("User name cannot be empty.");
+                return BadRequest(ModelState);
             }
             try
             {

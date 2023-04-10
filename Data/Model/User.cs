@@ -10,16 +10,16 @@ namespace Data.Model
         SELLER = 1
     }
 
-    [Index(nameof(User.Name), IsUnique = true)]
     public class User
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "User name cannot be empty.")]
         public string Name { get; set; } = null!;
-        [Required]
+        [Required(ErrorMessage = "Password cannot be empty.")]
         public string Password { get; set; } = null!;
+        [Range(0, 1, ErrorMessage = "Type can only be 0 AS Buyer and 1 AS Seller.")]
         public UserType? Type { get; set; }
         public List<Product>? Products { get; set; }
     }

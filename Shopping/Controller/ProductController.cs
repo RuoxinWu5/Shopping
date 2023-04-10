@@ -5,7 +5,7 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api/products")]
+    [Route("api/seller/{sellerId}/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -23,17 +23,9 @@ namespace Shopping.Controller
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult> AddProduct(Product product)
         {
-            if (string.IsNullOrWhiteSpace(product.Name))
-            {
-                return BadRequest("Product name cannot be empty.");
-            }
-            if (product.Quantity < 0)
-            {
-                return BadRequest("Quantity cannot be less than zero.");
-            }
             var result = await _productService.AddProduct(product);
             if (result.StatusCode == HttpStatusCode.Created)
             {
