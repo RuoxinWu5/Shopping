@@ -2,8 +2,6 @@ using Service;
 using Data.Repository;
 using Moq;
 using Data.Model;
-using Data.Exceptions;
-using System.Net;
 
 namespace UnitTest.ServiceTest
 {
@@ -17,33 +15,16 @@ namespace UnitTest.ServiceTest
             _userRepositoryMock = new Mock<IUserRepository>();
             _userService = new UserService(_userRepositoryMock.Object);
         }
-
         [Fact]
-        public async Task CreateUser_ShouldReturnSuccessMessage_WhenUserIsValid()
+        public async Task AddUser_ShouldCallAddUserMethodOfRepository()
         {
             // Arrange
-            var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
-            _userRepositoryMock
-                .Setup(repository => repository.AddUser(user))
-                .Returns(Task.CompletedTask);
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
             // Act
-            var result = await _userService.AddUser(user);
+            await _userService.AddUser(user);
             // Assert
-            Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+            _userRepositoryMock.Verify(repository => repository.AddUser(user), Times.Once);
         }
 
-        [Fact]
-        public async Task CreateUser_ShouldReturnDuplicateUserNameExceptionMessage_WhenUserNameExists()
-        {
-            // Arrange
-            var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
-            _userRepositoryMock
-                .Setup(repository => repository.AddUser(user))
-                .Throws(new DuplicateUserNameException("User Name 'test' already exists."));
-            // Act
-            var result = await _userService.AddUser(user);
-            // Assert
-            Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-        }
     }
 }

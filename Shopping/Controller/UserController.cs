@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Service;
@@ -32,12 +33,16 @@ namespace Shopping.Controller
             {
                 return BadRequest("User name cannot be empty.");
             }
-            var result = await _userService.AddUser(user);
-            if (result.StatusCode == HttpStatusCode.Created)//Statuscode not return from service
+            try
             {
+                await _userService.AddUser(user);
                 return CreatedAtAction(nameof(AddUser), new { id = user.Id }, "Registered successfully.");
+
             }
-            return Conflict(await result.Content.ReadAsStringAsync());//controller
+            catch (DuplicateUserNameException exception)
+            {
+                return Conflict(exception.Message);
+            }
         }
     }
 }

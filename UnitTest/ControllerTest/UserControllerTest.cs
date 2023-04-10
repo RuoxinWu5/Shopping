@@ -4,6 +4,7 @@ using Moq;
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Data.Exceptions;
 
 namespace UnitTest.ControllerTest
 {
@@ -26,7 +27,7 @@ namespace UnitTest.ControllerTest
             Assert.NotNull(user);
             _userServiceMock
                 .Setup(service => service.AddUser(user))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+                .Returns(Task.CompletedTask);
             // Act
             var result = await _userController.AddUser(user);
             // Assert
@@ -41,10 +42,7 @@ namespace UnitTest.ControllerTest
             var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
             _userServiceMock
                 .Setup(service => service.AddUser(user))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Conflict)
-                {
-                    Content = new StringContent($"User name '{user.Name}' already exists.")
-                });
+                .Throws(new DuplicateUserNameException("User name 'test' already exists."));
             // Act
             var result = await _userController.AddUser(user);
             // Assert
@@ -59,10 +57,7 @@ namespace UnitTest.ControllerTest
             var user = new User { Name = "test", Password = "", Type = UserType.BUYER };
             _userServiceMock
                 .Setup(service => service.AddUser(user))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent("Password cannot be empty.")
-                });
+                .Returns(Task.CompletedTask);
             // Act
             var result = await _userController.AddUser(user);
             // Assert
@@ -77,10 +72,7 @@ namespace UnitTest.ControllerTest
             var user = new User { Name = "", Password = "test123123", Type = UserType.BUYER };
             _userServiceMock
                 .Setup(service => service.AddUser(user))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent("User name cannot be empty.")
-                });
+                .Returns(Task.CompletedTask);
             // Act
             var result = await _userController.AddUser(user);
             // Assert
@@ -95,10 +87,7 @@ namespace UnitTest.ControllerTest
             var user = new User { Name = "test", Password = "test123123", Type = (UserType)2 };
             _userServiceMock
                 .Setup(service => service.AddUser(user))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent("Type can only be 0 AS Buyer and 1 AS Seller.")
-                });
+                .Returns(Task.CompletedTask);
             // Act
             var result = await _userController.AddUser(user);
             // Assert

@@ -4,6 +4,6 @@ namespace Service
 {
     public interface IUserService
     {
-        Task<HttpResponseMessage> AddUser(User user);
+        Task AddUser(User user);
     }
 }
