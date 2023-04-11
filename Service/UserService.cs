@@ -16,5 +16,10 @@ namespace Service
         {
             await _repository.AddUser(user);
         }
+
+        public User GetUserById(int id)
+        {
+            return _repository.GetUserById(id);
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Data.Exceptions;
 using Data.Model;
+using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 
@@ -10,10 +11,12 @@ namespace Shopping.Controller
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IUserService _userService;
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, IUserService userService)
         {
             _productService = productService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -24,8 +27,15 @@ namespace Shopping.Controller
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult> AddProduct(Product product)
+        public async Task<ActionResult> AddProduct(ProductRequestModel productViewModel)
         {
+            var product = new Product
+            {
+                Name = productViewModel.Name,
+                Quantity = productViewModel.Quantity,
+                SellerId = productViewModel.SellerId,
+                User = _userService.GetUserById(productViewModel.SellerId)
+            };
             try
             {
                 await _productService.AddProduct(product);

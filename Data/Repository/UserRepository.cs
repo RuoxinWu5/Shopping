@@ -27,5 +27,9 @@ namespace Data.Repository
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
+        public User GetUserById(int id)
+        {
+            return _context.Users.SingleOrDefault(u => u.Id == id) ?? throw new ArgumentException("User not found");
+        }
     }
 }
