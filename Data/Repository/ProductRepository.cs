@@ -34,5 +34,10 @@ namespace Data.Repository
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
+
+        public Product GetProductById(int id)
+        {
+            return _context.Products.SingleOrDefault(p => p.Id == id) ?? throw new ArgumentException("Product not found");
+        }
     }
 }

@@ -6,5 +6,6 @@ namespace Data.Repository
     {
         Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId);
         Task AddProduct(Product product);
+        Product GetProductById(int id);
     }
 }

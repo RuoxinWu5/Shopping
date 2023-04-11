@@ -22,5 +22,10 @@ namespace Service
             var result = await _repository.GetProductListBySellerId(sellerId);
             return result;
         }
+
+        public Product GetProductById(int id)
+        {
+            return _repository.GetProductById(id);
+        }
     }
 }
