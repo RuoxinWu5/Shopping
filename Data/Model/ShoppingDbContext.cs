@@ -23,9 +23,6 @@ namespace Data.Model
                 .HasForeignKey(p => p.SellerId)
                 .IsRequired();
 
-            modelBuilder.Entity<Product>()
-                .HasQueryFilter(p => p.Quantity > 0);
-
             modelBuilder.Entity<BuyerProduct>().HasNoKey().ToView("BuyerProduct")
                 .Property(bp => bp.Id).HasColumnName("Id");
             modelBuilder.Entity<BuyerProduct>().Property(bp => bp.Name).HasColumnName("Name");

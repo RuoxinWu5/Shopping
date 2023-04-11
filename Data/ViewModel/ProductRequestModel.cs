@@ -4,7 +4,6 @@ namespace Data.ViewModel
 {
     public class ProductRequestModel
     {
-        public int Id { get; set; }
         [Required(ErrorMessage = "Product name cannot be empty.")]
         public string Name { get; set; } = null!;
         [Required(ErrorMessage = "Quantity cannot be empty.")]
