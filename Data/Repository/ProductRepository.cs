@@ -15,13 +15,13 @@ namespace Data.Repository
 
         public async Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId)
         {
-            var result = await _context.Products.Where(product => product.User.Id == sellerId).ToListAsync();
+            var result = await _context.Products.Include(p => p.User).Where(product => product.User.Id == sellerId).ToListAsync();
             return result;
         }
 
         public async Task AddProduct(Product product)
         {
-            var existingProduct = await _context.Products.FirstOrDefaultAsync(u => u.Name == product.Name);
+            var existingProduct = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(u => u.Name == product.Name);
             if (existingProduct != null)
             {
                 throw new DuplicateUserNameException($"User name '{product.Name}' already exists.");
@@ -32,7 +32,7 @@ namespace Data.Repository
 
         public async Task<Product> GetProductById(int id)
         {
-            var result = await _context.Products.FindAsync(id);
+            var result = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
             if (result == null)
             {
                 throw new KeyNotFoundException("The product doesn't exist.");

@@ -1,4 +1,5 @@
 using Data.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repository
 {
@@ -13,7 +14,8 @@ namespace Data.Repository
         public async Task AddOrder(Order order)
         {
             _context.Orders.Add(order);
-            var findProduct = await _context.Products.FindAsync(order.Product.Id);
+            
+            var findProduct = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == order.Product.Id);
             if (findProduct != null)
             {
                 findProduct.Quantity -= order.Quantity;

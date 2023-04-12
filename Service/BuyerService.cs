@@ -14,7 +14,7 @@ namespace Service
 
         public async Task<IEnumerable<string>> AllProduct()
         {
-            var result = await _buyerRepository.AllProduct();
+            var result = await _buyerRepository.AllProduct();//模型转换放在controller
             return result;
         }
 

@@ -33,7 +33,7 @@ namespace Service
         public async Task<User> GetBuyerById(int id)
         {
             var result = await _repository.GetUserById(id);
-            if (result.Type == UserType.BUYER)
+            if (result.Type == UserType.SELLER)
             {
                 throw new KeyNotFoundException("The buyer doesn't exist.");
             }

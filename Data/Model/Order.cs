@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Model
 {
@@ -10,6 +11,7 @@ namespace Data.Model
         RECEIVED = 3,
         CANCELLED = 4
     }
+    [Table("Orders")]
     public class Order
     {
         public int Id { get; set; }

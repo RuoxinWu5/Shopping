@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Model
 {
@@ -7,7 +8,7 @@ namespace Data.Model
         BUYER = 0,
         SELLER = 1
     }
-
+    [Table("Users")]
     public class User
     {
         public int Id { get; set; }

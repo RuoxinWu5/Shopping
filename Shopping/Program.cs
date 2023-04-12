@@ -2,12 +2,17 @@ using Data.Model;
 using Microsoft.EntityFrameworkCore;
 using Data.Repository;
 using Service;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
 
 string connectionString = builder.Configuration.GetConnectionString("MyDb") ?? throw new ArgumentNullException(nameof(connectionString));
 var serverVersion = ServerVersion.AutoDetect(connectionString);

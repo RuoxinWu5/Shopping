@@ -14,7 +14,7 @@ namespace Data.Repository
 
         public async Task<IEnumerable<string>> AllProduct()
         {
-            var productResult = await _context.Products.ToListAsync();
+            var productResult = await _context.Products.Include(p => p.User).ToListAsync();
             List<string> result = new List<string>();
             for (int i = 0; i < _context.Products.Count(); i++)//LINQ
             {
@@ -30,7 +30,7 @@ namespace Data.Repository
 
         public async Task<BuyerProduct> GetProductByProductId(int productId)
         {
-            var productResult = await _context.Products.FindAsync(productId);
+            var productResult = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == productId);
             if (productResult == null)
             {
                 throw new KeyNotFoundException($"Product id '{productId}' doesn't exist.");

@@ -19,7 +19,7 @@ namespace Data.Repository
             {
                 user.Type = UserType.BUYER;
             }
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
+            var existingUser = await _context.Users.Include(p => p.Products).FirstOrDefaultAsync(u => u.Name == user.Name);
             if (existingUser != null)
             {
                 throw new DuplicateUserNameException($"User name '{user.Name}' already exists.");
@@ -29,7 +29,7 @@ namespace Data.Repository
         }
         public async Task<User> GetUserById(int id)
         {
-            var result = await _context.Users.FindAsync(id);
+            var result = await _context.Users.Include(p => p.Products).FirstOrDefaultAsync(u => u.Id == id);
             if (result == null)
             {
                 throw new KeyNotFoundException("The user doesn't exist.");

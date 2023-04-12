@@ -21,35 +21,30 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Model.BuyerProduct", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Name");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int")
-                        .HasColumnName("Quantity");
+                        .HasColumnType("int");
 
                     b.Property<string>("SellerName")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("SellerName");
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
 
                     b.ToTable((string)null);
 
-                    b.ToView("BuyerProduct", (string)null);
+                    b.ToView("View_BuyerProducts", (string)null);
                 });
 
             modelBuilder.Entity("Data.Model.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("BuyerId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
@@ -61,11 +56,14 @@ namespace Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("BuyerId");
-
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -83,12 +81,12 @@ namespace Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("SellerId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SellerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Products");
                 });
@@ -117,16 +115,16 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Data.Model.Order", b =>
                 {
-                    b.HasOne("Data.Model.User", "User")
-                        .WithMany()
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Data.Model.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
@@ -138,7 +136,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.Model.User", "User")
                         .WithMany("Products")
-                        .HasForeignKey("SellerId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
