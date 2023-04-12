@@ -4,7 +4,7 @@ namespace Service
 {
     public interface IBuyerService
     {
-        public Task<IEnumerable<string>> AllProduct();
+        public Task<IEnumerable<Product>> AllProduct();
         public Task<BuyerProduct> GetProductByProductId(int productId);
     }
 }

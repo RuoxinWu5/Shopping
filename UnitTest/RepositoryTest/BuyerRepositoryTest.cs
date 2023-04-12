@@ -25,7 +25,7 @@ namespace UnitTest.RepositoryTest
             var products = new List<Product>
             {
                 new Product { Name = "Apple", Quantity = 100, User = user },
-                new Product { Name = "Apple", Quantity = 0, User = user }
+                new Product { Name = "Banana", Quantity = 0, User = user }
             };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
@@ -62,15 +62,10 @@ namespace UnitTest.RepositoryTest
         {
             // Arrange
             var products = await AddProducts();
-            List<string> buyerProducts = new List<string>();
-            foreach (Product product in products)
-            {
-                buyerProducts.Add(product.Name);
-            }
             // Act
             var result = await _repository.AllProduct();
             // Assert
-            Assert.Equal(buyerProducts.ToString(), result.ToString());
+            Assert.Equal(products.ToString(), result.ToString());
         }
 
         [Fact]

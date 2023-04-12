@@ -20,8 +20,13 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task GetProductList_ShouldReturnOk_WhenProductsIsfound()
         {
-            var resultItem = new List<string> { "Apple", "Banana" };
-            _buyerServiceMock.Setup(x => x.AllProduct()).ReturnsAsync(resultItem);
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var resultServiceItem = new List<Product>{
+                new Product{ Name = "Apple", Quantity = 100, User = user },
+                new Product{ Name = "Banana", Quantity = 50, User = user }
+                };
+            var resultItem = new List<String> { "Apple", "Banana" };
+            _buyerServiceMock.Setup(x => x.AllProduct()).ReturnsAsync(resultServiceItem);
             // Act
             var result = await _buyerController.AllProduct();
             // Assert

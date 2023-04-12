@@ -12,10 +12,11 @@ namespace Service
             _buyerRepository = buyerRepository;
         }
 
-        public async Task<IEnumerable<string>> AllProduct()
+        public async Task<IEnumerable<Product>> AllProduct()
         {
-            var result = await _buyerRepository.AllProduct();//模型转换放在controller
-            return result;
+            var result = await _buyerRepository.AllProduct();
+            var filteredResult = result.Where(p => p.Quantity != 0);
+            return filteredResult;
         }
 
         public async Task<BuyerProduct> GetProductByProductId(int productId)

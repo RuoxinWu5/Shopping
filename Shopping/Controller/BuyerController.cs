@@ -17,7 +17,8 @@ namespace Shopping.Controller
         public async Task<ActionResult> AllProduct()
         {
             var result = await _buyerService.AllProduct();
-            return Ok(result);
+            var nameList = result.Select(p => p.Name);
+            return Ok(nameList);
         }
 
         [HttpGet("{productId}")]

@@ -12,19 +12,9 @@ namespace Data.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<string>> AllProduct()
+        public async Task<IEnumerable<Product>> AllProduct()
         {
-            var productResult = await _context.Products.Include(p => p.User).ToListAsync();
-            List<string> result = new List<string>();
-            for (int i = 0; i < _context.Products.Count(); i++)//LINQ
-            {
-                if (productResult[i].Quantity == 0)//service
-                {
-                    continue;
-                }
-                var product = productResult[i].Name;
-                result.Add(product);
-            }
+            var result = await _context.Products.Include(p => p.User).ToListAsync();
             return result;
         }
 
