@@ -24,6 +24,11 @@ namespace Data.Repository
                 throw new KeyNotFoundException("The buyer doesn't exist.");
             }
             _context.Orders.Add(order);
+            var findProduct = await _context.Products.FindAsync(order.ProductId);
+            if (findProduct != null)
+            {
+                findProduct.Quantity -= order.Quantity;
+            }
             await _context.SaveChangesAsync();
         }
     }
