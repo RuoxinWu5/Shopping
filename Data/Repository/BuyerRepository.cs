@@ -16,9 +16,9 @@ namespace Data.Repository
         {
             var productResult = await _context.Products.ToListAsync();
             List<string> result = new List<string>();
-            for (int i = 0; i < _context.Products.Count(); i++)
+            for (int i = 0; i < _context.Products.Count(); i++)//LINQ
             {
-                if (productResult[i].Quantity == 0)
+                if (productResult[i].Quantity == 0)//service
                 {
                     continue;
                 }
@@ -35,7 +35,7 @@ namespace Data.Repository
             {
                 throw new KeyNotFoundException($"Product id '{productId}' doesn't exist.");
             }
-            var seller = await _context.Users.FindAsync(productResult.SellerId);
+            var seller = await _context.Users.FindAsync(productResult.User.Id);
             BuyerProduct result = new BuyerProduct();
             result.Id = productResult.Id;
             result.Name = productResult.Name;

@@ -1,5 +1,4 @@
 using Data.Model;
-using Data.ViewModel;
 
 namespace Service
 {

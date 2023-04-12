@@ -1,6 +1,5 @@
 using Data.Model;
 using Data.Repository;
-using Data.ViewModel;
 using Moq;
 using Service;
 
@@ -22,12 +21,12 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task AddOder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsEnough()
+        public async Task AddOrder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsEnough()
         {
             // Arrange
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var order = new Order { ProductId = 1, Quantity = 10, BuyerId = 1, Type = OrderType.TO_BE_PAID, Product = product, User = user };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
+            var order = new Order { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = product, User = user };
             // Act
             var result = await _orderService.AddOrder(order);
             // Assert
@@ -37,13 +36,12 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task AddOder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsNotEnough()
+        public async Task AddOrder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsNotEnough()
         {
             // Arrange
-            var product = new Product { Name = "Apple", Quantity = 50, SellerId = 1 };
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var order = new Order { ProductId = 1, Quantity = 51, BuyerId = 1, Type = OrderType.TO_BE_PAID, Product = product, User = user };
-            _userRepositoryMock.Setup(repository => repository.GetUserById(order.BuyerId)).Returns(user);
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 51, Type = OrderType.TO_BE_PAID, Product = product, User = user };
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrder(order));
         }

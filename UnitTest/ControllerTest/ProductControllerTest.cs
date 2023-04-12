@@ -25,9 +25,10 @@ namespace UnitTest.ControllerTest
         public async Task GetProductListBySellerId_ShouldReturnOk_WhenProductsIsfound()
         {
             // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var resultItem = new List<Product>{
-                new Product{ Name = "Apple", Quantity = 100, SellerId = 1},
-                new Product{ Name = "Banana", Quantity = 50, SellerId = 1}
+                new Product{ Name = "Apple", Quantity = 100, User = user },
+                new Product{ Name = "Banana", Quantity = 50, User = user }
                 };
             _productServiceMock.Setup(x => x.GetProductListBySellerId(It.IsAny<int>())).ReturnsAsync(resultItem);
             // Act
@@ -42,7 +43,7 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1, User = user };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var productViewModel = new ProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
             Assert.NotNull(product);
             _productServiceMock
@@ -60,15 +61,15 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1, User = user };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var productViewModel = new ProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(It.Is<Product>(product => product.User.Name == "Jack" && product.Name == "Apple")))
                 .Throws(new DuplicateUserNameException($"Product name '{product.Name}' already exists."));
             _userServiceMock
-                .Setup(service => service.GetUserById(productViewModel.SellerId))
-                .Returns(user);
+                .Setup(service => service.GetSellerById(productViewModel.SellerId))
+                .ReturnsAsync(user);
             // Act
             var result = await _productController.AddProduct(productViewModel);
             // Assert
@@ -81,15 +82,15 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1, User = user };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var productViewModel = new ProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(It.Is<Product>(product => product.User.Name == "Jack" && product.Name == "Apple")))
                 .Throws(new KeyNotFoundException("The seller doesn't exist."));
             _userServiceMock
-                .Setup(service => service.GetUserById(productViewModel.SellerId))
-                .Returns(user);
+                .Setup(service => service.GetSellerById(productViewModel.SellerId))
+                .ReturnsAsync(user);
             // Act
             var result = await _productController.AddProduct(productViewModel);
             // Assert

@@ -27,9 +27,17 @@ namespace Data.Repository
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
-        public User GetUserById(int id)
+        public async Task<User> GetUserById(int id)
         {
-            return _context.Users.SingleOrDefault(u => u.Id == id) ?? throw new ArgumentException("User not found");
+            var result = await _context.Users.FindAsync(id);
+            if (result == null)
+            {
+                throw new KeyNotFoundException("The user doesn't exist.");
+            }
+            else
+            {
+                return result;
+            }
         }
     }
 }

@@ -17,9 +17,30 @@ namespace Service
             await _repository.AddUser(user);
         }
 
-        public User GetUserById(int id)
+        public async Task<User> GetSellerById(int id)
         {
-            return _repository.GetUserById(id);
+            var result = await _repository.GetUserById(id);
+            if (result.Type == UserType.BUYER)
+            {
+                throw new KeyNotFoundException("The seller doesn't exist.");
+            }
+            else
+            {
+                return result;
+            }
+        }
+
+        public async Task<User> GetBuyerById(int id)
+        {
+            var result = await _repository.GetUserById(id);
+            if (result.Type == UserType.BUYER)
+            {
+                throw new KeyNotFoundException("The buyer doesn't exist.");
+            }
+            else
+            {
+                return result;
+            }
         }
     }
 }

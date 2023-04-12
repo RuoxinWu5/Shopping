@@ -23,9 +23,9 @@ namespace Service
             return result;
         }
 
-        public Product GetProductById(int id)
+        public async Task<Product> GetProductById(int id)
         {
-            return _repository.GetProductById(id);
+            return await _repository.GetProductById(id);
         }
     }
 }

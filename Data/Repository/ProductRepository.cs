@@ -15,7 +15,7 @@ namespace Data.Repository
 
         public async Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId)
         {
-            var result = await _context.Products.Where(product => product.SellerId == sellerId).ToListAsync();
+            var result = await _context.Products.Where(product => product.User.Id == sellerId).ToListAsync();
             return result;
         }
 
@@ -26,18 +26,21 @@ namespace Data.Repository
             {
                 throw new DuplicateUserNameException($"User name '{product.Name}' already exists.");
             }
-            var existingSeller = await _context.Users.FirstOrDefaultAsync(u => u.Id == product.SellerId);
-            if (existingSeller == null || existingSeller.Type == UserType.BUYER)
-            {
-                throw new KeyNotFoundException("The seller doesn't exist.");
-            }
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
 
-        public Product GetProductById(int id)
+        public async Task<Product> GetProductById(int id)
         {
-            return _context.Products.SingleOrDefault(p => p.Id == id) ?? throw new ArgumentException("Product not found");
+            var result = await _context.Products.FindAsync(id);
+            if (result == null)
+            {
+                throw new KeyNotFoundException("The product doesn't exist.");
+            }
+            else
+            {
+                return result;
+            }
         }
     }
 }

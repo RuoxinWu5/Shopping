@@ -21,10 +21,11 @@ namespace UnitTest.RepositoryTest
 
         private async Task<List<Product>> AddProducts()
         {
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var products = new List<Product>
             {
-                new Product { Name = "Apple", Quantity = 100, SellerId = 1 },
-                new Product { Name = "Apple", Quantity = 0, SellerId = 1 }
+                new Product { Name = "Apple", Quantity = 100, User = user },
+                new Product { Name = "Apple", Quantity = 0, User = user }
             };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
@@ -34,10 +35,10 @@ namespace UnitTest.RepositoryTest
         private async Task<List<User>> AddUsers()
         {
             var users = new List<User>
-        {
-            new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
-            new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
-        };
+            {
+                new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
+                new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
+            };
             await _context.AddRangeAsync(users);
             await _context.SaveChangesAsync();
             return users;

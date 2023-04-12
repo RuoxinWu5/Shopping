@@ -25,12 +25,12 @@ namespace UnitTest.ControllerTest
         public async Task CreateOrder_ShouldReturnOk_WhenOrderIsValid()
         {
             // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
             var orderRequest = new OrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
-            _productServiceMock.Setup(repository => repository.GetProductById(orderRequest.ProductId)).Returns(product);
-            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            _userServiceMock.Setup(repository => repository.GetUserById(orderRequest.BuyerId)).Returns(user);
-            var expectedOrder = new Order { Id = 1, ProductId = 1, Quantity = 10, BuyerId = 1, Type = OrderType.TO_BE_PAID, Product = product, User = user };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
+            _productServiceMock.Setup(repository => repository.GetProductById(orderRequest.ProductId)).ReturnsAsync(product);
+            _userServiceMock.Setup(repository => repository.GetBuyerById(orderRequest.BuyerId)).ReturnsAsync(user);
+            var expectedOrder = new Order { Id = 1, Quantity = 10, Type = OrderType.TO_BE_PAID, Product = product, User = user };
             _orderServiceMock.Setup(x => x.AddOrder(It.IsAny<Order>())).ReturnsAsync(expectedOrder);
             // Act
             var result = await _orderController.AddOrder(orderRequest);

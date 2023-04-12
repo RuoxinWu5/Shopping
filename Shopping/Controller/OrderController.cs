@@ -27,12 +27,10 @@ namespace Shopping.Controller
             {
                 var order = new Order
                 {
-                    ProductId = orderRequestModel.ProductId,
                     Quantity = orderRequestModel.Quantity,
-                    BuyerId = orderRequestModel.BuyerId,
                     Type = OrderType.TO_BE_PAID,
-                    Product = _productService.GetProductById(orderRequestModel.ProductId),
-                    User = _userService.GetUserById(orderRequestModel.BuyerId)
+                    Product = await _productService.GetProductById(orderRequestModel.ProductId),
+                    User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
                 var result = await _orderService.AddOrder(order);
                 return CreatedAtAction(nameof(AddOrder), new { id = result.Id }, result);

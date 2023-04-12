@@ -7,6 +7,6 @@ namespace Service
         Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId);
         Task AddProduct(Product product);
 
-        Product GetProductById(int id);
+        Task<Product> GetProductById(int id);
     }
 }

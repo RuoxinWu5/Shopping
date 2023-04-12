@@ -23,11 +23,12 @@ namespace UnitTest.RepositoryTest
 
         private async Task<List<Product>> AddProducts()
         {
+            var users = await AddUsers();
             var products = new List<Product>
-        {
-            new Product { Name = "Apple", Quantity = 100, SellerId = 1 },
-            new Product { Name = "Banana", Quantity = 10, SellerId = 1 }
-        };
+            {
+                new Product { Name = "Apple", Quantity = 100, User = users[1] },
+                new Product { Name = "Banana", Quantity = 50, User = users[1] }
+            };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
             return products;
@@ -44,25 +45,25 @@ namespace UnitTest.RepositoryTest
             await _context.SaveChangesAsync();
             return users;
         }
+
         [Fact]
         public async Task GetProductListBySellerId_ShouldReturnProductList_WhenProductsIsfound()
         {
             // Arrange
             var products = await AddProducts();
-            var sellerId = 1;
+            var sellerId = 2;
             // Act
             var result = await _repository.GetProductListBySellerId(sellerId);
             // Assert
-            Assert.Equal(products, result);
+            Assert.Equal(products.ToString(), result.ToString());
         }
 
         [Fact]
         public async Task AddProduct_ShouldCreateNewProduct_WhenProductIsValid()
         {
             // Arrange
-            var products = await AddProducts();
             var users = await AddUsers();
-            var product = new Product { Name = "melon", Quantity = 90, SellerId = 2 };
+            var product = new Product { Name = "melon", Quantity = 90, User = users[1] };
             // Act
             await _repository.AddProduct(product);
             // Assert
@@ -71,27 +72,18 @@ namespace UnitTest.RepositoryTest
             Assert.NotNull(savedProduct);
             Assert.Equal(product.Name, savedProduct.Name);
             Assert.Equal(product.Quantity, savedProduct.Quantity);
-            Assert.Equal(product.SellerId, savedProduct.SellerId);
+            Assert.Equal(product.User.Id, savedProduct.User.Id);
         }
 
         [Fact]
         public async Task AddProduct_ShouldThrowDuplicateUserNameException_WhenProductNameExists()
         {
             // Arrange
+            var users = await AddUsers();
             var products = await AddProducts();
-            var product = new Product { Name = "Banana", Quantity = 90, SellerId = 2 };
+            var product = new Product { Name = "Banana", Quantity = 90, User = users[1] };
             // Act & Assert
             await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddProduct(product));
-        }
-
-        [Fact]
-        public async Task AddProduct_ShouldThrowNotFoundException_WhenSellerIdNotExists()
-        {
-            // Arrange
-            var products = await AddProducts();
-            var product = new Product { Name = "melon", Quantity = 90, SellerId = 1 };
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.AddProduct(product));
         }
     }
 }

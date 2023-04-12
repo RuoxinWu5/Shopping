@@ -21,10 +21,11 @@ namespace UnitTest.RepositoryTest
 
         private async Task<List<Product>> AddProducts()
         {
+            var users = await AddUsers();
             var products = new List<Product>
             {
-                new Product { Name = "Apple", Quantity = 100, SellerId = 2 },
-                new Product { Name = "Banana", Quantity = 50, SellerId = 2 }
+                new Product { Name = "Apple", Quantity = 100, User = users[1] },
+                new Product { Name = "Banana", Quantity = 50, User = users[1] }
             };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
@@ -49,36 +50,14 @@ namespace UnitTest.RepositoryTest
             // Arrange
             var products = await AddProducts();
             var users = await AddUsers();
-            var order = new Order { ProductId = 1, Quantity = 10, BuyerId = 1, Type = OrderType.TO_BE_PAID };
+            var order = new Order { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = products[0], User = users[0] };
             // Act
             await _repository.AddOrder(order);
             // Assert
             Assert.NotNull(_context.Orders);
-            var savedOrder = await _context.Orders.FirstOrDefaultAsync(u => u.ProductId == order.ProductId && u.BuyerId == order.BuyerId);
+            var savedOrder = await _context.Orders.FirstOrDefaultAsync(u => u.Product.Id == order.Product.Id && u.User.Id == order.User.Id);
             Assert.NotNull(savedOrder);
             Assert.Equal(order, savedOrder);
-        }
-
-        [Fact]
-        public async Task AddOrder_ShouldThrowNotFoundException_WhenProductIdNotExists()
-        {
-            // Arrange
-            var products = await AddProducts();
-            var users = await AddUsers();
-            var order = new Order { ProductId = 3, Quantity = 10, BuyerId = 1, Type = OrderType.TO_BE_PAID };
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.AddOrder(order));
-        }
-
-        [Fact]
-        public async Task AddOrder_ShouldThrowNotFoundException_WhenUserIdNotExists()
-        {
-            // Arrange
-            var products = await AddProducts();
-            var users = await AddUsers();
-            var order = new Order { ProductId = 1, Quantity = 10, BuyerId = 3, Type = OrderType.TO_BE_PAID };
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.AddOrder(order));
         }
     }
 }

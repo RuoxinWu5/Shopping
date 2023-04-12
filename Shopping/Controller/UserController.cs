@@ -2,7 +2,6 @@ using Data.Exceptions;
 using Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Service;
-using System.Net;
 
 namespace Shopping.Controller
 {

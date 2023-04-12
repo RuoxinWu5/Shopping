@@ -1,6 +1,5 @@
 using Data.Model;
 using Data.Repository;
-using Data.ViewModel;
 
 namespace Service
 {

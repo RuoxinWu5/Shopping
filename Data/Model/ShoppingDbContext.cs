@@ -12,36 +12,5 @@ namespace Data.Model
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<BuyerProduct> BuyerProducts { get; set; } = null!;
         public DbSet<Order> Orders { get; set; } = null!;
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.Products)
-                .WithOne(p => p.User);
-
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.User)
-                .WithMany(u => u.Products)
-                .HasForeignKey(p => p.SellerId)
-                .IsRequired();
-
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Product)
-                .WithMany()
-                .HasForeignKey(o => o.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.User)
-                .WithMany()
-                .HasForeignKey(o => o.BuyerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<BuyerProduct>().HasNoKey().ToView("BuyerProduct")
-                .Property(bp => bp.Id).HasColumnName("Id");
-            modelBuilder.Entity<BuyerProduct>().Property(bp => bp.Name).HasColumnName("Name");
-            modelBuilder.Entity<BuyerProduct>().Property(bp => bp.Quantity).HasColumnName("Quantity");
-            modelBuilder.Entity<BuyerProduct>().Property(bp => bp.SellerName).HasColumnName("SellerName");
-            modelBuilder.Entity<BuyerProduct>().HasQueryFilter(bp => bp.Quantity > 0);
-        }
     }
 }

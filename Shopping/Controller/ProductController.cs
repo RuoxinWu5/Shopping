@@ -20,7 +20,7 @@ namespace Shopping.Controller
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductListBySellerId(int sellerId)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductListBySellerId(int sellerId)///filter
         {
             var result = await _productService.GetProductListBySellerId(sellerId);
             return Ok(result);
@@ -29,15 +29,14 @@ namespace Shopping.Controller
         [HttpPost("add")]
         public async Task<ActionResult> AddProduct(ProductRequestModel productViewModel)
         {
-            var product = new Product
-            {
-                Name = productViewModel.Name,
-                Quantity = productViewModel.Quantity,
-                SellerId = productViewModel.SellerId,
-                User = _userService.GetUserById(productViewModel.SellerId)
-            };
             try
             {
+                var product = new Product
+                {
+                    Name = productViewModel.Name,
+                    Quantity = productViewModel.Quantity,
+                    User = await _userService.GetSellerById(productViewModel.SellerId)
+                };
                 await _productService.AddProduct(product);
                 return CreatedAtAction(nameof(AddProduct), new { id = product.Id }, "Create product successfully.");
             }
