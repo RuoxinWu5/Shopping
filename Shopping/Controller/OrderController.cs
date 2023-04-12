@@ -1,3 +1,4 @@
+using Data.Model;
 using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Service;
@@ -10,11 +11,13 @@ namespace Shopping.Controller
     {
         private readonly IOrderService _orderService;
         private readonly IProductService _productService;
+        private readonly IUserService _userService;
 
-        public OrderController(IOrderService orderService, IProductService productService)
+        public OrderController(IOrderService orderService, IProductService productService, IUserService userService)
         {
             _orderService = orderService;
             _productService = productService;
+            _userService = userService;
         }
 
         [HttpPost("add")]
@@ -22,7 +25,16 @@ namespace Shopping.Controller
         {
             try
             {
-                var result = await _orderService.AddOrder(orderRequestModel);
+                var order = new Order
+                {
+                    ProductId = orderRequestModel.ProductId,
+                    Quantity = orderRequestModel.Quantity,
+                    BuyerId = orderRequestModel.BuyerId,
+                    Type = OrderType.TO_BE_PAID,
+                    Product = _productService.GetProductById(orderRequestModel.ProductId),
+                    User = _userService.GetUserById(orderRequestModel.BuyerId)
+                };
+                var result = await _orderService.AddOrder(order);
                 return CreatedAtAction(nameof(AddOrder), new { id = result.Id }, result);
             }
             catch (ArgumentException exception)

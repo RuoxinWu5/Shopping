@@ -5,6 +5,6 @@ namespace Service
 {
     public interface IOrderService
     {
-        Task<Order> AddOrder(OrderRequestModel orderRequest);
+        Task<Order> AddOrder(Order order);
     }
 }

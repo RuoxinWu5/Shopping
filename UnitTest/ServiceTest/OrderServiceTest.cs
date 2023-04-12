@@ -25,13 +25,11 @@ namespace UnitTest.ServiceTest
         public async Task AddOder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsEnough()
         {
             // Arrange
-            var orderRequestModel = new OrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
             var product = new Product { Name = "Apple", Quantity = 100, SellerId = 1 };
-            _productRepositoryMock.Setup(repository => repository.GetProductById(orderRequestModel.ProductId)).Returns(product);
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            _userRepositoryMock.Setup(repository => repository.GetUserById(orderRequestModel.BuyerId)).Returns(user);
+            var order = new Order { ProductId = 1, Quantity = 10, BuyerId = 1, Type = OrderType.TO_BE_PAID, Product = product, User = user };
             // Act
-            var result = await _orderService.AddOrder(orderRequestModel);
+            var result = await _orderService.AddOrder(order);
             // Assert
             Assert.Equal(product, result.Product);
             Assert.Equal(user, result.User);
@@ -42,13 +40,12 @@ namespace UnitTest.ServiceTest
         public async Task AddOder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsNotEnough()
         {
             // Arrange
-            var orderRequestModel = new OrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            var product = new Product { Name = "Apple", Quantity = 9, SellerId = 1 };
-            _productRepositoryMock.Setup(repository => repository.GetProductById(orderRequestModel.ProductId)).Returns(product);
+            var product = new Product { Name = "Apple", Quantity = 50, SellerId = 1 };
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            _userRepositoryMock.Setup(repository => repository.GetUserById(orderRequestModel.BuyerId)).Returns(user);
+            var order = new Order { ProductId = 1, Quantity = 51, BuyerId = 1, Type = OrderType.TO_BE_PAID, Product = product, User = user };
+            _userRepositoryMock.Setup(repository => repository.GetUserById(order.BuyerId)).Returns(user);
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrder(orderRequestModel));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrder(order));
         }
     }
 }

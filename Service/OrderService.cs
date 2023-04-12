@@ -17,19 +17,10 @@ namespace Service
             _userRepository = userRepository;
         }
 
-        public async Task<Order> AddOrder(OrderRequestModel orderRequestModel)
+        public async Task<Order> AddOrder(Order order)
         {
-            var order = new Order
-            {
-                ProductId = orderRequestModel.ProductId,
-                Quantity = orderRequestModel.Quantity,
-                BuyerId = orderRequestModel.BuyerId,
-                Type = OrderType.TO_BE_PAID,
-                Product = _productRepository.GetProductById(orderRequestModel.ProductId),
-                User = _userRepository.GetUserById(orderRequestModel.BuyerId)
-            };
             var Quantity = order.Product.Quantity;
-            if (orderRequestModel.Quantity > Quantity)
+            if (order.Quantity > Quantity)
             {
                 throw new ArgumentException("Quantity not sufficient. Order creation failed.");
             }
