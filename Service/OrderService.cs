@@ -28,6 +28,11 @@ namespace Service
                 Product = _productRepository.GetProductById(orderRequestModel.ProductId),
                 User = _userRepository.GetUserById(orderRequestModel.BuyerId)
             };
+            var Quantity = order.Product.Quantity;
+            if (orderRequestModel.Quantity > Quantity)
+            {
+                throw new ArgumentException("Quantity not sufficient. Order creation failed.");
+            }
             await _orderRepository.AddOrder(order);
             return order;
         }

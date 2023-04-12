@@ -20,16 +20,14 @@ namespace Shopping.Controller
         [HttpPost("add")]
         public async Task<ActionResult> AddOrder(OrderRequestModel orderRequestModel)
         {
-
-            var Quantity = _productService.GetProductById(orderRequestModel.ProductId).Quantity;
-            if (orderRequestModel.Quantity > Quantity)
-            {
-                return BadRequest("Quantity not sufficient. Order creation failed.");
-            }
             try
             {
                 var result = await _orderService.AddOrder(orderRequestModel);
                 return CreatedAtAction(nameof(AddOrder), new { id = result.Id }, result);
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(exception.Message);
             }
             catch (KeyNotFoundException exception)
             {

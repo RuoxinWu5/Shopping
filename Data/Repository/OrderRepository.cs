@@ -11,7 +11,7 @@ namespace Data.Repository
         {
             _context = context;
         }
-        public async Task<Product> AddOrder(Order order)
+        public async Task AddOrder(Order order)
         {
             var existingProduct = await _context.Products.FirstOrDefaultAsync(u => u.Id == order.ProductId);
             if (existingProduct == null)
@@ -25,7 +25,6 @@ namespace Data.Repository
             }
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
-            return existingProduct;
         }
     }
 }
