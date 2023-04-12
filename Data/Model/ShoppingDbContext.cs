@@ -11,6 +11,7 @@ namespace Data.Model
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<BuyerProduct> BuyerProducts { get; set; } = null!;
+        public DbSet<Order> Orders { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
@@ -22,6 +23,18 @@ namespace Data.Model
                 .WithMany(u => u.Products)
                 .HasForeignKey(p => p.SellerId)
                 .IsRequired();
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Product)
+                .WithMany()
+                .HasForeignKey(o => o.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.User)
+                .WithMany()
+                .HasForeignKey(o => o.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BuyerProduct>().HasNoKey().ToView("BuyerProduct")
                 .Property(bp => bp.Id).HasColumnName("Id");
