@@ -67,5 +67,16 @@ namespace UnitTest.ServiceTest
             // Assert
             _orderRepositoryMock.Verify(repository => repository.PayOrder(id), Times.Once);
         }
+
+        [Fact]
+        public async Task ConfirmReceipt_ShouldCallConfirmReceiptMethodOfRepository()
+        {
+            // Arrange
+            var id = 1;
+            // Act
+            await _orderService.ConfirmReceipt(id);
+            // Assert
+            _orderRepositoryMock.Verify(repository => repository.ConfirmReceipt(id), Times.Once);
+        }
     }
 }

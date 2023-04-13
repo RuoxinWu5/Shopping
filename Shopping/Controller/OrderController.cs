@@ -95,5 +95,27 @@ namespace Shopping.Controller
             }
 
         }
+
+        [HttpPut("{orderId}/receipt")]
+        public async Task<ActionResult> ConfirmReceipt(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderById(orderId);
+                if (order.Type == OrderType.SHIPPED)
+                {
+                    await _orderService.PayOrder(orderId);
+                    return Ok("Received the goods successfully.");
+                }
+                else
+                {
+                    return BadRequest("Current order is not receivable.");
+                }
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

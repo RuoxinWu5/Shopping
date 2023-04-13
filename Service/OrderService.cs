@@ -36,5 +36,11 @@ namespace Service
         {
             await _orderRepository.PayOrder(orderId);
         }
+
+        public async Task ConfirmReceipt(int orderId)
+        {
+            await _orderRepository.ConfirmReceipt(orderId);
+        }
+
     }
 }

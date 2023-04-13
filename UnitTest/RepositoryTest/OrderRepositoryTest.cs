@@ -106,5 +106,19 @@ namespace UnitTest.RepositoryTest
             Assert.NotNull(result);
             Assert.Equal(OrderType.PAID, result.Type);
         }
+
+        [Fact]
+        public async Task ConfirmReceipt_ShouldChangeOrderStateToRecevied_WhenOrderIsValid()
+        {
+            // Arrange
+            var orders = await AddOrder();
+            var order = orders[0];
+            // Act
+            await _repository.ConfirmReceipt(order.Id);
+            // Assert
+            var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
+            Assert.NotNull(result);
+            Assert.Equal(OrderType.RECEIVED, result.Type);
+        }
     }
 }

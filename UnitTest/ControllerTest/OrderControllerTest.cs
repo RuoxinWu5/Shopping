@@ -117,6 +117,9 @@ namespace UnitTest.ControllerTest
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
             var order = new Order() { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            _orderServiceMock
+                .Setup(service => service.PayOrder(It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
             // Act
             var result = await _orderController.PayOrder(order.Id);
             // Assert
@@ -133,9 +136,6 @@ namespace UnitTest.ControllerTest
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
             var order = new Order() { Quantity = 10, Type = OrderType.PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            _orderServiceMock
-                .Setup(service => service.PayOrder(It.IsAny<int>()))
-                .Returns(Task.CompletedTask);
             // Act
             var result = await _orderController.PayOrder(order.Id);
             // Assert
@@ -148,7 +148,52 @@ namespace UnitTest.ControllerTest
         {
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
             // Act
-            var result = await _orderController.GetOrderById(1);
+            var result = await _orderController.PayOrder(1);
+            // Assert
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task ConfirmReceipt_ShouldReturnOk_WhenOrderStateIsShipped()
+        {
+            // Arrange
+            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
+            var order = new Order() { Quantity = 10, Type = OrderType.SHIPPED, Product = product, User = buyer };
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            _orderServiceMock
+                .Setup(service => service.ConfirmReceipt(It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
+            // Act
+            var result = await _orderController.ConfirmReceipt(order.Id);
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal("Received the goods successfully.", okObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task ConfirmReceipt_ShouldReturnBadRequest_WhenOrderStateIsNotShipped()
+        {
+            // Arrange
+            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
+            var order = new Order() { Quantity = 10, Type = OrderType.PAID, Product = product, User = buyer };
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            var result = await _orderController.ConfirmReceipt(order.Id);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Current order is not receivable.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task ConfirmReceipt_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        {
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            // Act
+            var result = await _orderController.ConfirmReceipt(1);
             // Assert
             Assert.IsType<NotFoundObjectResult>(result);
         }

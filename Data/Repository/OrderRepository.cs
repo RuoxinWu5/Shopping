@@ -42,5 +42,12 @@ namespace Data.Repository
             order.Type = OrderType.PAID;
             await _context.SaveChangesAsync();
         }
+
+        public async Task ConfirmReceipt(int orderId)
+        {
+            var order = await GetOrderById(orderId);
+            order.Type = OrderType.RECEIVED;
+            await _context.SaveChangesAsync();
+        }
     }
 }
