@@ -1,6 +1,7 @@
 using Data.Model;
 using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Service;
 
 namespace Shopping.Controller
@@ -51,21 +52,48 @@ namespace Shopping.Controller
             try
             {
                 var order = await _orderService.GetOrderById(orderId);
+                var product = await _productService.GetProductById(order.Product.Id);
+                var buyer = await _userService.GetBuyerById(order.User.Id);
                 var result = new BuyerOrder
                 {
                     Id = order.Id,
-                    ProductName = order.Product.Name,
+                    ProductName = product.Name,
                     Quantity = order.Quantity,
-                    SellerName = order.Product.User.Name,
-                    BuyerName = order.User.Name,
+                    SellerName = product.User.Name,
+                    BuyerName = buyer.Name,
                     Type = order.Type
                 };
+                string resultJson = JsonConvert.SerializeObject(result);
+                Console.WriteLine(resultJson);
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        [HttpPut("{orderId}/payment")]
+        public async Task<ActionResult> PayOrder(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderById(orderId);
+                if (order.Type == OrderType.TO_BE_PAID)
+                {
+                    await _orderService.PayOrder(orderId);
+                    return Ok("Payment successful.");
+                }
+                else
+                {
+                    return BadRequest("Current order is not payable.");
+                }
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
         }
     }
 }

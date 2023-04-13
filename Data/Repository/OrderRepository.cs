@@ -14,7 +14,7 @@ namespace Data.Repository
         public async Task AddOrder(Order order)
         {
             _context.Orders.Add(order);
-            
+
             var findProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == order.Product.Id);
             if (findProduct != null)
             {
@@ -23,9 +23,17 @@ namespace Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public Task<Order> GetOrderById(int id)
+        public async Task<Order> GetOrderById(int id)
         {
-            throw new NotImplementedException();
+            var result = await _context.Orders.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Id == id);
+            if (result == null)
+            {
+                throw new KeyNotFoundException("The order doesn't exist.");
+            }
+            else
+            {
+                return result;
+            }
         }
     }
 }

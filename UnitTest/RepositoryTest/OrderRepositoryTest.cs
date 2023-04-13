@@ -19,6 +19,19 @@ namespace UnitTest.RepositoryTest
             _repository = new OrderRepository(_context);
         }
 
+        private async Task<List<Order>> AddOrder()
+        {
+            var users = await AddUsers();
+            var products = await AddProducts();
+            var order = new List<Order>
+            {
+                new Order { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = products[0], User = users[0] }
+            };
+            await _context.AddRangeAsync(order);
+            await _context.SaveChangesAsync();
+            return order;
+        }
+
         private async Task<List<Product>> AddProducts()
         {
             var users = await AddUsers();
@@ -60,24 +73,24 @@ namespace UnitTest.RepositoryTest
             Assert.Equal(order, savedOrder);
         }
 
-        // [Fact]
-        // public async Task GetOrderById_ShouldReturnOrder_WhenOrderIsfound()
-        // {
-        //     // Arrange
-        //     var order = await AddProducts();
-        //     // Act
-        //     var result = await _repository.GetProductById(products[0].Id);
-        //     // Assert
-        //     Assert.Equal(products[0].ToString(), result.ToString());
-        // }
+        [Fact]
+        public async Task GetOrderById_ShouldReturnOrder_WhenOrderIsfound()
+        {
+            // Arrange
+            var order = await AddOrder();
+            // Act
+            var result = await _repository.GetOrderById(order[0].Id);
+            // Assert
+            Assert.Equal(order[0].ToString(), result.ToString());
+        }
 
-        // [Fact]
-        // public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
-        // {
-        //     // Arrange
-        //     var products = await AddProducts();
-        //     // Act & Assert
-        //     await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductById(3));
-        // }
+        [Fact]
+        public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        {
+            // Arrange
+            var products = await AddProducts();
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetOrderById(1));
+        }
     }
 }
