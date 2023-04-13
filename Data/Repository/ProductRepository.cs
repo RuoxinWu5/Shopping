@@ -42,5 +42,10 @@ namespace Data.Repository
                 return result;
             }
         }
+        public async Task<IEnumerable<Product>> AllProduct()
+        {
+            var result = await _context.Products.Include(p => p.User).ToListAsync();
+            return result;
+        }
     }
 }

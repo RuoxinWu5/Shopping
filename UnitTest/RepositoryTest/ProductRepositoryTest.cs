@@ -85,5 +85,16 @@ namespace UnitTest.RepositoryTest
             // Act & Assert
             await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddProduct(product));
         }
+
+        [Fact]
+        public async Task GetProductList_ShouldReturnProductList_WhenProductsIsfound()
+        {
+            // Arrange
+            var products = await AddProducts();
+            // Act
+            var result = await _repository.AllProduct();
+            // Assert
+            Assert.Equal(products.ToString(), result.ToString());
+        }
     }
 }

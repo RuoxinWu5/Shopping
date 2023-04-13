@@ -45,5 +45,26 @@ namespace UnitTest.ServiceTest
             _productRepositoryMock.Verify(repository => repository.AddProduct(product), Times.Once);
         }
 
+        [Fact]
+        public async Task GetProductList_ShouldReturnProductList_WhenProductsIsfound()
+        {
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var resultRepositoryItem = new List<Product>
+            {
+                new Product { Name = "Apple", Quantity = 100, User = user },
+                new Product { Name = "Banana", Quantity = 0, User = user }
+            };
+            var resultItem = new List<Product>
+            {
+                new Product { Name = "Apple", Quantity = 100, User = user }
+            };
+            _productRepositoryMock.Setup(repository => repository.AllProduct()).ReturnsAsync(resultRepositoryItem);
+            // Act
+            var result = await _productService.AllProduct();
+            // Assert
+            Assert.Equal(resultItem[0].Name, result.First().Name);
+            Assert.Equal(resultItem[0].Quantity, result.First().Quantity);
+        }
+
     }
 }

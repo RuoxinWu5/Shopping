@@ -6,7 +6,7 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api/seller/{sellerId}/products")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace Shopping.Controller
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductListBySellerId(int sellerId)///filter
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductListBySellerId(int sellerId)
         {
             var result = await _productService.GetProductListBySellerId(sellerId);
             return Ok(result);

@@ -27,5 +27,12 @@ namespace Service
         {
             return await _repository.GetProductById(id);
         }
+
+        public async Task<IEnumerable<Product>> AllProduct()
+        {
+            var result = await _repository.AllProduct();
+            var filteredResult = result.Where(p => p.Quantity != 0);
+            return filteredResult;
+        }
     }
 }
