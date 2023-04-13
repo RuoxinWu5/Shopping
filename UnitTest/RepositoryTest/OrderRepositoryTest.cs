@@ -92,5 +92,19 @@ namespace UnitTest.RepositoryTest
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetOrderById(1));
         }
+
+        [Fact]
+        public async Task PayOrder_ShouldChangeOrderStateToPaid_WhenOrderIsValid()
+        {
+            // Arrange
+            var orders = await AddOrder();
+            var order = orders[0];
+            // Act
+            await _repository.PayOrder(order.Id);
+            // Assert
+            var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
+            Assert.NotNull(result);
+            Assert.Equal(OrderType.PAID, result.Type);
+        }
     }
 }

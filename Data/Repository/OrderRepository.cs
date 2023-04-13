@@ -36,9 +36,11 @@ namespace Data.Repository
             }
         }
 
-        public Task PayOrder(int orderId)
+        public async Task PayOrder(int orderId)
         {
-            throw new NotImplementedException();
+            var order = await GetOrderById(orderId);
+            order.Type = OrderType.PAID;
+            await _context.SaveChangesAsync();
         }
     }
 }
