@@ -35,5 +35,10 @@ namespace Data.Repository
                 return result;
             }
         }
+
+        public Task PayOrder(int orderId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

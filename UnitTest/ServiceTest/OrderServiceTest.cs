@@ -56,5 +56,16 @@ namespace UnitTest.ServiceTest
             // Assert
             _orderRepositoryMock.Verify(repository => repository.GetOrderById(id), Times.Once);
         }
+        
+        [Fact]
+        public async Task PayOrder_ShouldCallPayOrderMethodOfRepository()
+        {
+            // Arrange
+            var id = 1;
+            // Act
+            await _orderService.PayOrder(id);
+            // Assert
+            _orderRepositoryMock.Verify(repository => repository.PayOrder(id), Times.Once);
+        }
     }
 }

@@ -32,9 +32,9 @@ namespace Service
             return await _orderRepository.GetOrderById(id);
         }
 
-        public Task PayOrder(int orderId)
+        public async Task PayOrder(int orderId)
         {
-            throw new NotImplementedException();
+            await _orderRepository.PayOrder(orderId);
         }
     }
 }
