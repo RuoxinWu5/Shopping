@@ -26,5 +26,10 @@ namespace Service
             await _orderRepository.AddOrder(order);
             return order;
         }
+
+        public Task<Order> GetOrderById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

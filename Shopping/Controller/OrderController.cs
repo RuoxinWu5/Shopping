@@ -44,5 +44,28 @@ namespace Shopping.Controller
                 return NotFound(exception.Message);
             }
         }
+
+        [HttpGet("{orderId}")]
+        public async Task<ActionResult> GetOrderById(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderById(orderId);
+                var result = new BuyerOrder
+                {
+                    Id = order.Id,
+                    ProductName = order.Product.Name,
+                    Quantity = order.Quantity,
+                    SellerName = order.Product.User.Name,
+                    BuyerName = order.User.Name,
+                    Type = order.Type
+                };
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

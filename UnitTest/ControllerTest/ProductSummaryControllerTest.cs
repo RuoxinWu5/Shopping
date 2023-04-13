@@ -6,13 +6,13 @@ using Shopping.Controller;
 
 namespace UnitTest.ControllerTest
 {
-    public class BuyerControllerTest
+    public class ProductSummaryControllerTest
     {
         private readonly ProductSummaryController _buyerController;
         private readonly Mock<IProductService> _productServiceMock;
         private readonly Mock<IUserService> _userServiceMock;
 
-        public BuyerControllerTest()
+        public ProductSummaryControllerTest()
         {
             _productServiceMock = new Mock<IProductService>();
             _userServiceMock = new Mock<IUserService>();

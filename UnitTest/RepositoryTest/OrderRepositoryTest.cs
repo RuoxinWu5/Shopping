@@ -59,5 +59,25 @@ namespace UnitTest.RepositoryTest
             Assert.NotNull(savedOrder);
             Assert.Equal(order, savedOrder);
         }
+
+        // [Fact]
+        // public async Task GetOrderById_ShouldReturnOrder_WhenOrderIsfound()
+        // {
+        //     // Arrange
+        //     var order = await AddProducts();
+        //     // Act
+        //     var result = await _repository.GetProductById(products[0].Id);
+        //     // Assert
+        //     Assert.Equal(products[0].ToString(), result.ToString());
+        // }
+
+        // [Fact]
+        // public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        // {
+        //     // Arrange
+        //     var products = await AddProducts();
+        //     // Act & Assert
+        //     await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductById(3));
+        // }
     }
 }
