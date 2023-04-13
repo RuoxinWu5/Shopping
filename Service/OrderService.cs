@@ -31,5 +31,10 @@ namespace Service
         {
             return await _orderRepository.GetOrderById(id);
         }
+
+        public Task PayOrder(int orderId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -86,10 +86,12 @@ namespace UnitTest.ControllerTest
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
             var order = new Order() { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = product, User = buyer };
-            var resultItem = new BuyerOrder() { Id = 1, ProductName = "Apple", Quantity = 10, SellerName = "Jack", BuyerName = "Lisa", Type = OrderType.TO_BE_PAID };
+            var resultItem = new BuyerOrder() { ProductName = "Apple", Quantity = 10, SellerName = "Jack", BuyerName = "Lisa", Type = OrderType.TO_BE_PAID };
+            _productServiceMock.Setup(p => p.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _userServiceMock.Setup(u => u.GetBuyerById(It.IsAny<int>())).ReturnsAsync(seller);
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             // Act
-            var result = await _orderController.GetOrderById(1);
+            var result = await _orderController.GetOrderById(order.Id);
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okObjectResult.Value);
@@ -98,6 +100,51 @@ namespace UnitTest.ControllerTest
 
         [Fact]
         public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        {
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            // Act
+            var result = await _orderController.GetOrderById(1);
+            // Assert
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task PayOrder_ShouldReturnOk_WhenOrderStateIsToBePaid()
+        {
+            // Arrange
+            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
+            var order = new Order() { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = product, User = buyer };
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            var result = await _orderController.PayOrder(order.Id);
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal("Payment successful.", okObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task PayOrder_ShouldReturnBadRequest_WhenOrderStateIsNotToBePaid()
+        {
+            // Arrange
+            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
+            var order = new Order() { Quantity = 10, Type = OrderType.PAID, Product = product, User = buyer };
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            _orderServiceMock
+                .Setup(service => service.PayOrder(It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
+            // Act
+            var result = await _orderController.PayOrder(order.Id);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Current order is not payable.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task PayOrder_ShouldReturnNotFoundException_WhenOrderIsNotfound()
         {
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
             // Act

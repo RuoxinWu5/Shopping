@@ -6,5 +6,6 @@ namespace Service
     {
         Task<Order> AddOrder(Order order);
         Task<Order> GetOrderById(int id);
+        Task PayOrder(int orderId);
     }
 }
