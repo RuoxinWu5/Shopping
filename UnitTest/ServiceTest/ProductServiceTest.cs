@@ -66,5 +66,16 @@ namespace UnitTest.ServiceTest
             Assert.Equal(resultItem[0].Quantity, result.First().Quantity);
         }
 
+        [Fact]
+        public async Task GetProductById_ShouldCallGetProductByIdMethodOfRepository()
+        {
+            // Arrange
+            var id = 1;
+            // Act
+            await _productService.GetProductById(id);
+            // Assert
+            _productRepositoryMock.Verify(repository => repository.GetProductById(id), Times.Once);
+        }
+
     }
 }

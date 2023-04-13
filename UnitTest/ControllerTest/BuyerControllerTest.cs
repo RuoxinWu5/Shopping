@@ -47,6 +47,7 @@ namespace UnitTest.ControllerTest
             var result = await _buyerController.GetProductByProductId(1);
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.NotNull(okObjectResult.Value);
             Assert.Equal(resultItem.ToString(), okObjectResult.Value.ToString());
         }
 
