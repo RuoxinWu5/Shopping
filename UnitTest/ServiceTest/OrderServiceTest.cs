@@ -45,5 +45,16 @@ namespace UnitTest.ServiceTest
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrder(order));
         }
+
+        [Fact]
+        public async Task GetOrderById_ShouldCallGetOrderByIdMethodOfRepository()
+        {
+            // Arrange
+            var id = 1;
+            // Act
+            await _orderService.GetOrderById(id);
+            // Assert
+            _orderRepositoryMock.Verify(repository => repository.GetOrderById(id), Times.Once);
+        }
     }
 }

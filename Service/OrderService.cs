@@ -27,9 +27,9 @@ namespace Service
             return order;
         }
 
-        public Task<Order> GetOrderById(int id)
+        public async Task<Order> GetOrderById(int id)
         {
-            throw new NotImplementedException();
+            return await _orderRepository.GetOrderById(id);
         }
     }
 }

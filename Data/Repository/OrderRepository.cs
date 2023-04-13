@@ -22,5 +22,10 @@ namespace Data.Repository
             }
             await _context.SaveChangesAsync();
         }
+
+        public Task<Order> GetOrderById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
