@@ -25,7 +25,7 @@ namespace UnitTest.RepositoryTest
             var products = await AddProducts();
             var order = new List<Order>
             {
-                new Order { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = products[0], User = users[0] }
+                new Order { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] }
             };
             await _context.AddRangeAsync(order);
             await _context.SaveChangesAsync();
@@ -63,7 +63,7 @@ namespace UnitTest.RepositoryTest
             // Arrange
             var products = await AddProducts();
             var users = await AddUsers();
-            var order = new Order { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = products[0], User = users[0] };
+            var order = new Order { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] };
             // Act
             await _repository.AddOrder(order);
             // Assert
@@ -104,7 +104,7 @@ namespace UnitTest.RepositoryTest
             // Assert
             var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
             Assert.NotNull(result);
-            Assert.Equal(OrderType.PAID, result.Type);
+            Assert.Equal(OrderState.PAID, result.Type);
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace UnitTest.RepositoryTest
             // Assert
             var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
             Assert.NotNull(result);
-            Assert.Equal(OrderType.RECEIVED, result.Type);
+            Assert.Equal(OrderState.RECEIVED, result.Type);
         }
     }
 }

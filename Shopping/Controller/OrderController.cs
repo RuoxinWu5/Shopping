@@ -1,7 +1,6 @@
 using Data.Model;
 using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Service;
 
 namespace Shopping.Controller
@@ -29,7 +28,7 @@ namespace Shopping.Controller
                 var order = new Order
                 {
                     Quantity = orderRequestModel.Quantity,
-                    Type = OrderType.TO_BE_PAID,
+                    Type = OrderState.TO_BE_PAID,
                     Product = await _productService.GetProductById(orderRequestModel.ProductId),
                     User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
@@ -63,8 +62,6 @@ namespace Shopping.Controller
                     BuyerName = buyer.Name,
                     Type = order.Type
                 };
-                string resultJson = JsonConvert.SerializeObject(result);
-                Console.WriteLine(resultJson);
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)
@@ -79,7 +76,7 @@ namespace Shopping.Controller
             try
             {
                 var order = await _orderService.GetOrderById(orderId);
-                if (order.Type == OrderType.TO_BE_PAID)
+                if (order.Type == OrderState.TO_BE_PAID)
                 {
                     await _orderService.PayOrder(orderId);
                     return Ok("Payment successful.");
@@ -102,7 +99,7 @@ namespace Shopping.Controller
             try
             {
                 var order = await _orderService.GetOrderById(orderId);
-                if (order.Type == OrderType.SHIPPED)
+                if (order.Type == OrderState.SHIPPED)
                 {
                     await _orderService.PayOrder(orderId);
                     return Ok("Received the goods successfully.");

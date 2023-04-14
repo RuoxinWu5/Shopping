@@ -26,7 +26,7 @@ namespace UnitTest.ServiceTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            var order = new Order { Quantity = 10, Type = OrderType.TO_BE_PAID, Product = product, User = user };
+            var order = new Order { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = user };
             // Act
             var result = await _orderService.AddOrder(order);
             // Assert
@@ -41,7 +41,7 @@ namespace UnitTest.ServiceTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 50, User = user };
-            var order = new Order { Quantity = 51, Type = OrderType.TO_BE_PAID, Product = product, User = user };
+            var order = new Order { Quantity = 51, Type = OrderState.TO_BE_PAID, Product = product, User = user };
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrder(order));
         }
@@ -56,7 +56,7 @@ namespace UnitTest.ServiceTest
             // Assert
             _orderRepositoryMock.Verify(repository => repository.GetOrderById(id), Times.Once);
         }
-        
+
         [Fact]
         public async Task PayOrder_ShouldCallPayOrderMethodOfRepository()
         {

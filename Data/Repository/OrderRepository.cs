@@ -39,14 +39,14 @@ namespace Data.Repository
         public async Task PayOrder(int orderId)
         {
             var order = await GetOrderById(orderId);
-            order.Type = OrderType.PAID;
+            order.Type = OrderState.PAID;
             await _context.SaveChangesAsync();
         }
 
         public async Task ConfirmReceipt(int orderId)
         {
             var order = await GetOrderById(orderId);
-            order.Type = OrderType.RECEIVED;
+            order.Type = OrderState.RECEIVED;
             await _context.SaveChangesAsync();
         }
     }

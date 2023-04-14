@@ -8,7 +8,6 @@ namespace Data.Model
         BUYER = 0,
         SELLER = 1
     }
-    [Table("Users")]
     public class User
     {
         public int Id { get; set; }
