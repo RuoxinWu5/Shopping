@@ -18,8 +18,8 @@ namespace Service
 
         public async Task<Order> AddOrder(Order order)
         {
-            var Quantity = order.Product.Quantity;
-            if (order.Quantity > Quantity)
+            var quantity = order.Product.Quantity;
+            if (order.Quantity > quantity)
             {
                 throw new ArgumentException("Quantity not sufficient. Order creation failed.");
             }
