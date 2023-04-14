@@ -101,7 +101,7 @@ namespace Shopping.Controller
                 var order = await _orderService.GetOrderById(orderId);
                 if (order.Type == OrderState.SHIPPED)
                 {
-                    await _orderService.PayOrder(orderId);
+                    await _orderService.ConfirmReceipt(orderId);
                     return Ok("Received the goods successfully.");
                 }
                 else
@@ -123,7 +123,7 @@ namespace Shopping.Controller
                 var order = await _orderService.GetOrderById(orderId);
                 if (order.Type == OrderState.PAID)
                 {
-                    await _orderService.PayOrder(orderId);
+                    await _orderService.ShipOrder(orderId);
                     return Ok("Delivery successful.");
                 }
                 else
