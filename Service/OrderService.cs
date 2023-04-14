@@ -43,5 +43,10 @@ namespace Service
             await _orderRepository.ConfirmReceipt(orderId);
         }
 
+        public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
+        {
+            var result = await _orderRepository.GetOrderListBySellerId(sellerId);
+            return result;
+        }
     }
 }

@@ -79,5 +79,16 @@ namespace UnitTest.ServiceTest
             // Assert
             _orderRepositoryMock.Verify(repository => repository.ConfirmReceipt(id), Times.Once);
         }
+        
+        [Fact]
+        public async Task GetProductListBySellerId_ShouldCallGetProductListBySellerIdMethodOfRepository()
+        {
+            // Arrange
+            var id = 1;
+            // Act
+            await _orderService.GetOrderListBySellerId(id);
+            // Assert
+            _orderRepositoryMock.Verify(repository => repository.GetOrderListBySellerId(id), Times.Once);
+        }
     }
 }

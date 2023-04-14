@@ -114,5 +114,12 @@ namespace Shopping.Controller
                 return NotFound(ex.Message);
             }
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrderListBySellerId(int sellerId)
+        {
+            var result = await _orderService.GetOrderListBySellerId(sellerId);
+            return Ok(result);
+        }
     }
 }

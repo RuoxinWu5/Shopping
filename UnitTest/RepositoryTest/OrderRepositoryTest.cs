@@ -120,5 +120,17 @@ namespace UnitTest.RepositoryTest
             Assert.NotNull(result);
             Assert.Equal(OrderState.RECEIVED, result.Type);
         }
+
+        [Fact]
+        public async Task GetOrderListBySellerId_ShouldReturnOrderList_WhenOrdersIsfound()
+        {
+            // Arrange
+            var products = await AddOrder();
+            var sellerId = 2;
+            // Act
+            var result = await _repository.GetOrderListBySellerId(sellerId);
+            // Assert
+            Assert.Equal(products.ToString(), result.ToString());
+        }
     }
 }

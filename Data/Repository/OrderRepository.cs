@@ -43,5 +43,11 @@ namespace Data.Repository
             order.Type = OrderState.RECEIVED;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
+        {
+            var result = await _context.Orders.Include(o => o.User).Include(o => o.Product).Where(order => order.User.Id == sellerId).ToListAsync();
+            return result;
+        }
     }
 }

@@ -197,5 +197,22 @@ namespace UnitTest.ControllerTest
             // Assert
             Assert.IsType<NotFoundObjectResult>(result);
         }
+
+        [Fact]
+        public async Task GetOrderListBySellerId_ShouldReturnOk_WhenOrdersIsfound()
+        {
+            // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
+            var resultItem = new List<Order>{
+                new Order{ Quantity = 10, Type = OrderState.TO_BE_PAID, User = user, Product = product }
+                };
+            _orderServiceMock.Setup(x => x.GetOrderListBySellerId(It.IsAny<int>())).ReturnsAsync(resultItem);
+            // Act
+            var result = await _orderController.GetOrderListBySellerId(1);
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result.Result);
+            Assert.Equal(resultItem, okObjectResult.Value);
+        }
     }
 }

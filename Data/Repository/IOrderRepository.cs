@@ -8,5 +8,6 @@ namespace Data.Repository
         Task<Order> GetOrderById(int id);
         Task PayOrder(int orderId);
         Task ConfirmReceipt(int orderId);
+        Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId);
     }
 }
