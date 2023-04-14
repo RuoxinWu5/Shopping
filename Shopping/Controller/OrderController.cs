@@ -5,7 +5,7 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api/order")]
+    [Route("api/orders")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace Shopping.Controller
             _userService = userService;
         }
 
-        [HttpPost("add")]
+        [HttpPost]
         public async Task<ActionResult> AddOrder(OrderRequestModel orderRequestModel)
         {
             try
@@ -70,7 +70,7 @@ namespace Shopping.Controller
             }
         }
 
-        [HttpPut("{orderId}/payment")]
+        [HttpPost("{orderId}/payment")]
         public async Task<ActionResult> PayOrder(int orderId)
         {
             try
@@ -93,7 +93,7 @@ namespace Shopping.Controller
 
         }
 
-        [HttpPut("{orderId}/receipt")]
+        [HttpPost("{orderId}/receipt")]
         public async Task<ActionResult> ConfirmReceipt(int orderId)
         {
             try

@@ -5,7 +5,7 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api")]
+    [Route("api/users")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace Shopping.Controller
             _userService = userService;
         }
 
-        [HttpPost("register")]
+        [HttpPost]
         public async Task<ActionResult> AddUser(User user)
         {
             try

@@ -26,7 +26,7 @@ namespace Shopping.Controller
             return Ok(result);
         }
 
-        [HttpPost("add")]
+        [HttpPost]
         public async Task<ActionResult> AddProduct(ProductRequestModel productViewModel)
         {
             try
