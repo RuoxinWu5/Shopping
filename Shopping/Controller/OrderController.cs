@@ -116,10 +116,33 @@ namespace Shopping.Controller
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrderListBySellerId(int sellerId)
+        public async Task<ActionResult<IEnumerable<SellerOrder>>> GetOrderListBySellerId(int sellerId)
         {
-            var result = await _orderService.GetOrderListBySellerId(sellerId);
-            return Ok(result);
+            try
+            {
+                var orders = await _orderService.GetOrderListBySellerId(sellerId);
+                List<SellerOrder> result = new List<SellerOrder>();
+                foreach (Order order in orders){
+                    var product = await _productService.GetProductById(order.Product.Id);
+                    var buyer = await _userService.GetBuyerById(order.User.Id);
+                    var buyerOrder = new SellerOrder
+                    {
+                        Id = order.Id,
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        Quantity = order.Quantity,
+                        BuyerId = buyer.Id,
+                        BuyerName = buyer.Name,
+                        Type = order.Type
+                    };
+                    result.Add(buyerOrder);
+                }
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

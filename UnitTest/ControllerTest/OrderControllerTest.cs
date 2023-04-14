@@ -202,17 +202,24 @@ namespace UnitTest.ControllerTest
         public async Task GetOrderListBySellerId_ShouldReturnOk_WhenOrdersIsfound()
         {
             // Arrange
-            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            var resultItem = new List<Order>{
-                new Order{ Quantity = 10, Type = OrderState.TO_BE_PAID, User = user, Product = product }
-                };
-            _orderServiceMock.Setup(x => x.GetOrderListBySellerId(It.IsAny<int>())).ReturnsAsync(resultItem);
+            var seller = new User {Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var serviceResult = new List<Order>{
+                new Order{ Quantity = 10, Type = OrderState.TO_BE_PAID, User = buyer, Product = product }
+            };
+            var resultItem = new List<SellerOrder>{
+                new SellerOrder{ ProductId = 1, ProductName = "Apple", Quantity = 10, BuyerId = 2, BuyerName = "Lisa", Type = OrderState.TO_BE_PAID }
+            };
+            _productServiceMock.Setup(p => p.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _userServiceMock.Setup(u => u.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
+            _orderServiceMock.Setup(x => x.GetOrderListBySellerId(It.IsAny<int>())).ReturnsAsync(serviceResult);
             // Act
             var result = await _orderController.GetOrderListBySellerId(1);
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result.Result);
-            Assert.Equal(resultItem, okObjectResult.Value);
+            Assert.NotNull(okObjectResult.Value);
+            Assert.Equal(resultItem.ToString(), okObjectResult.Value.ToString());
         }
     }
 }
