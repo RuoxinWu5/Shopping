@@ -247,7 +247,7 @@ namespace UnitTest.ControllerTest
         public async Task GetOrderListBySellerId_ShouldReturnOk_WhenOrdersIsfound()
         {
             // Arrange
-            var seller = new User {Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var serviceResult = new List<Order>{
@@ -265,6 +265,19 @@ namespace UnitTest.ControllerTest
             var okObjectResult = Assert.IsType<OkObjectResult>(result.Result);
             Assert.NotNull(okObjectResult.Value);
             Assert.Equal(resultItem.ToString(), okObjectResult.Value.ToString());
+        }
+
+        [Fact]
+        public async Task GetOrderListBySellerId_ShouldReturnNotFound_WhenSellerNotFound()
+        {
+            // Arrange
+            int sellerId = 1;
+            _userServiceMock.Setup(x => x.GetSellerById(sellerId)).Throws(new KeyNotFoundException("Seller not found"));
+            // Act
+            var result = await _orderController.GetOrderListBySellerId(sellerId);
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Equal("Seller not found", notFoundResult.Value);
         }
     }
 }

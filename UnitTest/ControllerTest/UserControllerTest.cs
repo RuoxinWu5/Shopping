@@ -48,5 +48,34 @@ namespace UnitTest.ControllerTest
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
             Assert.Equal("User name 'test' already exists.", conflictResult.Value);
         }
+
+        [Fact]
+        public async Task GetUserById_ShouldReturnOk_WhenUserIsExist()
+        {
+            // Arrange
+            var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
+            _userServiceMock
+                .Setup(service => service.GetUserById(It.IsAny<int>()))
+                .ReturnsAsync(user);
+            // Act
+            var result = await _userController.GetUserById(1);
+            // Assert
+            var createdResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(user, createdResult.Value);
+        }
+
+        [Fact]
+        public async Task GetUserById_ShouldReturnBadRequest_WhenUserIsNotExists()
+        {
+            // Arrange
+            _userServiceMock
+                .Setup(service => service.GetUserById(It.IsAny<int>()))
+                .Throws(new KeyNotFoundException("The user doesn't exist."));
+            // Act
+            var result = await _userController.GetUserById(1);
+            // Assert
+            var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("The user doesn't exist.", notFoundObjectResult.Value);
+        }
     }
 }
