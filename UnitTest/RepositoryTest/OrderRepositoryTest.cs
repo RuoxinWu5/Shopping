@@ -129,6 +129,22 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
+        public async Task ShipOrder_ShouldChangeOrderStateToShipped_WhenOrderIsValid()
+        {
+            // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
+            var orders = await AddOrder();
+            var order = orders[0];
+            // Act
+            await _repository.ShipOrder(order.Id);
+            // Assert
+            var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
+            Assert.NotNull(result);
+            Assert.Equal(OrderState.SHIPPED, result.Type);
+        }
+
+        [Fact]
         public async Task GetOrderListBySellerId_ShouldReturnOrderList_WhenOrdersIsfound()
         {
             // Arrange

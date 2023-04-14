@@ -44,15 +44,17 @@ namespace Data.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task ShipOrder(int orderId)
+        {
+            var order = await GetOrderById(orderId);
+            order.Type = OrderState.SHIPPED;
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
             var result = await _context.Orders.Include(o => o.User).Include(o => o.Product).Where(order => order.Product.User.Id == sellerId).ToListAsync();
             return result;
-        }
-
-        public Task ShipOrder(int orderId)
-        {
-            throw new NotImplementedException();
         }
     }
 }
