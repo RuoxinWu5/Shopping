@@ -43,9 +43,9 @@ namespace Service
             await _orderRepository.ConfirmReceipt(orderId);
         }
 
-        public Task ShipOrder(int orderId)
+        public async Task ShipOrder(int orderId)
         {
-            throw new NotImplementedException();
+            await _orderRepository.ShipOrder(orderId);
         }
 
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)

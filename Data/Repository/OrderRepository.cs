@@ -49,5 +49,10 @@ namespace Data.Repository
             var result = await _context.Orders.Include(o => o.User).Include(o => o.Product).Where(order => order.Product.User.Id == sellerId).ToListAsync();
             return result;
         }
+
+        public Task ShipOrder(int orderId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
