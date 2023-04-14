@@ -22,12 +22,26 @@ namespace Shopping.Controller
             try
             {
                 await _userService.AddUser(user);
-                return CreatedAtAction(nameof(AddUser), new { id = user.Id }, "Registered successfully.");
+                return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, "Registered successfully.");
 
             }
             catch (DuplicateUserNameException exception)
             {
                 return Conflict(exception.Message);
+            }
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<ActionResult> GetUserById(int userId)
+        {
+            try
+            {
+                var user = await _userService.GetUserById(userId);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
     }

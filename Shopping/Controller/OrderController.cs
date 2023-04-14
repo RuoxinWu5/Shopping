@@ -33,7 +33,7 @@ namespace Shopping.Controller
                     User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
                 var result = await _orderService.AddOrder(order);
-                return CreatedAtAction(nameof(AddOrder), new { id = result.Id }, result);
+                return CreatedAtAction(nameof(GetOrderById), new { id = result.Id }, result);
             }
             catch (ArgumentException exception)
             {

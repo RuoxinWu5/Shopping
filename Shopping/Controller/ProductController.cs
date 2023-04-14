@@ -38,7 +38,7 @@ namespace Shopping.Controller
                     User = await _userService.GetSellerById(productViewModel.SellerId)
                 };
                 await _productService.AddProduct(product);
-                return CreatedAtAction(nameof(AddProduct), new { id = product.Id }, "Create product successfully.");
+                return CreatedAtAction(nameof(ProductSummaryController.GetProductByProductId), new { id = product.Id }, "Create product successfully.");
             }
             catch (DuplicateUserNameException exception)
             {

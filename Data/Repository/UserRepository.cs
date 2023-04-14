@@ -27,6 +27,7 @@ namespace Data.Repository
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
+
         public async Task<User> GetUserById(int id)
         {
             var result = await _context.Users.Include(p => p.Products).FirstOrDefaultAsync(u => u.Id == id);
