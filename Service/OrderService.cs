@@ -24,6 +24,7 @@ namespace Service
                 throw new ArgumentException("Quantity not sufficient. Order creation failed.");
             }
             await _orderRepository.AddOrder(order);
+            await _productRepository.ProductReduce(order.Product, order.Quantity);
             return order;
         }
 

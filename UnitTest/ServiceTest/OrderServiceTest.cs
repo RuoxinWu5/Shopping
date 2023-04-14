@@ -33,6 +33,7 @@ namespace UnitTest.ServiceTest
             Assert.Equal(product, result.Product);
             Assert.Equal(user, result.User);
             _orderRepositoryMock.Verify(repository => repository.AddOrder(result), Times.Once);
+            _productRepositoryMock.Verify(x => x.ProductReduce(product, order.Quantity), Times.Once);
         }
 
         [Fact]

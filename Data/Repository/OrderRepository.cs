@@ -14,12 +14,6 @@ namespace Data.Repository
         public async Task AddOrder(Order order)
         {
             _context.Orders.Add(order);
-
-            var findProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == order.Product.Id);
-            if (findProduct != null)
-            {
-                findProduct.Quantity -= order.Quantity;
-            }
             await _context.SaveChangesAsync();
         }
 

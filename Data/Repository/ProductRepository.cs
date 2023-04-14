@@ -47,5 +47,12 @@ namespace Data.Repository
             var result = await _context.Products.Include(p => p.User).ToListAsync();
             return result;
         }
+
+        public async Task ProductReduce(Product product, int quantity)
+        {
+            var result = await GetProductById(product.Id);
+            result.Quantity -= quantity;
+            await _context.SaveChangesAsync();
+        }
     }
 }
