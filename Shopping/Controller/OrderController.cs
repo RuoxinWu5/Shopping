@@ -115,6 +115,28 @@ namespace Shopping.Controller
             }
         }
 
+        [HttpPost("{orderId}/ship")]
+        public async Task<ActionResult> ShipOrder(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderById(orderId);
+                if (order.Type == OrderState.PAID)
+                {
+                    await _orderService.PayOrder(orderId);
+                    return Ok("Delivery successful.");
+                }
+                else
+                {
+                    return BadRequest("Current order is not shippable.");
+                }
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SellerOrder>>> GetOrderListBySellerId(int sellerId)
         {

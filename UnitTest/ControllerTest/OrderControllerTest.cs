@@ -199,6 +199,51 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
+        public async Task ShipOrder_ShouldReturnOk_WhenOrderStateIsPaid()
+        {
+            // Arrange
+            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
+            var order = new Order() { Quantity = 10, Type = OrderState.PAID, Product = product, User = buyer };
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            _orderServiceMock
+                .Setup(service => service.ShipOrder(It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
+            // Act
+            var result = await _orderController.ShipOrder(order.Id);
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal("Delivery successful.", okObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task ShipOrder_ShouldReturnBadRequest_WhenOrderStateIsNotPaid()
+        {
+            // Arrange
+            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
+            var order = new Order() { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = buyer };
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            var result = await _orderController.ShipOrder(order.Id);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Current order is not shippable.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task ShipOrder_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        {
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            // Act
+            var result = await _orderController.ShipOrder(1);
+            // Assert
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        [Fact]
         public async Task GetOrderListBySellerId_ShouldReturnOk_WhenOrdersIsfound()
         {
             // Arrange

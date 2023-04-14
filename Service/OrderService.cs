@@ -43,6 +43,11 @@ namespace Service
             await _orderRepository.ConfirmReceipt(orderId);
         }
 
+        public Task ShipOrder(int orderId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
             var result = await _orderRepository.GetOrderListBySellerId(sellerId);
