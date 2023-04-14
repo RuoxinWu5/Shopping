@@ -21,11 +21,11 @@ namespace UnitTest.RepositoryTest
 
         private async Task<List<Order>> AddOrder()
         {
-            var users = await AddUsers();
-            var products = await AddProducts();
+            var users = _context.Users.ToList();
+            var products = _context.Products.ToList();
             var order = new List<Order>
             {
-                new Order { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] }
+                new Order { Id = 1, Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] }
             };
             await _context.AddRangeAsync(order);
             await _context.SaveChangesAsync();
@@ -34,11 +34,11 @@ namespace UnitTest.RepositoryTest
 
         private async Task<List<Product>> AddProducts()
         {
-            var users = await AddUsers();
+            var users = _context.Users.ToList();
             var products = new List<Product>
             {
-                new Product { Name = "Apple", Quantity = 100, User = users[1] },
-                new Product { Name = "Banana", Quantity = 50, User = users[1] }
+                new Product { Id = 1, Name = "Apple", Quantity = 100, User = users[1] },
+                new Product { Id = 2, Name = "Banana", Quantity = 50, User = users[1] }
             };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
@@ -49,8 +49,8 @@ namespace UnitTest.RepositoryTest
         {
             var users = new List<User>
         {
-            new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
-            new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
+            new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
+            new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
         };
             await _context.AddRangeAsync(users);
             await _context.SaveChangesAsync();
@@ -61,9 +61,9 @@ namespace UnitTest.RepositoryTest
         public async Task AddOrder_ShouldCreateNewOrder_WhenOrderIsValid()
         {
             // Arrange
-            var products = await AddProducts();
             var users = await AddUsers();
-            var order = new Order { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] };
+            var products = await AddProducts();
+            var order = new Order { Id = 1, Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] };
             // Act
             await _repository.AddOrder(order);
             // Assert
@@ -77,6 +77,8 @@ namespace UnitTest.RepositoryTest
         public async Task GetOrderById_ShouldReturnOrder_WhenOrderIsfound()
         {
             // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
             var order = await AddOrder();
             // Act
             var result = await _repository.GetOrderById(order[0].Id);
@@ -88,6 +90,7 @@ namespace UnitTest.RepositoryTest
         public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
         {
             // Arrange
+            var users = await AddUsers();
             var products = await AddProducts();
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetOrderById(1));
@@ -97,6 +100,8 @@ namespace UnitTest.RepositoryTest
         public async Task PayOrder_ShouldChangeOrderStateToPaid_WhenOrderIsValid()
         {
             // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
             var orders = await AddOrder();
             var order = orders[0];
             // Act
@@ -111,6 +116,8 @@ namespace UnitTest.RepositoryTest
         public async Task ConfirmReceipt_ShouldChangeOrderStateToRecevied_WhenOrderIsValid()
         {
             // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
             var orders = await AddOrder();
             var order = orders[0];
             // Act
@@ -125,12 +132,14 @@ namespace UnitTest.RepositoryTest
         public async Task GetOrderListBySellerId_ShouldReturnOrderList_WhenOrdersIsfound()
         {
             // Arrange
-            var products = await AddOrder();
+            var users = await AddUsers();
+            var products = await AddProducts();
+            var orders = await AddOrder();
             var sellerId = 2;
             // Act
             var result = await _repository.GetOrderListBySellerId(sellerId);
             // Assert
-            Assert.Equal(products.ToString(), result.ToString());
+            Assert.Equal(orders, result);
         }
     }
 }

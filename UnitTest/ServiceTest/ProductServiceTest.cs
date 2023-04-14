@@ -17,7 +17,7 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task GetProductListBySellerId_ShouldReturnProductList_WhenProductsIsfound()
+        public async Task GetProductListBySellerId_ShouldCallGetProductListBySellerIdMethodOfRepository()
         {
             // Arrange
             var id = 1;

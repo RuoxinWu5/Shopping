@@ -81,7 +81,7 @@ namespace UnitTest.ServiceTest
         }
         
         [Fact]
-        public async Task GetProductListBySellerId_ShouldCallGetProductListBySellerIdMethodOfRepository()
+        public async Task GetOrderListBySellerId_ShouldCallGetOrderListBySellerIdMethodOfRepository()
         {
             // Arrange
             var id = 1;

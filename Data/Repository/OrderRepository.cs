@@ -46,7 +46,7 @@ namespace Data.Repository
 
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
-            var result = await _context.Orders.Include(o => o.User).Include(o => o.Product).Where(order => order.User.Id == sellerId).ToListAsync();
+            var result = await _context.Orders.Include(o => o.User).Include(o => o.Product).Where(order => order.Product.User.Id == sellerId).ToListAsync();
             return result;
         }
     }

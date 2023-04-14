@@ -120,6 +120,7 @@ namespace Shopping.Controller
         {
             try
             {
+                await _userService.GetSellerById(sellerId);
                 var orders = await _orderService.GetOrderListBySellerId(sellerId);
                 List<SellerOrder> result = new List<SellerOrder>();
                 foreach (Order order in orders){
