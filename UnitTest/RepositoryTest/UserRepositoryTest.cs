@@ -72,4 +72,24 @@ public class UserRepositoryTest
         // Act & Assert
         await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddUser(user));
     }
+
+    [Fact]
+    public async Task GetUserById_ShouldReturnUser_WhenUserIsfound()
+    {
+        // Arrange
+        var users = await AddUsers();
+        // Act
+        var result = await _repository.GetUserById(users[0].Id);
+        // Assert
+        Assert.Equal(users[0], result);
+    }
+
+    [Fact]
+    public async Task GetUserById_ShouldReturnNotFoundException_WhenUserIsNotfound()
+    {
+        // Arrange
+        var users = await AddUsers();
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(async ()=>await _repository.GetUserById(3));
+    }
 }
