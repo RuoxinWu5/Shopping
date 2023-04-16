@@ -23,11 +23,11 @@ namespace UnitTest.RepositoryTest
 
         private async Task<List<Product>> AddProducts()
         {
-            var users = await AddUsers();
+            var users = _context.Users.ToList();
             var products = new List<Product>
             {
-                new Product { Name = "Apple", Quantity = 100, User = users[1] },
-                new Product { Name = "Banana", Quantity = 50, User = users[1] }
+                new Product { Id = 1, Name = "Apple", Quantity = 100, User = users[1] },
+                new Product { Id = 2, Name = "Banana", Quantity = 50, User = users[1] }
             };
             await _context.AddRangeAsync(products);
             await _context.SaveChangesAsync();
@@ -38,8 +38,8 @@ namespace UnitTest.RepositoryTest
         {
             var users = new List<User>
         {
-            new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
-            new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
+            new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
+            new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
         };
             await _context.AddRangeAsync(users);
             await _context.SaveChangesAsync();
@@ -50,6 +50,7 @@ namespace UnitTest.RepositoryTest
         public async Task GetProductListBySellerId_ShouldReturnProductList_WhenProductsIsfound()
         {
             // Arrange
+            var users = await AddUsers();
             var products = await AddProducts();
             var sellerId = 2;
             // Act
@@ -90,6 +91,7 @@ namespace UnitTest.RepositoryTest
         public async Task GetProductList_ShouldReturnProductList_WhenProductsIsfound()
         {
             // Arrange
+            var users = await AddUsers();
             var products = await AddProducts();
             // Act
             var result = await _repository.AllProduct();
@@ -100,6 +102,7 @@ namespace UnitTest.RepositoryTest
         public async Task GetProductById_ShouldReturnProduct_WhenProductsIsfound()
         {
             // Arrange
+            var users = await AddUsers();
             var products = await AddProducts();
             // Act
             var result = await _repository.GetProductById(products[0].Id);
@@ -111,9 +114,22 @@ namespace UnitTest.RepositoryTest
         public async Task GetProductById_ShouldReturnNotFoundException_WhenProductsIsNotfound()
         {
             // Arrange
+            var users = await AddUsers();
             var products = await AddProducts();
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductById(3));
+        }
+
+        [Fact]
+        public async Task ProductReduce_ShouldReduceQuantity_WhenProductsIsfound()
+        {
+            // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
+            // Act
+            await _repository.ProductReduce(products[0], 10);
+            // Assert
+            Assert.Equal(90, products[0].Quantity);
         }
     }
 }
