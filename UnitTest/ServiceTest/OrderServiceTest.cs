@@ -90,7 +90,7 @@ namespace UnitTest.ServiceTest
             // Assert
             _orderRepositoryMock.Verify(repository => repository.ShipOrder(id), Times.Once);
         }
-        
+
         [Fact]
         public async Task GetOrderListBySellerId_ShouldCallGetOrderListBySellerIdMethodOfRepository()
         {

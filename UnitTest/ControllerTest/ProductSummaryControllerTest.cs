@@ -22,11 +22,12 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task GetProductList_ShouldReturnOk_WhenProductsIsfound()
         {
+            // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var resultServiceItem = new List<Product>{
                 new Product{ Name = "Apple", Quantity = 100, User = user },
                 new Product{ Name = "Banana", Quantity = 50, User = user }
-                };
+            };
             var resultItem = new List<String> { "Apple", "Banana" };
             _productServiceMock.Setup(x => x.AllProduct()).ReturnsAsync(resultServiceItem);
             // Act
@@ -39,6 +40,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task GetProductByProductId_ShouldReturnOk_WhenProductsIsfound()
         {
+            // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var resultItem = new BuyerProduct() { Id = 1, Name = "Apple", Quantity = 100, SellerName = "Jack" };
@@ -54,6 +56,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task GetProductByProductId_ShouldReturnNotFoundException_WhenProductsIsNotfound()
         {
+            // Arrange
             _productServiceMock.Setup(x => x.GetProductById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
             // Act
             var result = await _buyerController.GetProductByProductId(1);

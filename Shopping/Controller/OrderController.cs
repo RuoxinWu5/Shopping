@@ -145,7 +145,8 @@ namespace Shopping.Controller
                 await _userService.GetSellerById(sellerId);
                 var orders = await _orderService.GetOrderListBySellerId(sellerId);
                 List<SellerOrder> result = new List<SellerOrder>();
-                foreach (Order order in orders){
+                foreach (Order order in orders)
+                {
                     var product = await _productService.GetProductById(order.Product.Id);
                     var buyer = await _userService.GetBuyerById(order.User.Id);
                     var buyerOrder = new SellerOrder

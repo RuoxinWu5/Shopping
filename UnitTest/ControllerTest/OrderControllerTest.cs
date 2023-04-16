@@ -81,7 +81,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task GetOrderById_ShouldReturnOk_WhenOrderIsfound()
         {
-
+            // Arrange
             var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
@@ -101,6 +101,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
         {
+            // Arrange
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
             // Act
             var result = await _orderController.GetOrderById(1);
@@ -146,6 +147,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task PayOrder_ShouldReturnNotFoundException_WhenOrderIsNotfound()
         {
+            // Arrange
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
             // Act
             var result = await _orderController.PayOrder(1);
@@ -191,6 +193,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task ConfirmReceipt_ShouldReturnNotFoundException_WhenOrderIsNotfound()
         {
+            // Arrange
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
             // Act
             var result = await _orderController.ConfirmReceipt(1);
@@ -236,6 +239,7 @@ namespace UnitTest.ControllerTest
         [Fact]
         public async Task ShipOrder_ShouldReturnNotFoundException_WhenOrderIsNotfound()
         {
+            // Arrange
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
             // Act
             var result = await _orderController.ShipOrder(1);
