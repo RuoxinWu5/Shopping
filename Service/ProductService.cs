@@ -12,9 +12,10 @@ namespace Service
             _repository = repository;
         }
 
-        public async Task AddProduct(Product product)
+        public async Task<Product> AddProduct(Product product)
         {
             await _repository.AddProduct(product);
+            return product;
         }
 
         public async Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId)

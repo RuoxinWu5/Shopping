@@ -45,15 +45,17 @@ namespace UnitTest.ControllerTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var productViewModel = new ProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
-            Assert.NotNull(product);
             _productServiceMock
-                .Setup(service => service.AddProduct(product))
-                .Returns(Task.CompletedTask);
+                .Setup(service => service.AddProduct(It.IsAny<Product>()))
+                .ReturnsAsync(product);
+            _userServiceMock
+                .Setup(service => service.GetSellerById(productViewModel.SellerId))
+                .ReturnsAsync(user);
             // Act
             var result = await _productController.AddProduct(productViewModel);
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-            Assert.Equal("Create product successfully.", createdResult.Value);
+            Assert.Equal(product, createdResult.Value);
         }
 
         [Fact]

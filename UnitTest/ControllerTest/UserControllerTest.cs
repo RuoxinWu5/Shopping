@@ -26,12 +26,12 @@ namespace UnitTest.ControllerTest
             Assert.NotNull(user);
             _userServiceMock
                 .Setup(service => service.AddUser(user))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(user);
             // Act
             var result = await _userController.AddUser(user);
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-            Assert.Equal("Registered successfully.", createdResult.Value);
+            Assert.Equal(user, createdResult.Value);
         }
 
         [Fact]

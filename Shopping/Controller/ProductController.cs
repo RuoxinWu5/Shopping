@@ -27,18 +27,18 @@ namespace Shopping.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddProduct(ProductRequestModel productViewModel)
+        public async Task<ActionResult> AddProduct(ProductRequestModel productRequestModel)
         {
             try
             {
                 var product = new Product
                 {
-                    Name = productViewModel.Name,
-                    Quantity = productViewModel.Quantity,
-                    User = await _userService.GetSellerById(productViewModel.SellerId)
+                    Name = productRequestModel.Name,
+                    Quantity = productRequestModel.Quantity,
+                    User = await _userService.GetSellerById(productRequestModel.SellerId)
                 };
-                await _productService.AddProduct(product);
-                return CreatedAtAction(nameof(ProductSummaryController.GetProductByProductId), new { id = product.Id }, "Create product successfully.");
+                var result = await _productService.AddProduct(product);
+                return CreatedAtAction(nameof(GetProductById), new { productId = result.Id }, result);
             }
             catch (DuplicateUserNameException exception)
             {
@@ -47,6 +47,20 @@ namespace Shopping.Controller
             catch (KeyNotFoundException exception)
             {
                 return NotFound(exception.Message);
+            }
+        }
+
+        [HttpGet("{productId}")]
+        public async Task<ActionResult> GetProductById(int productId)
+        {
+            try
+            {
+                var result = await _productService.GetProductById(productId);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
     }

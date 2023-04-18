@@ -12,9 +12,10 @@ namespace Service
             _userRepository = repository;
         }
 
-        public async Task AddUser(User user)
+        public async Task<User> AddUser(User user)
         {
             await _userRepository.AddUser(user);
+            return user;
         }
 
         public async Task<User> GetSellerById(int id)
