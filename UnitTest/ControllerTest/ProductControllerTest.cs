@@ -99,5 +99,35 @@ namespace UnitTest.ControllerTest
             var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal("The seller doesn't exist.", notFoundObjectResult.Value);
         }
+
+        [Fact]
+        public async Task GetProductById_ShouldReturnOk_WhenProductIsExist()
+        {
+            // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
+            _productServiceMock
+                .Setup(service => service.GetProductById(It.IsAny<int>()))
+                .ReturnsAsync(product);
+            // Act
+            var result = await _productController.GetProductById(1);
+            // Assert
+            var createdResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(product, createdResult.Value);
+        }
+
+        [Fact]
+        public async Task GetProductById_ShouldReturnBadRequest_WhenProductIsNotExists()
+        {
+            // Arrange
+            _productServiceMock
+                .Setup(service => service.GetProductById(It.IsAny<int>()))
+                .Throws(new KeyNotFoundException("The product doesn't exist."));
+            // Act
+            var result = await _productController.GetProductById(1);
+            // Assert
+            var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("The product doesn't exist.", notFoundObjectResult.Value);
+        }
     }
 }
