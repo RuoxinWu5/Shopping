@@ -1,5 +1,6 @@
 using Data.Model;
 using Data.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 
@@ -69,7 +70,8 @@ namespace Shopping.Controller
                 return NotFound(ex.Message);
             }
         }
-
+        
+        [Authorize("BuyerPolicy")]
         [HttpPost("{orderId}/payment")]
         public async Task<ActionResult> PayOrder(int orderId)
         {
@@ -90,9 +92,9 @@ namespace Shopping.Controller
             {
                 return NotFound(ex.Message);
             }
-
         }
-
+        
+        [Authorize("BuyerPolicy")]
         [HttpPost("{orderId}/receipt")]
         public async Task<ActionResult> ConfirmReceipt(int orderId)
         {
@@ -115,6 +117,7 @@ namespace Shopping.Controller
             }
         }
 
+        [Authorize("SellerPolicy")]
         [HttpPost("{orderId}/ship")]
         public async Task<ActionResult> ShipOrder(int orderId)
         {

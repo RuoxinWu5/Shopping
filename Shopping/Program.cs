@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -37,12 +38,18 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidateLifetime = true,
+        ValidateLifetime = false,
         ValidateIssuerSigningKey = true,
         ValidIssuer = configuration["Jwt:Issuer"],
         ValidAudience = configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]?? throw new ArgumentNullException(nameof(connectionString))))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException(nameof(connectionString))))
     };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("BuyerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Buyer"));
+    options.AddPolicy("SellerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Seller"));
 });
 
 var app = builder.Build();

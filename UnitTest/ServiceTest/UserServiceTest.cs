@@ -88,5 +88,28 @@ namespace UnitTest.ServiceTest
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _userService.GetBuyerById(id));
         }
+
+        [Fact]
+        public async Task GetUserByUserNameAndPassword_ShouldReturnUserInfo_WhenUserIsfound()
+        {
+            // Arrange
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
+            _userRepositoryMock.Setup(repository => repository.GetUserByName(It.IsAny<string>())).ReturnsAsync(user);
+            // Act
+            var result = await _userService.GetUserByUserNameAndPassword("testuser", "testpassword");
+            // Assert
+            _userRepositoryMock.Verify(repository => repository.GetUserByName(result.Name), Times.Once);
+            Assert.Equal(user, result);
+        }
+
+        [Fact]
+        public async Task GetUserByUserNameAndPassword_ShouldThrowNotFoundException_WhenUserIsNotfound()
+        {
+            // Arrange
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
+            _userRepositoryMock.Setup(repository => repository.GetUserByName(It.IsAny<string>())).ReturnsAsync(user);
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _userService.GetUserByUserNameAndPassword("testuser", "password"));
+        }
     }
 }

@@ -48,5 +48,15 @@ namespace Service
         {
             return await _userRepository.GetUserById(userId);
         }
+
+        public async Task<User> GetUserByUserNameAndPassword(string username, string password)
+        {
+            var user = await _userRepository.GetUserByName(username);
+            if (user.Password != password)
+            {
+                throw new KeyNotFoundException("The user doesn't exist.");
+            }
+            return user;
+        }
     }
 }

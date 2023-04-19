@@ -92,4 +92,24 @@ public class UserRepositoryTest
         // Act & Assert
         await Assert.ThrowsAsync<KeyNotFoundException>(async ()=>await _repository.GetUserById(3));
     }
+
+    [Fact]
+    public async Task GetUserByName_ShouldReturnUser_WhenUserIsfound()
+    {
+        // Arrange
+        var users = await AddUsers();
+        // Act
+        var result = await _repository.GetUserByName(users[0].Name);
+        // Assert
+        Assert.Equal(users[0], result);
+    }
+
+    [Fact]
+    public async Task GetUserByName_ShouldReturnNotFoundException_WhenUserIsNotfound()
+    {
+        // Arrange
+        var users = await AddUsers();
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(async ()=>await _repository.GetUserByName("Tizzy"));
+    }
 }

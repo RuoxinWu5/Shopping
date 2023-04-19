@@ -8,5 +8,6 @@ namespace Service
         Task<User> GetSellerById(int id);
         Task<User> GetBuyerById(int id);
         Task<User> GetUserById(int userId);
+        Task<User> GetUserByUserNameAndPassword(string username, string password);
     }
 }
