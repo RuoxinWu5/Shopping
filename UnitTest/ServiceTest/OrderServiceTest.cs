@@ -59,36 +59,14 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task PayOrder_ShouldCallPayOrderMethodOfRepository()
+        public async Task UpdateOrderState_ShouldCallUpdateOrderStateMethodOfRepository()
         {
             // Arrange
             var id = 1;
             // Act
-            await _orderService.PayOrder(id);
+            await _orderService.UpdateOrderState(id, OrderState.TO_BE_PAID);
             // Assert
-            _orderRepositoryMock.Verify(repository => repository.PayOrder(id), Times.Once);
-        }
-
-        [Fact]
-        public async Task ConfirmReceipt_ShouldCallConfirmReceiptMethodOfRepository()
-        {
-            // Arrange
-            var id = 1;
-            // Act
-            await _orderService.ConfirmReceipt(id);
-            // Assert
-            _orderRepositoryMock.Verify(repository => repository.ConfirmReceipt(id), Times.Once);
-        }
-
-        [Fact]
-        public async Task ShipOrder_ShouldCallShipOrderMethodOfRepository()
-        {
-            // Arrange
-            var id = 1;
-            // Act
-            await _orderService.ShipOrder(id);
-            // Assert
-            _orderRepositoryMock.Verify(repository => repository.ShipOrder(id), Times.Once);
+            _orderRepositoryMock.Verify(repository => repository.UpdateOrderState(id, OrderState.TO_BE_PAID), Times.Once);
         }
 
         [Fact]

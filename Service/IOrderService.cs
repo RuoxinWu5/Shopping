@@ -6,9 +6,7 @@ namespace Service
     {
         Task<Order> AddOrder(Order order);
         Task<Order> GetOrderById(int id);
-        Task PayOrder(int orderId);
-        Task ConfirmReceipt(int orderId);
-        Task ShipOrder(int orderId);
+        Task UpdateOrderState(int orderId, OrderState state);
         Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId);
     }
 }

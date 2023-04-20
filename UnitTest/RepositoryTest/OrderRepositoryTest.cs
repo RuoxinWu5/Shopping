@@ -97,7 +97,7 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task PayOrder_ShouldChangeOrderStateToPaid_WhenOrderIsValid()
+        public async Task UpdateOrderState_ShouldChangeOrderStateToPaid_WhenOrderIsValid()
         {
             // Arrange
             var users = await AddUsers();
@@ -105,43 +105,11 @@ namespace UnitTest.RepositoryTest
             var orders = await AddOrder();
             var order = orders[0];
             // Act
-            await _repository.PayOrder(order.Id);
+            await _repository.UpdateOrderState(order.Id, OrderState.PAID);
             // Assert
             var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
             Assert.NotNull(result);
             Assert.Equal(OrderState.PAID, result.Type);
-        }
-
-        [Fact]
-        public async Task ConfirmReceipt_ShouldChangeOrderStateToRecevied_WhenOrderIsValid()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            var orders = await AddOrder();
-            var order = orders[0];
-            // Act
-            await _repository.ConfirmReceipt(order.Id);
-            // Assert
-            var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
-            Assert.NotNull(result);
-            Assert.Equal(OrderState.RECEIVED, result.Type);
-        }
-
-        [Fact]
-        public async Task ShipOrder_ShouldChangeOrderStateToShipped_WhenOrderIsValid()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            var orders = await AddOrder();
-            var order = orders[0];
-            // Act
-            await _repository.ShipOrder(order.Id);
-            // Assert
-            var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
-            Assert.NotNull(result);
-            Assert.Equal(OrderState.SHIPPED, result.Type);
         }
 
         [Fact]

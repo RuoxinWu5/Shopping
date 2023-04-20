@@ -70,7 +70,7 @@ namespace Shopping.Controller
                 return NotFound(ex.Message);
             }
         }
-        
+
         [Authorize("BuyerPolicy")]
         [HttpPost("{orderId}/payment")]
         public async Task<ActionResult> PayOrder(int orderId)
@@ -80,7 +80,7 @@ namespace Shopping.Controller
                 var order = await _orderService.GetOrderById(orderId);
                 if (order.Type == OrderState.TO_BE_PAID)
                 {
-                    await _orderService.PayOrder(orderId);
+                    await _orderService.UpdateOrderState(orderId, OrderState.PAID);
                     return Ok("Payment successful.");
                 }
                 else
@@ -93,7 +93,7 @@ namespace Shopping.Controller
                 return NotFound(ex.Message);
             }
         }
-        
+
         [Authorize("BuyerPolicy")]
         [HttpPost("{orderId}/receipt")]
         public async Task<ActionResult> ConfirmReceipt(int orderId)
@@ -103,7 +103,7 @@ namespace Shopping.Controller
                 var order = await _orderService.GetOrderById(orderId);
                 if (order.Type == OrderState.SHIPPED)
                 {
-                    await _orderService.ConfirmReceipt(orderId);
+                    await _orderService.UpdateOrderState(orderId, OrderState.RECEIVED);
                     return Ok("Received the goods successfully.");
                 }
                 else
@@ -126,7 +126,7 @@ namespace Shopping.Controller
                 var order = await _orderService.GetOrderById(orderId);
                 if (order.Type == OrderState.PAID)
                 {
-                    await _orderService.ShipOrder(orderId);
+                    await _orderService.UpdateOrderState(orderId, OrderState.SHIPPED);
                     return Ok("Delivery successful.");
                 }
                 else

@@ -33,21 +33,11 @@ namespace Service
             return await _orderRepository.GetOrderById(id);
         }
 
-        public async Task PayOrder(int orderId)
+        public async Task UpdateOrderState(int orderId, OrderState state)
         {
-            await _orderRepository.PayOrder(orderId);
+            await _orderRepository.UpdateOrderState(orderId, state);
         }
-
-        public async Task ConfirmReceipt(int orderId)
-        {
-            await _orderRepository.ConfirmReceipt(orderId);
-        }
-
-        public async Task ShipOrder(int orderId)
-        {
-            await _orderRepository.ShipOrder(orderId);
-        }
-
+        
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
             var result = await _orderRepository.GetOrderListBySellerId(sellerId);

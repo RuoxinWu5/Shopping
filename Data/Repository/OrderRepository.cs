@@ -30,24 +30,10 @@ namespace Data.Repository
             }
         }
 
-        public async Task PayOrder(int orderId)
+        public async Task UpdateOrderState(int orderId, OrderState state)
         {
             var order = await GetOrderById(orderId);
-            order.Type = OrderState.PAID;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task ConfirmReceipt(int orderId)
-        {
-            var order = await GetOrderById(orderId);
-            order.Type = OrderState.RECEIVED;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task ShipOrder(int orderId)
-        {
-            var order = await GetOrderById(orderId);
-            order.Type = OrderState.SHIPPED;
+            order.Type = state;
             await _context.SaveChangesAsync();
         }
 
