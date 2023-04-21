@@ -6,14 +6,14 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api/products")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
         private readonly IUserService _userService;
 
-        public ProductController(IProductService productService, IUserService userService)
+        public ProductsController(IProductService productService, IUserService userService)
         {
             _productService = productService;
             _userService = userService;

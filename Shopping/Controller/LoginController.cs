@@ -9,14 +9,14 @@ using Data.RequestModel;
 
 namespace Shopping.Controller
 {
-    [Route("api/login")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class UserLoginController : ControllerBase
+    public class LoginController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
 
-        public UserLoginController(IUserService userService, IConfiguration configuration)
+        public LoginController(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
             _configuration = configuration;

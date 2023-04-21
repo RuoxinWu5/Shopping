@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Data.Model;
 using Data.RequestModel;
 using Microsoft.AspNetCore.Mvc;
@@ -9,17 +8,17 @@ using Shopping.Controller;
 
 namespace UnitTest.ControllerTest
 {
-    public class UserLoginControllerTests
+    public class LoginControllerTests
     {
         private readonly Mock<IUserService> _userServiceMock;
         private readonly Mock<IConfiguration> _configurationMock;
-        private readonly UserLoginController _userLoginController;
+        private readonly LoginController _userLoginController;
 
-        public UserLoginControllerTests()
+        public LoginControllerTests()
         {
             _userServiceMock = new Mock<IUserService>();
             _configurationMock = new Mock<IConfiguration>();
-            _userLoginController = new UserLoginController(_userServiceMock.Object, _configurationMock.Object);
+            _userLoginController = new LoginController(_userServiceMock.Object, _configurationMock.Object);
         }
 
         [Fact]

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -51,6 +52,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("BuyerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Buyer"));
     options.AddPolicy("SellerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Seller"));
 });
+
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
 

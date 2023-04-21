@@ -12,14 +12,13 @@ namespace UnitTest.ControllerTest
         private readonly Mock<IOrderService> _orderServiceMock = new Mock<IOrderService>();
         private readonly Mock<IProductService> _productServiceMock = new Mock<IProductService>();
         private readonly Mock<IUserService> _userServiceMock = new Mock<IUserService>();
-        private readonly OrderController _orderController;
-
+        private readonly OrdersController _orderController;
         public OrderControllerTest()
         {
             _orderServiceMock = new Mock<IOrderService>();
             _productServiceMock = new Mock<IProductService>();
             _userServiceMock = new Mock<IUserService>();
-            _orderController = new OrderController(_orderServiceMock.Object, _productServiceMock.Object, _userServiceMock.Object);
+            _orderController = new OrdersController(_orderServiceMock.Object, _productServiceMock.Object, _userServiceMock.Object);
         }
         [Fact]
         public async Task CreateOrder_ShouldReturnOk_WhenOrderIsValid()
@@ -113,13 +112,13 @@ namespace UnitTest.ControllerTest
         public async Task PayOrder_ShouldReturnOk_WhenOrderStateIsToBePaid()
         {
             // Arrange
-            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
             var order = new Order() { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             _orderServiceMock
-                .Setup(service => service.UpdateOrderState(It.IsAny<int>(),It.IsAny<OrderState>()))
+                .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderState>()))
                 .Returns(Task.CompletedTask);
             // Act
             var result = await _orderController.PayOrder(order.Id);
@@ -165,7 +164,7 @@ namespace UnitTest.ControllerTest
             var order = new Order() { Quantity = 10, Type = OrderState.SHIPPED, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             _orderServiceMock
-                .Setup(service => service.UpdateOrderState(It.IsAny<int>(),It.IsAny<OrderState>()))
+                .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderState>()))
                 .Returns(Task.CompletedTask);
             // Act
             var result = await _orderController.ConfirmReceipt(order.Id);
@@ -211,7 +210,7 @@ namespace UnitTest.ControllerTest
             var order = new Order() { Quantity = 10, Type = OrderState.PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             _orderServiceMock
-                .Setup(service => service.UpdateOrderState(It.IsAny<int>(),It.IsAny<OrderState>()))
+                .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderState>()))
                 .Returns(Task.CompletedTask);
             // Act
             var result = await _orderController.ShipOrder(order.Id);

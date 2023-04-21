@@ -10,7 +10,7 @@ namespace UnitTest.ControllerTest
 {
     public class ProductControllerTest
     {
-        private readonly ProductController _productController;
+        private readonly ProductsController _productController;
         private readonly Mock<IProductService> _productServiceMock;
         private readonly Mock<IUserService> _userServiceMock;
 
@@ -18,7 +18,7 @@ namespace UnitTest.ControllerTest
         {
             _productServiceMock = new Mock<IProductService>();
             _userServiceMock = new Mock<IUserService>();
-            _productController = new ProductController(_productServiceMock.Object, _userServiceMock.Object);
+            _productController = new ProductsController(_productServiceMock.Object, _userServiceMock.Object);
         }
 
         [Fact]

@@ -6,15 +6,15 @@ using Service;
 
 namespace Shopping.Controller
 {
-    [Route("api/orders")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
         private readonly IProductService _productService;
         private readonly IUserService _userService;
 
-        public OrderController(IOrderService orderService, IProductService productService, IUserService userService)
+        public OrdersController(IOrderService orderService, IProductService productService, IUserService userService)
         {
             _orderService = orderService;
             _productService = productService;

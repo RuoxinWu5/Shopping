@@ -9,13 +9,13 @@ namespace UnitTest.ControllerTest
 {
     public class UserControllerTest
     {
-        private readonly UserController _userController;
+        private readonly UsersController _userController;
         private readonly Mock<IUserService> _userServiceMock;
 
         public UserControllerTest()
         {
             _userServiceMock = new Mock<IUserService>();
-            _userController = new UserController(_userServiceMock.Object);
+            _userController = new UsersController(_userServiceMock.Object);
         }
 
         [Fact]
