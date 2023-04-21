@@ -3,6 +3,7 @@ using Data.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;
+using System.Security.Claims;
 
 namespace Shopping.Controller
 {
@@ -78,6 +79,11 @@ namespace Shopping.Controller
             try
             {
                 var order = await _orderService.GetOrderById(orderId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (order.User.Id.ToString() != userId)
+                {
+                    return BadRequest("This order is not yours.");
+                }
                 if (order.Type == OrderState.TO_BE_PAID)
                 {
                     await _orderService.UpdateOrderState(orderId, OrderState.PAID);
@@ -101,6 +107,11 @@ namespace Shopping.Controller
             try
             {
                 var order = await _orderService.GetOrderById(orderId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (order.User.Id.ToString() != userId)
+                {
+                    return BadRequest("This order is not yours.");
+                }
                 if (order.Type == OrderState.SHIPPED)
                 {
                     await _orderService.UpdateOrderState(orderId, OrderState.RECEIVED);
@@ -124,6 +135,11 @@ namespace Shopping.Controller
             try
             {
                 var order = await _orderService.GetOrderById(orderId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (order.Product.User.Id.ToString() != userId)
+                {
+                    return BadRequest("This order is not yours.");
+                }
                 if (order.Type == OrderState.PAID)
                 {
                     await _orderService.UpdateOrderState(orderId, OrderState.SHIPPED);
