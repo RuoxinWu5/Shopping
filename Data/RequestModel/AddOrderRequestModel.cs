@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Data.ViewModel
 {
-    public class OrderRequestModel
+    public class AddOrderRequestModel
     {
         [Required(ErrorMessage = "Product Id cannot be empty.")]
         public int ProductId { get; set; }

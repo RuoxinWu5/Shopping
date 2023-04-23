@@ -23,7 +23,7 @@ namespace Shopping.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddOrder(OrderRequestModel orderRequestModel)
+        public async Task<ActionResult> AddOrder(AddOrderRequestModel orderRequestModel)
         {
             try
             {

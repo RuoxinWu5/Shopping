@@ -44,7 +44,7 @@ namespace UnitTest.ControllerTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            var productViewModel = new ProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
+            var productViewModel = new AddProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
             _productServiceMock
                 .Setup(service => service.AddProduct(It.IsAny<Product>()))
                 .ReturnsAsync(product);
@@ -64,7 +64,7 @@ namespace UnitTest.ControllerTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            var productViewModel = new ProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
+            var productViewModel = new AddProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(It.Is<Product>(product => product.User.Name == "Jack" && product.Name == "Apple")))
@@ -85,7 +85,7 @@ namespace UnitTest.ControllerTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            var productViewModel = new ProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
+            var productViewModel = new AddProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
             Assert.NotNull(product);
             _productServiceMock
                 .Setup(service => service.AddProduct(It.Is<Product>(product => product.User.Name == "Jack" && product.Name == "Apple")))
