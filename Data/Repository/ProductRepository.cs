@@ -21,11 +21,6 @@ namespace Data.Repository
 
         public async Task AddProduct(Product product)
         {
-            var existingProduct = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(u => u.Name == product.Name);
-            if (existingProduct != null)
-            {
-                throw new DuplicateUserNameException($"User name '{product.Name}' already exists.");
-            }
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
@@ -42,6 +37,20 @@ namespace Data.Repository
                 return result;
             }
         }
+
+        public async Task<Product> GetProductByName(string name)
+        {
+            var result = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Name == name);
+            if (result == null)
+            {
+                throw new KeyNotFoundException("The product doesn't exist.");
+            }
+            else
+            {
+                return result;
+            }
+        }
+
         public async Task<IEnumerable<Product>> AllProduct()
         {
             var result = await _context.Products.Include(p => p.User).ToListAsync();

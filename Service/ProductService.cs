@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 
@@ -14,7 +15,18 @@ namespace Service
 
         public async Task<Product> AddProduct(Product product)
         {
-            await _repository.AddProduct(product);
+            try
+            {
+                var existingProduct = await _repository.GetProductByName(product.Name);
+                if (existingProduct != null)
+                {
+                    throw new DuplicateUserNameException($"User name '{product.Name}' already exists.");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                await _repository.AddProduct(product);
+            }
             return product;
         }
 

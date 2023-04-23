@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 using Moq;
@@ -33,10 +34,22 @@ namespace UnitTest.ServiceTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Banana", Quantity = 100, User = user };
+            _productRepositoryMock.Setup(repository=>repository.GetProductByName(It.IsAny<string>())).ThrowsAsync(new KeyNotFoundException());
             // Act
             await _productService.AddProduct(product);
             // Assert
             _productRepositoryMock.Verify(repository => repository.AddProduct(product), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddProduct_ShouldThrowDuplicateUserNameException_WhenProductNameExists()
+        {
+            // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Banana", Quantity = 100, User = user };
+            _productRepositoryMock.Setup(repository=>repository.GetProductByName(It.IsAny<string>())).ReturnsAsync(product);
+            // Act & Assert
+            await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _productService.AddProduct(product));
         }
 
         [Fact]

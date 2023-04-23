@@ -77,17 +77,6 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task AddProduct_ShouldThrowDuplicateUserNameException_WhenProductNameExists()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            var product = new Product { Name = "Banana", Quantity = 90, User = users[1] };
-            // Act & Assert
-            await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddProduct(product));
-        }
-
-        [Fact]
         public async Task GetProductList_ShouldReturnProductList_WhenProductsIsfound()
         {
             // Arrange
@@ -98,6 +87,7 @@ namespace UnitTest.RepositoryTest
             // Assert
             Assert.Equal(products.ToString(), result.ToString());
         }
+
         [Fact]
         public async Task GetProductById_ShouldReturnProduct_WhenProductsIsfound()
         {
@@ -118,6 +108,28 @@ namespace UnitTest.RepositoryTest
             var products = await AddProducts();
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductById(3));
+        }
+
+        [Fact]
+        public async Task GetProductByName_ShouldReturnProduct_WhenProductsIsfound()
+        {
+            // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
+            // Act
+            var result = await _repository.GetProductByName(products[0].Name);
+            // Assert
+            Assert.Equal(products[0].ToString(), result.ToString());
+        }
+
+        [Fact]
+        public async Task GetProductByName_ShouldReturnNotFoundException_WhenProductsIsNotfound()
+        {
+            // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductByName("T"));
         }
 
         [Fact]
