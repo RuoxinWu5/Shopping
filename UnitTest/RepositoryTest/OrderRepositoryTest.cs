@@ -10,10 +10,10 @@ namespace UnitTest.RepositoryTest
         private readonly OrderRepository _repository;
         public OrderRepositoryTest()
         {
-            var productOptions = new DbContextOptionsBuilder<ShoppingDbContext>()
-                    .UseInMemoryDatabase("ProductList2")
+            var options = new DbContextOptionsBuilder<ShoppingDbContext>()
+                    .UseInMemoryDatabase("OrderList")
                     .Options;
-            _context = new ShoppingDbContext(productOptions);
+            _context = new ShoppingDbContext(options);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
             _repository = new OrderRepository(_context);
