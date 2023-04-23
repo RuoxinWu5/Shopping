@@ -49,31 +49,6 @@ public class UserRepositoryTest
     }
 
     [Fact]
-    public async Task CreateUser_ShouldCreateNewUserWithTypeBuyer_WhenTypeIsNull()
-    {
-        // Arrange
-        var users = AddUsers();
-        var user = new User { Name = "noType", Password = "noType123123" };
-        // Act
-        await _repository.AddUser(user);
-        // Assert
-        var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
-        Assert.NotNull(savedUser);
-        Assert.Equal(user.Password, savedUser.Password);
-        Assert.Equal(UserType.BUYER, savedUser.Type);
-    }
-
-    [Fact]
-    public async Task CreateUser_ShouldThrowDuplicateUserNameException_WhenUserNameExists()
-    {
-        // Arrange
-        var users = AddUsers();
-        var user = new User { Name = "Lisa", Password = "test123123", Type = UserType.SELLER };
-        // Act & Assert
-        await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _repository.AddUser(user));
-    }
-
-    [Fact]
     public async Task GetUserById_ShouldReturnUser_WhenUserIsfound()
     {
         // Arrange

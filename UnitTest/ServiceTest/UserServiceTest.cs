@@ -2,7 +2,7 @@ using Service;
 using Data.Repository;
 using Moq;
 using Data.Model;
-using Microsoft.AspNetCore.Mvc;
+using Data.Exceptions;
 
 namespace UnitTest.ServiceTest
 {
@@ -21,11 +21,34 @@ namespace UnitTest.ServiceTest
         public async Task AddUser_ShouldCallAddUserMethodOfRepository()
         {
             // Arrange
-            var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword", Type = UserType.BUYER };
+            _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ThrowsAsync(new KeyNotFoundException("The user doesn't exist."));
             // Act
             await _userService.AddUser(user);
             // Assert
             _userRepositoryMock.Verify(repository => repository.AddUser(user), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddUser_ShouldCreateNewUserWithTypeBuyer_WhenTypeIsNull()
+        {
+            // Arrange
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
+            _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ThrowsAsync(new KeyNotFoundException("The user doesn't exist."));
+            // Act
+            var savedUser = await _userService.AddUser(user);
+            // Assert
+            Assert.Equal(UserType.BUYER, savedUser.Type);
+        }
+
+        [Fact]
+        public async Task AddUser_ShouldThrowDuplicateUserNameException_WhenUserNameExists()
+        {
+            // Arrange
+            var user = new User { Name = "Lisa", Password = "test123123", Type = UserType.SELLER };
+            _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ReturnsAsync(user);
+            // Act & Assert
+            await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _userService.AddUser(user));
         }
 
         [Fact]

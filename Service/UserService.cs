@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 
@@ -14,7 +15,22 @@ namespace Service
 
         public async Task<User> AddUser(User user)
         {
-            await _userRepository.AddUser(user);
+            if (!user.Type.HasValue)
+            {
+                user.Type = UserType.BUYER;
+            }
+            try
+            {
+                var existingUser = await _userRepository.GetUserByName(user.Name);
+                if (existingUser != null)
+                {
+                    throw new DuplicateUserNameException($"User name '{user.Name}' already exists.");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                await _userRepository.AddUser(user);
+            }
             return user;
         }
 
