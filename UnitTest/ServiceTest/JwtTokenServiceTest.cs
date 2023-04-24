@@ -14,6 +14,9 @@ namespace UnitTest.ServiceTest
         public JwtTokenServiceTest()
         {
             _configurationMock = new Mock<IConfiguration>();
+            _configurationMock.Setup(x => x["Jwt:Issuer"]).Returns("testIssuer");
+            _configurationMock.Setup(x => x["Jwt:Audience"]).Returns("testAudience");
+            _configurationMock.Setup(x => x["Jwt:SecretKey"]).Returns("this-is-my-test-secret-key");
             _jwtTokenService = new JwtTokenService(_configurationMock.Object);
         }
 
@@ -21,9 +24,6 @@ namespace UnitTest.ServiceTest
         public void GenerateJwtToken_ShouldReturnToken()
         {
             // Arrange
-            _configurationMock.Setup(x => x["Jwt:Issuer"]).Returns("testIssuer");
-            _configurationMock.Setup(x => x["Jwt:Audience"]).Returns("testAudience");
-            _configurationMock.Setup(x => x["Jwt:SecretKey"]).Returns("this-is-my-test-secret-key");
             var user = new User { Id = 1, Name = "Test User", Type = UserType.BUYER };
             // Act
             var token = _jwtTokenService.GenerateJwtToken(user);
