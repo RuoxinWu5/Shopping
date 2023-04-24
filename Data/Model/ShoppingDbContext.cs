@@ -12,10 +12,6 @@ namespace Data.Model
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<BuyerProduct> BuyerProducts { get; set; } = null!;
         public DbSet<Order> Orders { get; set; } = null!;
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<BuyerProduct>().ToView("View_BuyerProducts");
-        }
+        public DbSet<CartItem> CartItems { get; set; } = null!;
     }
 }
