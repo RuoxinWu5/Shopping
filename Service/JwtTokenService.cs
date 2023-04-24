@@ -10,29 +10,33 @@ namespace Service
     public class JwtTokenService : IJwtTokenService
     {
         private readonly IConfiguration _configuration;
+        private readonly string _issuer;
+        private readonly string _audience;
+        private readonly string _secretKey;
+        private const string BuyerRoleName = "Buyer";
+        private const string SellerRoleName = "Seller";
 
         public JwtTokenService(IConfiguration configuration)
         {
             _configuration = configuration;
+            _issuer = _configuration["Jwt:Issuer"] ?? throw new ArgumentNullException(nameof(_issuer));
+            _audience = _configuration["Jwt:Audience"] ?? throw new ArgumentNullException(nameof(_audience));
+            _secretKey = _configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException(nameof(_secretKey));
         }
-
         public string GenerateJwtToken(User user)
         {
-            var issuer = _configuration["Jwt:Issuer"];
-            var audience = _configuration["Jwt:Audience"];
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException("Jwt:SecretKey"));
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                        new Claim(ClaimTypes.Name, user.Name),
-                        new Claim(ClaimTypes.Role, user.Type == UserType.BUYER ? "Buyer" : "Seller")
-                    }),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.Role, user.Type == UserType.BUYER ? BuyerRoleName : SellerRoleName)
+                }),
                 Expires = DateTime.UtcNow.AddDays(1),
-                Issuer = issuer,
-                Audience = audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                Issuer = _issuer,
+                Audience = _audience,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_secretKey)), SecurityAlgorithms.HmacSha256Signature)
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
