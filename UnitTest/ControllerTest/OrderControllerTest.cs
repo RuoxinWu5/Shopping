@@ -32,7 +32,7 @@ namespace UnitTest.ControllerTest
             _productServiceMock.Setup(repository => repository.GetProductById(orderRequest.ProductId)).ReturnsAsync(product);
             _userServiceMock.Setup(repository => repository.GetBuyerById(orderRequest.BuyerId)).ReturnsAsync(user);
             var expectedOrder = new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
-            _orderServiceMock.Setup(x => x.AddOrder(It.IsAny<Order>())).ReturnsAsync(expectedOrder);
+            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).ReturnsAsync(expectedOrder);
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
@@ -45,7 +45,7 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _orderServiceMock.Setup(x => x.AddOrder(It.IsAny<Order>())).Throws(new ArgumentException("Quantity not sufficient. Order creation failed."));
+            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new ArgumentException("Quantity not sufficient. Order creation failed."));
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
@@ -58,7 +58,7 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _orderServiceMock.Setup(x => x.AddOrder(It.IsAny<Order>())).Throws(new KeyNotFoundException("The buyer doesn't exist."));
+            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new KeyNotFoundException("The buyer doesn't exist."));
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
@@ -71,7 +71,7 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _orderServiceMock.Setup(x => x.AddOrder(It.IsAny<Order>())).Throws(new KeyNotFoundException("The product doesn't exist."));
+            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new KeyNotFoundException("The product doesn't exist."));
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert

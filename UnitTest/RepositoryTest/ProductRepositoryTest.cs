@@ -138,7 +138,7 @@ namespace UnitTest.RepositoryTest
             var users = await AddUsers();
             var products = await AddProducts();
             // Act
-            await _repository.ProductReduce(products[0], 10);
+            await _repository.ReduceProductQuantity(products[0], 10);
             // Assert
             Assert.Equal(90, products[0].Quantity);
         }

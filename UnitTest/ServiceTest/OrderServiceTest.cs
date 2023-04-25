@@ -28,12 +28,12 @@ namespace UnitTest.ServiceTest
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var order = new Order { Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
             // Act
-            var result = await _orderService.AddOrder(order);
+            var result = await _orderService.AddOrderAndReduceProductQuantity(order);
             // Assert
             Assert.Equal(product, result.Product);
             Assert.Equal(user, result.User);
             _orderRepositoryMock.Verify(repository => repository.AddOrder(result), Times.Once);
-            _productRepositoryMock.Verify(x => x.ProductReduce(product, order.Quantity), Times.Once);
+            _productRepositoryMock.Verify(x => x.ReduceProductQuantity(product, order.Quantity), Times.Once);
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace UnitTest.ServiceTest
             var product = new Product { Name = "Apple", Quantity = 50, User = user };
             var order = new Order { Quantity = 51, Status = OrderState.TO_BE_PAID, Product = product, User = user };
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrder(order));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrderAndReduceProductQuantity(order));
         }
 
         [Fact]

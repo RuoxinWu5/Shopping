@@ -34,7 +34,7 @@ namespace Shopping.Controller
                     Product = await _productService.GetProductById(orderRequestModel.ProductId),
                     User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
-                var result = await _orderService.AddOrder(order);
+                var result = await _orderService.AddOrderAndReduceProductQuantity(order);
                 return CreatedAtAction(nameof(GetOrderById), new { orderId = result.Id }, result);
             }
             catch (ArgumentException exception)

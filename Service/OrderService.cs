@@ -16,7 +16,7 @@ namespace Service
             _userRepository = userRepository;
         }
 
-        public async Task<Order> AddOrder(Order order)
+        public async Task<Order> AddOrderAndReduceProductQuantity(Order order)
         {
             var quantity = order.Product.Quantity;
             if (order.Quantity > quantity)
@@ -24,7 +24,7 @@ namespace Service
                 throw new ArgumentException("Quantity not sufficient. Order creation failed.");
             }
             await _orderRepository.AddOrder(order);
-            await _productRepository.ProductReduce(order.Product, order.Quantity);
+            await _productRepository.ReduceProductQuantity(order.Product, order.Quantity);
             return order;
         }
 
@@ -37,7 +37,7 @@ namespace Service
         {
             await _orderRepository.UpdateOrderState(orderId, state);
         }
-        
+
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
             var result = await _orderRepository.GetOrderListBySellerId(sellerId);

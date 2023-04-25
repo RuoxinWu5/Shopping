@@ -57,7 +57,7 @@ namespace Data.Repository
             return result;
         }
 
-        public async Task ProductReduce(Product product, int quantity)
+        public async Task ReduceProductQuantity(Product product, int quantity)
         {
             var result = await GetProductById(product.Id);
             result.Quantity -= quantity;
