@@ -30,7 +30,7 @@ namespace Shopping.Controller
                 var order = new Order
                 {
                     Quantity = orderRequestModel.Quantity,
-                    Type = OrderState.TO_BE_PAID,
+                    Status = OrderState.TO_BE_PAID,
                     Product = await _productService.GetProductById(orderRequestModel.ProductId),
                     User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
@@ -62,7 +62,7 @@ namespace Shopping.Controller
                     Quantity = order.Quantity,
                     SellerName = product.User.Name,
                     BuyerName = buyer.Name,
-                    Type = order.Type
+                    Status = order.Status
                 };
                 return Ok(result);
             }
@@ -84,7 +84,7 @@ namespace Shopping.Controller
                 {
                     return BadRequest("This order is not yours.");
                 }
-                if (order.Type == OrderState.TO_BE_PAID)
+                if (order.Status == OrderState.TO_BE_PAID)
                 {
                     await _orderService.UpdateOrderState(orderId, OrderState.PAID);
                     return Ok("Payment successful.");
@@ -112,7 +112,7 @@ namespace Shopping.Controller
                 {
                     return BadRequest("This order is not yours.");
                 }
-                if (order.Type == OrderState.SHIPPED)
+                if (order.Status == OrderState.SHIPPED)
                 {
                     await _orderService.UpdateOrderState(orderId, OrderState.RECEIVED);
                     return Ok("Received the goods successfully.");
@@ -140,7 +140,7 @@ namespace Shopping.Controller
                 {
                     return BadRequest("This order is not yours.");
                 }
-                if (order.Type == OrderState.PAID)
+                if (order.Status == OrderState.PAID)
                 {
                     await _orderService.UpdateOrderState(orderId, OrderState.SHIPPED);
                     return Ok("Delivery successful.");
@@ -176,7 +176,7 @@ namespace Shopping.Controller
                         Quantity = order.Quantity,
                         BuyerId = buyer.Id,
                         BuyerName = buyer.Name,
-                        Type = order.Type
+                        Status = order.Status
                     };
                     result.Add(buyerOrder);
                 }

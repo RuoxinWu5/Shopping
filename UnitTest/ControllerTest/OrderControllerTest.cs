@@ -31,7 +31,7 @@ namespace UnitTest.ControllerTest
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             _productServiceMock.Setup(repository => repository.GetProductById(orderRequest.ProductId)).ReturnsAsync(product);
             _userServiceMock.Setup(repository => repository.GetBuyerById(orderRequest.BuyerId)).ReturnsAsync(user);
-            var expectedOrder = new Order { Id = 1, Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = user };
+            var expectedOrder = new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
             _orderServiceMock.Setup(x => x.AddOrder(It.IsAny<Order>())).ReturnsAsync(expectedOrder);
             // Act
             var result = await _orderController.AddOrder(orderRequest);
@@ -86,8 +86,8 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = buyer };
-            var resultItem = new BuyerOrder() { ProductName = "Apple", Quantity = 10, SellerName = "Jack", BuyerName = "Lisa", Type = OrderState.TO_BE_PAID };
+            var order = new Order() { Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = buyer };
+            var resultItem = new BuyerOrder() { ProductName = "Apple", Quantity = 10, SellerName = "Jack", BuyerName = "Lisa", Status = OrderState.TO_BE_PAID };
             _productServiceMock.Setup(p => p.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
             _userServiceMock.Setup(u => u.GetBuyerById(It.IsAny<int>())).ReturnsAsync(seller);
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
@@ -117,7 +117,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             _orderServiceMock
                 .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderState>()))
@@ -162,7 +162,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             var claims = new List<Claim>
             {
@@ -193,7 +193,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.PAID, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             var claims = new List<Claim>
             {
@@ -224,7 +224,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.SHIPPED, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.SHIPPED, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             _orderServiceMock
                 .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderState>()))
@@ -269,7 +269,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.SHIPPED, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.SHIPPED, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             var claims = new List<Claim>
             {
@@ -300,7 +300,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.PAID, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             var claims = new List<Claim>
             {
@@ -331,7 +331,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.PAID, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             _orderServiceMock
                 .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderState>()))
@@ -376,7 +376,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.PAID, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             var claims = new List<Claim>
             {
@@ -407,7 +407,7 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var seller = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Type = OrderState.TO_BE_PAID, Product = product, User = buyer };
+            var order = new Order() { Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = buyer };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             var claims = new List<Claim>
             {
@@ -439,11 +439,12 @@ namespace UnitTest.ControllerTest
             var buyer = new User { Id = 2, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var serviceResult = new List<Order>{
-                new Order{ Quantity = 10, Type = OrderState.TO_BE_PAID, User = buyer, Product = product }
+                new Order{ Quantity = 10, Status = OrderState.TO_BE_PAID, User = buyer, Product = product }
             };
             var resultItem = new List<SellerOrder>{
-                new SellerOrder{ ProductId = 1, ProductName = "Apple", Quantity = 10, BuyerId = 2, BuyerName = "Lisa", Type = OrderState.TO_BE_PAID }
+                new SellerOrder{ ProductId = 1, ProductName = "Apple", Quantity = 10, BuyerId = 2, BuyerName = "Lisa", Status = OrderState.TO_BE_PAID }
             };
+            _userServiceMock.Setup(x => x.GetSellerById(It.IsAny<int>())).ReturnsAsync(seller);
             _productServiceMock.Setup(p => p.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
             _userServiceMock.Setup(u => u.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
             _orderServiceMock.Setup(x => x.GetOrderListBySellerId(It.IsAny<int>())).ReturnsAsync(serviceResult);

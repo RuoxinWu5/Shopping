@@ -5,21 +5,21 @@ using Service;
 
 namespace UnitTest.ServiceTest
 {
-    public class CartServiceTest
+    public class CartItemServiceTest
     {
-        private readonly CartService _cartService;
-        private readonly Mock<ICartRepository> _cartRepositoryMock;
+        private readonly CartItemService _cartService;
+        private readonly Mock<ICartItemRepository> _cartRepositoryMock;
         private readonly Mock<IProductRepository> _productRepositoryMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
 
-        public CartServiceTest()
+        public CartItemServiceTest()
         {
-            _cartRepositoryMock = new Mock<ICartRepository>();
+            _cartRepositoryMock = new Mock<ICartItemRepository>();
             _productRepositoryMock = new Mock<IProductRepository>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _cartService = new CartService(_cartRepositoryMock.Object, _productRepositoryMock.Object, _userRepositoryMock.Object);
+            _cartService = new CartItemService(_cartRepositoryMock.Object, _productRepositoryMock.Object, _userRepositoryMock.Object);
         }
-        
+
         [Fact]
         public async Task AddCartItem_ShouldCallAddCartItemMethodOfRepository_WhenQuantityIsEnough()
         {

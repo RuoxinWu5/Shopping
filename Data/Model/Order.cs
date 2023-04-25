@@ -12,7 +12,7 @@ namespace Data.Model
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
-        public OrderState Type { get; set; }
+        public OrderState Status { get; set; }
         public Product Product { get; set; } = null!;
         public User User { get; set; } = null!;
     }

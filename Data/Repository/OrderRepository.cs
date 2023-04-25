@@ -33,7 +33,7 @@ namespace Data.Repository
         public async Task UpdateOrderState(int orderId, OrderState state)
         {
             var order = await GetOrderById(orderId);
-            order.Type = state;
+            order.Status = state;
             await _context.SaveChangesAsync();
         }
 

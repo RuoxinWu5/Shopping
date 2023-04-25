@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repository
 {
-    public class CartRepository : ICartRepository
+    public class CartItemRepository : ICartItemRepository
     {
         private readonly ShoppingDbContext _context;
 
-        public CartRepository(ShoppingDbContext context)
+        public CartItemRepository(ShoppingDbContext context)
         {
             _context = context;
         }

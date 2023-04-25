@@ -25,7 +25,7 @@ namespace UnitTest.RepositoryTest
             var products = _context.Products.ToList();
             var order = new List<Order>
             {
-                new Order { Id = 1, Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] }
+                new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = products[0], User = users[0] }
             };
             await _context.AddRangeAsync(order);
             await _context.SaveChangesAsync();
@@ -63,7 +63,7 @@ namespace UnitTest.RepositoryTest
             // Arrange
             var users = await AddUsers();
             var products = await AddProducts();
-            var order = new Order { Id = 1, Quantity = 10, Type = OrderState.TO_BE_PAID, Product = products[0], User = users[0] };
+            var order = new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = products[0], User = users[0] };
             // Act
             await _repository.AddOrder(order);
             // Assert
@@ -109,7 +109,7 @@ namespace UnitTest.RepositoryTest
             // Assert
             var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
             Assert.NotNull(result);
-            Assert.Equal(OrderState.PAID, result.Type);
+            Assert.Equal(OrderState.PAID, result.Status);
         }
 
         [Fact]

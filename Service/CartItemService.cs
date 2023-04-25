@@ -3,13 +3,13 @@ using Data.Repository;
 
 namespace Service
 {
-    public class CartService : ICartService
+    public class CartItemService : ICartItemService
     {
-        private readonly ICartRepository _cartRepository;
+        private readonly ICartItemRepository _cartRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
 
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository)
+        public CartItemService(ICartItemRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;

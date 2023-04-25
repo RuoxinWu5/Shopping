@@ -8,13 +8,13 @@ namespace Shopping.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CartsController : ControllerBase
+    public class CartItemsController : ControllerBase
     {
-        private readonly ICartService _cartService;
+        private readonly ICartItemService _cartService;
         private readonly IProductService _productService;
         private readonly IUserService _userService;
 
-        public CartsController(ICartService cartService, IProductService productService, IUserService userService)
+        public CartItemsController(ICartItemService cartService, IProductService productService, IUserService userService)
         {
             _cartService = cartService;
             _productService = productService;

@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace UnitTest.RepositoryTest
 {
-    public class CartRepositoryTest
+    public class CartItemRepositoryTest
     {
         private readonly ShoppingDbContext _context;
-        private readonly CartRepository _repository;
-        public CartRepositoryTest()
+        private readonly CartItemRepository _repository;
+        public CartItemRepositoryTest()
         {
             var options = new DbContextOptionsBuilder<ShoppingDbContext>()
                     .UseInMemoryDatabase("CartList")
@@ -16,7 +16,7 @@ namespace UnitTest.RepositoryTest
             _context = new ShoppingDbContext(options);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            _repository = new CartRepository(_context);
+            _repository = new CartItemRepository(_context);
         }
 
         private async Task<List<CartItem>> AddCarts()

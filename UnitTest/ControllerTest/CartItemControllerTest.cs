@@ -8,18 +8,18 @@ using Shopping.Controller;
 
 namespace UnitTest.ControllerTest
 {
-    public class CartControllerTest
+    public class CartItemControllerTest
     {
-        private readonly Mock<ICartService> _cartServiceMock = new Mock<ICartService>();
+        private readonly Mock<ICartItemService> _cartServiceMock = new Mock<ICartItemService>();
         private readonly Mock<IProductService> _productServiceMock = new Mock<IProductService>();
         private readonly Mock<IUserService> _userServiceMock = new Mock<IUserService>();
-        private readonly CartsController _cartController;
-        public CartControllerTest()
+        private readonly CartItemsController _cartController;
+        public CartItemControllerTest()
         {
-            _cartServiceMock = new Mock<ICartService>();
+            _cartServiceMock = new Mock<ICartItemService>();
             _productServiceMock = new Mock<IProductService>();
             _userServiceMock = new Mock<IUserService>();
-            _cartController = new CartsController(_cartServiceMock.Object, _productServiceMock.Object, _userServiceMock.Object);
+            _cartController = new CartItemsController(_cartServiceMock.Object, _productServiceMock.Object, _userServiceMock.Object);
         }
 
         [Fact]
