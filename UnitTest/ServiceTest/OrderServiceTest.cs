@@ -27,12 +27,11 @@ namespace UnitTest.ServiceTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var order = new Order { Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
+            _productRepositoryMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
             // Act
-            var result = await _orderService.AddOrderAndReduceProductQuantity(order);
+            await _orderService.AddOrderAndReduceProductQuantity(order);
             // Assert
-            Assert.Equal(product, result.Product);
-            Assert.Equal(user, result.User);
-            _orderRepositoryMock.Verify(repository => repository.AddOrder(result), Times.Once);
+            _orderRepositoryMock.Verify(repository => repository.AddOrder(order), Times.Once);
             _productRepositoryMock.Verify(x => x.ReduceProductQuantity(product, order.Quantity), Times.Once);
         }
 
@@ -43,6 +42,7 @@ namespace UnitTest.ServiceTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 50, User = user };
             var order = new Order { Quantity = 51, Status = OrderState.TO_BE_PAID, Product = product, User = user };
+            _productRepositoryMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrderAndReduceProductQuantity(order));
         }

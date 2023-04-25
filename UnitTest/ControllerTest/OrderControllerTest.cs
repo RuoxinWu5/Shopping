@@ -32,7 +32,7 @@ namespace UnitTest.ControllerTest
             _productServiceMock.Setup(repository => repository.GetProductById(orderRequest.ProductId)).ReturnsAsync(product);
             _userServiceMock.Setup(repository => repository.GetBuyerById(orderRequest.BuyerId)).ReturnsAsync(user);
             var expectedOrder = new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
-            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).ReturnsAsync(expectedOrder);
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(expectedOrder);
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
