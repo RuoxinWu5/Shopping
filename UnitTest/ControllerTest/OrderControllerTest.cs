@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Data.Exceptions;
 using Data.Model;
 using Data.ViewModel;
 using Microsoft.AspNetCore.Http;
@@ -23,16 +24,16 @@ namespace UnitTest.ControllerTest
             _orderController = new OrdersController(_orderServiceMock.Object, _productServiceMock.Object, _userServiceMock.Object);
         }
         [Fact]
-        public async Task CreateOrder_ShouldReturnOk_WhenOrderIsValid()
+        public async Task AddOrder_ShouldReturnOk_WhenOrderIsValid()
         {
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
-            var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            _productServiceMock.Setup(repository => repository.GetProductById(orderRequest.ProductId)).ReturnsAsync(product);
-            _userServiceMock.Setup(repository => repository.GetBuyerById(orderRequest.BuyerId)).ReturnsAsync(user);
+            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _userServiceMock.Setup(repository => repository.GetBuyerById(It.IsAny<int>())).ReturnsAsync(user);
             var expectedOrder = new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(expectedOrder);
+            var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
@@ -41,42 +42,49 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task CreateOrder_ShouldReturnBadRequest_WhenQuantityIsNotEnough()
+        public async Task AddOrder_ShouldReturnNotFound_WhenProductIdNotExists()
         {
             // Arrange
+            _productServiceMock.Setup(x => x.GetProductById(It.IsAny<int>())).Throws(new KeyNotFoundException("The product doesn't exist."));
             var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new ArgumentException("Quantity not sufficient. Order creation failed."));
-            // Act
-            var result = await _orderController.AddOrder(orderRequest);
-            // Assert
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Quantity not sufficient. Order creation failed.", badRequestObjectResult.Value);
-        }
-
-        [Fact]
-        public async Task CreateOrder_ShouldReturnNotFound_WhenUserIdNotExists()
-        {
-            // Arrange
-            var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new KeyNotFoundException("The buyer doesn't exist."));
-            // Act
-            var result = await _orderController.AddOrder(orderRequest);
-            // Assert
-            var createdResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("The buyer doesn't exist.", createdResult.Value);
-        }
-
-        [Fact]
-        public async Task CreateOrder_ShouldReturnNotFound_WhenProductIdNotExists()
-        {
-            // Arrange
-            var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new KeyNotFoundException("The product doesn't exist."));
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
             var createdResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal("The product doesn't exist.", createdResult.Value);
+        }
+
+        [Fact]
+        public async Task AddOrder_ShouldReturnNotFound_WhenUserIdNotExists()
+        {
+            // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
+            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _userServiceMock.Setup(x => x.GetBuyerById(It.IsAny<int>())).Throws(new BuyerNotFoundException("The buyer doesn't exist."));
+            var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
+            // Act
+            var result = await _orderController.AddOrder(orderRequest);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The buyer doesn't exist.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task AddOrder_ShouldReturnBadRequest_WhenQuantityIsNotEnough()
+        {
+            // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
+            var product = new Product { Name = "Apple", Quantity = 100, User = user };
+            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _userServiceMock.Setup(repository => repository.GetBuyerById(It.IsAny<int>())).ReturnsAsync(user);
+            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new ArgumentException("Quantity not sufficient. Order creation failed."));
+            var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
+            // Act
+            var result = await _orderController.AddOrder(orderRequest);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Quantity not sufficient. Order creation failed.", badRequestObjectResult.Value);
         }
 
         [Fact]
@@ -441,13 +449,12 @@ namespace UnitTest.ControllerTest
             var serviceResult = new List<Order>{
                 new Order{ Quantity = 10, Status = OrderState.TO_BE_PAID, User = buyer, Product = product }
             };
+            _orderServiceMock.Setup(x => x.GetOrderListBySellerId(It.IsAny<int>())).ReturnsAsync(serviceResult);
+            _productServiceMock.Setup(p => p.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _userServiceMock.Setup(u => u.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
             var resultItem = new List<SellerOrder>{
                 new SellerOrder{ ProductId = 1, ProductName = "Apple", Quantity = 10, BuyerId = 2, BuyerName = "Lisa", Status = OrderState.TO_BE_PAID }
             };
-            _userServiceMock.Setup(x => x.GetSellerById(It.IsAny<int>())).ReturnsAsync(seller);
-            _productServiceMock.Setup(p => p.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
-            _userServiceMock.Setup(u => u.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
-            _orderServiceMock.Setup(x => x.GetOrderListBySellerId(It.IsAny<int>())).ReturnsAsync(serviceResult);
             // Act
             var result = await _orderController.GetOrderListBySellerId(1);
             // Assert
@@ -457,16 +464,15 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task GetOrderListBySellerId_ShouldReturnNotFound_WhenSellerNotFound()
+        public async Task GetOrderListBySellerId_ShouldReturnOk_WhenSellerIsNotfound()
         {
             // Arrange
-            int sellerId = 1;
-            _userServiceMock.Setup(x => x.GetSellerById(sellerId)).Throws(new KeyNotFoundException("Seller not found"));
+            _userServiceMock.Setup(x => x.ValidateIfSellerExist(It.IsAny<int>())).ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
             // Act
-            var result = await _orderController.GetOrderListBySellerId(sellerId);
+            var result = await _orderController.GetOrderListBySellerId(1);
             // Assert
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal("Seller not found", notFoundResult.Value);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("The seller doesn't exist.", badRequestObjectResult.Value);
         }
     }
 }

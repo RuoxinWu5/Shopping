@@ -38,9 +38,9 @@ namespace Shopping.Controller
                 var user = await _userService.GetUserById(userId);
                 return Ok(user);
             }
-            catch (KeyNotFoundException ex)
+            catch (UserNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

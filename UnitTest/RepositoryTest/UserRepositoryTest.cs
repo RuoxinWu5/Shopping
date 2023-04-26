@@ -1,7 +1,6 @@
 using Data.Model;
 using Data.Repository;
 using Microsoft.EntityFrameworkCore;
-using Data.Exceptions;
 
 namespace UnitTest.RepositoryTest;
 
@@ -49,7 +48,7 @@ public class UserRepositoryTest
     }
 
     [Fact]
-    public async Task GetUserById_ShouldReturnUser_WhenUserIsfound()
+    public async Task GetUserById_ShouldReturnUser()
     {
         // Arrange
         var users = await AddUsers();
@@ -57,15 +56,6 @@ public class UserRepositoryTest
         var result = await _repository.GetUserById(users[0].Id);
         // Assert
         Assert.Equal(users[0], result);
-    }
-
-    [Fact]
-    public async Task GetUserById_ShouldReturnNotFoundException_WhenUserIsNotfound()
-    {
-        // Arrange
-        var users = await AddUsers();
-        // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(async ()=>await _repository.GetUserById(3));
     }
 
     [Fact]
@@ -85,6 +75,6 @@ public class UserRepositoryTest
         // Arrange
         var users = await AddUsers();
         // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(async ()=>await _repository.GetUserByName("Tizzy"));
+        await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetUserByName("Tizzy"));
     }
 }

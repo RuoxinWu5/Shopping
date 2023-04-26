@@ -70,12 +70,12 @@ namespace UnitTest.ControllerTest
             // Arrange
             _userServiceMock
                 .Setup(service => service.GetUserById(It.IsAny<int>()))
-                .Throws(new KeyNotFoundException("The user doesn't exist."));
+                .Throws(new UserNotFoundException("The user doesn't exist."));
             // Act
             var result = await _userController.GetUserById(1);
             // Assert
-            var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("The user doesn't exist.", notFoundObjectResult.Value);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The user doesn't exist.", badRequestObjectResult.Value);
         }
     }
 }

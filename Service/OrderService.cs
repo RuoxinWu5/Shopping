@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 
@@ -40,8 +41,8 @@ namespace Service
 
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
-            var result = await _orderRepository.GetOrderListBySellerId(sellerId);
-            return result;
+            var orderLists = await _orderRepository.GetOrderListBySellerId(sellerId);
+            return orderLists;
         }
     }
 }

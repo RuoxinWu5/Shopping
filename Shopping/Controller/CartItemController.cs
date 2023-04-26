@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.RequestModel;
 using Data.ViewModel;
@@ -35,13 +36,17 @@ namespace Shopping.Controller
                 var result = await _cartService.AddCartItem(cartItem);
                 return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = result.Id }, result);
             }
-            catch (ArgumentException exception)
-            {
-                return BadRequest(exception.Message);
-            }
             catch (KeyNotFoundException exception)
             {
                 return NotFound(exception.Message);
+            }
+            catch (BuyerNotFoundException exception)
+            {
+                return BadRequest(exception.Message);
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(exception.Message);
             }
         }
 

@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -38,13 +39,17 @@ namespace Shopping.Controller
                 var addOrderResult = await _orderService.GetOrderById(order.Id);
                 return CreatedAtAction(nameof(GetOrderById), new { orderId = addOrderResult.Id }, addOrderResult);
             }
-            catch (ArgumentException exception)
-            {
-                return BadRequest(exception.Message);
-            }
             catch (KeyNotFoundException exception)
             {
                 return NotFound(exception.Message);
+            }
+            catch (BuyerNotFoundException exception)
+            {
+                return BadRequest(exception.Message);
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(exception.Message);
             }
         }
 
@@ -162,7 +167,7 @@ namespace Shopping.Controller
         {
             try
             {
-                await _userService.GetSellerById(sellerId);
+                await _userService.ValidateIfSellerExist(sellerId);
                 var orders = await _orderService.GetOrderListBySellerId(sellerId);
                 List<SellerOrder> result = new List<SellerOrder>();
                 foreach (Order order in orders)
@@ -183,9 +188,9 @@ namespace Shopping.Controller
                 }
                 return Ok(result);
             }
-            catch (KeyNotFoundException ex)
+            catch (SellerNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

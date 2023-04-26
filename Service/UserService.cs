@@ -36,33 +36,33 @@ namespace Service
 
         public async Task<User> GetSellerById(int id)
         {
-            var result = await _userRepository.GetUserById(id);
-            if (result.Type == UserType.BUYER)
-            {
-                throw new KeyNotFoundException("The seller doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            var user = await _userRepository.GetUserById(id);
+            if (user != null && user.Type == UserType.SELLER)
+                return user;
+            throw new SellerNotFoundException("The seller doesn't exist.");
         }
 
         public async Task<User> GetBuyerById(int id)
         {
-            var result = await _userRepository.GetUserById(id);
-            if (result.Type == UserType.SELLER)
-            {
-                throw new KeyNotFoundException("The buyer doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            var user = await _userRepository.GetUserById(id);
+            if (user != null && user.Type == UserType.BUYER)
+                return user;
+            throw new BuyerNotFoundException("The buyer doesn't exist.");
         }
 
         public async Task<User> GetUserById(int userId)
         {
-            return await _userRepository.GetUserById(userId);
+            var user = await _userRepository.GetUserById(userId);
+            if (user != null)
+                return user;
+            throw new UserNotFoundException("The user doesn't exist.");
+        }
+
+        public async Task ValidateIfSellerExist(int id)
+        {
+            var user = await _userRepository.GetUserById(id);
+            if (user == null || user.Type != UserType.SELLER)
+                throw new UserNotFoundException("The user doesn't exist.");
         }
 
         public async Task<User> GetUserByUserNameAndPassword(string username, string password)

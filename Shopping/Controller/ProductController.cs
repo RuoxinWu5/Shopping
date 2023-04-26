@@ -40,13 +40,13 @@ namespace Shopping.Controller
                 var result = await _productService.AddProduct(product);
                 return CreatedAtAction(nameof(GetProductById), new { productId = result.Id }, result);
             }
+            catch (SellerNotFoundException exception)
+            {
+                return BadRequest(exception.Message);
+            }
             catch (DuplicateUserNameException exception)
             {
                 return Conflict(exception.Message);
-            }
-            catch (KeyNotFoundException exception)
-            {
-                return NotFound(exception.Message);
             }
         }
 

@@ -18,17 +18,10 @@ namespace Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<User> GetUserById(int id)
+        public async Task<User?> GetUserById(int id)
         {
             var result = await _context.Users.Include(p => p.Products).FirstOrDefaultAsync(u => u.Id == id);
-            if (result == null)
-            {
-                throw new KeyNotFoundException("The user doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            return result;
         }
 
         public async Task<User> GetUserByName(string name)

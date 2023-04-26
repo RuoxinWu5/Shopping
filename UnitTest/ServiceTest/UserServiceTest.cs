@@ -52,14 +52,28 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task GetUserById_ShouldCallGetUserByIdMethodOfRepository()
+        public async Task GetUserById_ShouldReturnUserInfo_WhenUserIsfound()
         {
             // Arrange
             var id = 1;
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(user);
             // Act
-            await _userService.GetUserById(id);
+            var result = await _userService.GetUserById(id);
             // Assert
+            Assert.Equal(user, result);
             _userRepositoryMock.Verify(repository => repository.GetUserById(id), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetUserById_ShouldReturnUserNotFoundException_WhenUserIsNotfound()
+        {
+            // Arrange
+            var id = 1;
+            User? user = null;
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(user);
+            // Act & Assert
+            await Assert.ThrowsAsync<UserNotFoundException>(async () => await _userService.GetUserById(id));
         }
 
         [Fact]
@@ -72,19 +86,19 @@ namespace UnitTest.ServiceTest
             // Act
             var result = await _userService.GetSellerById(id);
             // Assert
-            Assert.Equal(UserType.SELLER, result.Type);
+            Assert.Equal(seller, result);
             _userRepositoryMock.Verify(repository => repository.GetUserById(id), Times.Once);
         }
 
         [Fact]
-        public async Task GetSellerById_ShouldThrowNotFoundException_WhenSellerIsNotfound()
+        public async Task GetSellerById_ShouldThrowSellerNotFoundException_WhenSellerIsNotfound()
         {
             // Arrange
             var id = 1;
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
-            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(seller);
+            var buyer = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(buyer);
             // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _userService.GetSellerById(id));
+            await Assert.ThrowsAsync<SellerNotFoundException>(async () => await _userService.GetSellerById(id));
         }
 
         [Fact]
@@ -92,24 +106,48 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var id = 1;
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
-            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(seller);
+            var buyer = new User { Name = "Jack", Password = "Jack123", Type = UserType.BUYER };
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(buyer);
             // Act
             var result = await _userService.GetBuyerById(id);
             // Assert
-            Assert.Equal(UserType.BUYER, result.Type);
+            Assert.Equal(buyer, result);
             _userRepositoryMock.Verify(repository => repository.GetUserById(id), Times.Once);
         }
 
         [Fact]
-        public async Task GetBuyerById_ShouldThrowNotFoundException_WhenBuyerIsNotfound()
+        public async Task GetBuyerById_ShouldThrowBuyerNotFoundException_WhenBuyerIsNotfound()
         {
             // Arrange
             var id = 1;
             var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(seller);
             // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _userService.GetBuyerById(id));
+            await Assert.ThrowsAsync<BuyerNotFoundException>(async () => await _userService.GetBuyerById(id));
+        }
+
+        [Fact]
+        public async Task ValidateIfSellerExit_ShouldCallGetUserByIdMethodOfRepository_WhenSellerIsfound()
+        {
+            // Arrange
+            var id = 1;
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword", Type = UserType.SELLER };
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(user);
+            // Act
+            await _userService.ValidateIfSellerExist(id);
+            // Assert
+            _userRepositoryMock.Verify(repository => repository.GetUserById(id), Times.Once);
+        }
+
+        [Fact]
+        public async Task ValidateIfSellerExit_ShouldThrowSellerNotFoundException_WhenSellerIsNotfound()
+        {
+            // Arrange
+            var id = 1;
+            User? user = null;
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(user);
+            // Act & Assert
+            await Assert.ThrowsAsync<SellerNotFoundException>(async () => await _userService.GetSellerById(id));
         }
 
         [Fact]

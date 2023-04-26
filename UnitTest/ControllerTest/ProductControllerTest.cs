@@ -86,18 +86,14 @@ namespace UnitTest.ControllerTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var productViewModel = new AddProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
-            Assert.NotNull(product);
-            _productServiceMock
-                .Setup(service => service.AddProduct(It.Is<Product>(product => product.User.Name == "Jack" && product.Name == "Apple")))
-                .Throws(new KeyNotFoundException("The seller doesn't exist."));
             _userServiceMock
-                .Setup(service => service.GetSellerById(productViewModel.SellerId))
-                .ReturnsAsync(user);
+                .Setup(service => service.GetSellerById(It.IsAny<int>()))
+                .Throws(new SellerNotFoundException("The seller doesn't exist."));
             // Act
             var result = await _productController.AddProduct(productViewModel);
             // Assert
-            var notFoundObjectResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("The seller doesn't exist.", notFoundObjectResult.Value);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The seller doesn't exist.", badRequestObjectResult.Value);
         }
 
         [Fact]
