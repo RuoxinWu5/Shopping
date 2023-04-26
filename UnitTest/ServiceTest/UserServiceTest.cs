@@ -22,7 +22,8 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var user = new User { Id = 1, Name = "testuser", Password = "testpassword", Type = UserType.BUYER };
-            _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ThrowsAsync(new KeyNotFoundException("The user doesn't exist."));
+            User? nullUser = null;
+            _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ReturnsAsync(nullUser);
             // Act
             await _userService.AddUser(user);
             // Assert
@@ -34,7 +35,8 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
-            _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ThrowsAsync(new KeyNotFoundException("The user doesn't exist."));
+            User? nullUser = null;
+            _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ReturnsAsync(nullUser);
             // Act
             var savedUser = await _userService.AddUser(user);
             // Assert
@@ -168,9 +170,20 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
+            User? nullUser = null;
+            _userRepositoryMock.Setup(repository => repository.GetUserByName(It.IsAny<string>())).ReturnsAsync(nullUser);
+            // Act & Assert
+            await Assert.ThrowsAsync<UserNotFoundException>(async () => await _userService.GetUserByUserNameAndPassword("testuser", "testpassword"));
+        }
+        
+        [Fact]
+        public async Task GetUserByUserNameAndPassword_ShouldThrowNotFoundException_WhenPasswordIsNotEqual()
+        {
+            // Arrange
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword" };
             _userRepositoryMock.Setup(repository => repository.GetUserByName(It.IsAny<string>())).ReturnsAsync(user);
             // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _userService.GetUserByUserNameAndPassword("testuser", "password"));
+            await Assert.ThrowsAsync<UserNotFoundException>(async () => await _userService.GetUserByUserNameAndPassword("testuser", "password"));
         }
     }
 }

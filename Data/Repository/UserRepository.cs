@@ -24,17 +24,10 @@ namespace Data.Repository
             return result;
         }
 
-        public async Task<User> GetUserByName(string name)
+        public async Task<User?> GetUserByName(string name)
         {
             var result = await _context.Users.Include(p => p.Products).FirstOrDefaultAsync(u => u.Name == name);
-            if (result == null)
-            {
-                throw new KeyNotFoundException("The user doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            return result;
         }
     }
 }
