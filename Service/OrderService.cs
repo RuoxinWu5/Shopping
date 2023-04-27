@@ -9,12 +9,14 @@ namespace Service
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository)
+        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository, IUserService userService)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
+            _userService = userService;
         }
 
         public async Task AddOrderAndReduceProductQuantity(Order order)
@@ -41,6 +43,7 @@ namespace Service
 
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
+            await _userService.ValidateIfSellerExist(sellerId);
             var orderLists = await _orderRepository.GetOrderListBySellerId(sellerId);
             return orderLists;
         }

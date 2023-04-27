@@ -467,7 +467,7 @@ namespace UnitTest.ControllerTest
         public async Task GetOrderListBySellerId_ShouldReturnOk_WhenSellerIsNotfound()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.ValidateIfSellerExist(It.IsAny<int>())).ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
+            _orderServiceMock.Setup(x => x.GetOrderListBySellerId(It.IsAny<int>())).ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
             // Act
             var result = await _orderController.GetOrderListBySellerId(1);
             // Assert

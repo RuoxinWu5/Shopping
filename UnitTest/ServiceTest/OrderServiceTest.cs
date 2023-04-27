@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 using Moq;
@@ -11,13 +12,15 @@ namespace UnitTest.ServiceTest
         private readonly Mock<IOrderRepository> _orderRepositoryMock;
         private readonly Mock<IProductRepository> _productRepositoryMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IUserService> _userServiceMock;
 
         public OrderServiceTest()
         {
             _orderRepositoryMock = new Mock<IOrderRepository>();
             _productRepositoryMock = new Mock<IProductRepository>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _userRepositoryMock.Object);
+            _userServiceMock = new Mock<IUserService>();
+            _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _userRepositoryMock.Object, _userServiceMock.Object);
         }
 
         [Fact]
@@ -70,14 +73,30 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task GetOrderListBySellerId_ShouldCallGetOrderListBySellerIdMethodOfRepository()
+        public async Task GetOrderListBySellerId_ShouldReturnOrderLists_WhenSellerExist()
         {
             // Arrange
             var id = 1;
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var orderLists = new List<Order>{
+               new Order { Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user }
+            };
+            _orderRepositoryMock.Setup(repository => repository.GetOrderListBySellerId(It.IsAny<int>())).ReturnsAsync(orderLists);
             // Act
-            await _orderService.GetOrderListBySellerId(id);
+            var result = await _orderService.GetOrderListBySellerId(id);
             // Assert
-            _orderRepositoryMock.Verify(repository => repository.GetOrderListBySellerId(id), Times.Once);
+            Assert.Equal(orderLists, result);
+        }
+
+        [Fact]
+        public async Task GetOrderListBySellerId_ShouldThrowSellerNotFoundException_WhenSellerNotExist()
+        {
+            // Arrange
+            var id = 1;
+            _userServiceMock.Setup(service => service.ValidateIfSellerExist(It.IsAny<int>())).ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
+            // Act & Assert
+            await Assert.ThrowsAsync<SellerNotFoundException>(async () => await _orderService.GetOrderListBySellerId(id));
         }
     }
 }
