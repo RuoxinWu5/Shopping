@@ -39,9 +39,9 @@ namespace Shopping.Controller
                 var addOrderResult = await _orderService.GetOrderById(order.Id);
                 return CreatedAtAction(nameof(GetOrderById), new { orderId = addOrderResult.Id }, addOrderResult);
             }
-            catch (KeyNotFoundException exception)
+            catch (ProductNotFoundException exception)
             {
-                return NotFound(exception.Message);
+                return BadRequest(exception.Message);
             }
             catch (BuyerNotFoundException exception)
             {
@@ -72,9 +72,9 @@ namespace Shopping.Controller
                 };
                 return Ok(result);
             }
-            catch (KeyNotFoundException ex)
+            catch (OrderNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -100,9 +100,9 @@ namespace Shopping.Controller
                     return BadRequest("Current order is not payable.");
                 }
             }
-            catch (KeyNotFoundException ex)
+            catch (OrderNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -128,9 +128,9 @@ namespace Shopping.Controller
                     return BadRequest("Current order is not receivable.");
                 }
             }
-            catch (KeyNotFoundException ex)
+            catch (OrderNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -156,9 +156,9 @@ namespace Shopping.Controller
                     return BadRequest("Current order is not shippable.");
                 }
             }
-            catch (KeyNotFoundException ex)
+            catch (OrderNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 

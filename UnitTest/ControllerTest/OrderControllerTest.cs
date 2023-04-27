@@ -42,16 +42,16 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task AddOrder_ShouldReturnNotFound_WhenProductIdNotExists()
+        public async Task AddOrder_ShouldReturnBadRequest_WhenProductIdNotExists()
         {
             // Arrange
-            _productServiceMock.Setup(x => x.GetProductById(It.IsAny<int>())).Throws(new KeyNotFoundException("The product doesn't exist."));
+            _productServiceMock.Setup(x => x.GetProductById(It.IsAny<int>())).Throws(new ProductNotFoundException("The product doesn't exist."));
             var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
-            var createdResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("The product doesn't exist.", createdResult.Value);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The product doesn't exist.", badRequestObjectResult.Value);
         }
 
         [Fact]
@@ -108,14 +108,15 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        public async Task GetOrderById_ShouldReturnBadRequest_WhenOrderIsNotfound()
         {
             // Arrange
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
             // Act
             var result = await _orderController.GetOrderById(1);
             // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The order doesn't exist.", badRequestObjectResult.Value);
         }
 
         [Fact]
@@ -153,14 +154,15 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task PayOrder_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        public async Task PayOrder_ShouldReturnBadRequest_WhenOrderIsNotfound()
         {
             // Arrange
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
             // Act
             var result = await _orderController.PayOrder(1);
             // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The order doesn't exist.", badRequestObjectResult.Value);
         }
 
         [Fact]
@@ -260,14 +262,15 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task ConfirmReceipt_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        public async Task ConfirmReceipt_ShouldReturnBadRequest_WhenOrderIsNotfound()
         {
             // Arrange
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
             // Act
             var result = await _orderController.ConfirmReceipt(1);
             // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The order doesn't exist.", badRequestObjectResult.Value);
         }
 
         [Fact]
@@ -367,14 +370,15 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task ShipOrder_ShouldReturnNotFoundException_WhenOrderIsNotfound()
+        public async Task ShipOrder_ShouldReturnBadRequest_WhenOrderIsNotfound()
         {
             // Arrange
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
             // Act
             var result = await _orderController.ShipOrder(1);
             // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The order doesn't exist.", badRequestObjectResult.Value);
         }
 
         [Fact]
