@@ -22,8 +22,15 @@ namespace Shopping.Controller
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProductListBySellerId(int sellerId)
         {
-            var result = await _productService.GetProductListBySellerId(sellerId);
-            return Ok(result);
+            try
+            {
+                var productLists = await _productService.GetProductListBySellerId(sellerId);
+                return Ok(productLists);
+            }
+            catch (SellerNotFoundException exception)
+            {
+                return BadRequest(exception.Message);
+            }
         }
 
         [HttpPost]
@@ -37,8 +44,8 @@ namespace Shopping.Controller
                     Quantity = productRequestModel.Quantity,
                     User = await _userService.GetSellerById(productRequestModel.SellerId)
                 };
-                var result = await _productService.AddProduct(product);
-                return CreatedAtAction(nameof(GetProductById), new { productId = result.Id }, result);
+                await _productService.AddProduct(product);
+                return CreatedAtAction(nameof(GetProductById), new { productId = product.Id }, product);
             }
             catch (SellerNotFoundException exception)
             {
@@ -55,12 +62,12 @@ namespace Shopping.Controller
         {
             try
             {
-                var result = await _productService.GetProductById(productId);
-                return Ok(result);
+                var product = await _productService.GetProductById(productId);
+                return Ok(product);
             }
-            catch (KeyNotFoundException ex)
+            catch (ProductNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

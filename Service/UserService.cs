@@ -13,19 +13,16 @@ namespace Service
             _userRepository = repository;
         }
 
-        public async Task<User> AddUser(User user)
+        public async Task AddUser(User user)
         {
             if (!user.Type.HasValue)
             {
                 user.Type = UserType.BUYER;
             }
             var existingUser = await _userRepository.GetUserByName(user.Name);
-            if (existingUser == null)
-            {
-                await _userRepository.AddUser(user);
-                return user;
-            }
-            throw new DuplicateUserNameException($"User name '{user.Name}' already exists.");
+            if (existingUser != null)
+                throw new DuplicateUserNameException($"User name '{user.Name}' already exists.");
+            await _userRepository.AddUser(user);
         }
 
         public async Task<User> GetSellerById(int id)
@@ -56,7 +53,7 @@ namespace Service
         {
             var user = await _userRepository.GetUserById(id);
             if (user == null || user.Type != UserType.SELLER)
-                throw new UserNotFoundException("The user doesn't exist.");
+                throw new SellerNotFoundException("The seller doesn't exist.");
         }
 
         public async Task<User> GetUserByUserNameAndPassword(string username, string password)

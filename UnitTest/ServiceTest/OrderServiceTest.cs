@@ -21,7 +21,7 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task AddOrder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsEnough()
+        public async Task AddOrderAndReduceProductQuantity_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsEnough()
         {
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
@@ -36,7 +36,7 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task AddOrder_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsNotEnough()
+        public async Task AddOrderAndReduceProductQuantity_ShouldCallAddOrderMethodOfRepository_WhenQuantityIsNotEnough()
         {
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };

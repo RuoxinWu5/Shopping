@@ -7,38 +7,37 @@ namespace Service
     public class ProductService : IProductService
     {
         private readonly IProductRepository _repository;
+        private readonly IUserService _userService;
 
-        public ProductService(IProductRepository repository)
+        public ProductService(IProductRepository repository, IUserService userService)
         {
             _repository = repository;
+            _userService = userService;
         }
 
-        public async Task<Product> AddProduct(Product product)
+        public async Task AddProduct(Product product)
         {
-            try
-            {
-                var existingProduct = await _repository.GetProductByName(product.Name);
-                if (existingProduct != null)
-                {
-                    throw new DuplicateUserNameException($"User name '{product.Name}' already exists.");
-                }
-            }
-            catch (KeyNotFoundException)
-            {
-                await _repository.AddProduct(product);
-            }
-            return product;
+            var existingProduct = await _repository.GetProductByName(product.Name);
+            if (existingProduct != null)
+                throw new DuplicateUserNameException($"User name '{product.Name}' already exists.");
+            await _repository.AddProduct(product);
         }
 
         public async Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId)
         {
+            await _userService.ValidateIfSellerExist(sellerId);
             var result = await _repository.GetProductListBySellerId(sellerId);
             return result;
         }
 
         public async Task<Product> GetProductById(int id)
         {
-            return await _repository.GetProductById(id);
+            var product = await _repository.GetProductById(id);
+            if (product != null)
+            {
+                return product;
+            }
+            throw new ProductNotFoundException("The product doesn't exist.");
         }
 
         public async Task<IEnumerable<Product>> AllProduct()

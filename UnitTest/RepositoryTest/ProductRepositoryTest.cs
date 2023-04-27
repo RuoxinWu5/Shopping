@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -88,7 +89,7 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task GetProductById_ShouldReturnProduct_WhenProductsIsfound()
+        public async Task GetProductById_ShouldReturnProduct()
         {
             // Arrange
             var users = await AddUsers();
@@ -96,21 +97,11 @@ namespace UnitTest.RepositoryTest
             // Act
             var result = await _repository.GetProductById(products[0].Id);
             // Assert
-            Assert.Equal(products[0].ToString(), result.ToString());
+            Assert.Equal(products[0], result);
         }
 
         [Fact]
-        public async Task GetProductById_ShouldReturnNotFoundException_WhenProductsIsNotfound()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductById(3));
-        }
-
-        [Fact]
-        public async Task GetProductByName_ShouldReturnProduct_WhenProductsIsfound()
+        public async Task GetProductByName_ShouldReturnProduct()
         {
             // Arrange
             var users = await AddUsers();
@@ -118,21 +109,11 @@ namespace UnitTest.RepositoryTest
             // Act
             var result = await _repository.GetProductByName(products[0].Name);
             // Assert
-            Assert.Equal(products[0].ToString(), result.ToString());
+            Assert.Equal(products[0], result);
         }
 
         [Fact]
-        public async Task GetProductByName_ShouldReturnNotFoundException_WhenProductsIsNotfound()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetProductByName("T"));
-        }
-
-        [Fact]
-        public async Task ProductReduce_ShouldReduceQuantity_WhenProductsIsfound()
+        public async Task ReduceProductQuantity_ShouldReduceQuantity_WhenProductsIsfound()
         {
             // Arrange
             var users = await AddUsers();
@@ -141,6 +122,16 @@ namespace UnitTest.RepositoryTest
             await _repository.ReduceProductQuantity(products[0], 10);
             // Assert
             Assert.Equal(90, products[0].Quantity);
+        }
+
+        [Fact]
+        public async Task ReduceProductQuantity_ShouldThrowProductNotFoundException_WhenProductsIsNotfound()
+        {
+            // Arrange
+            var users = await AddUsers();
+            var product = new Product { Id = 100, Name = "melon", Quantity = 90, User = users[1] };
+            // Act & Assert
+            await Assert.ThrowsAsync<ProductNotFoundException>(async () => await _repository.ReduceProductQuantity(product, 10));
         }
     }
 }

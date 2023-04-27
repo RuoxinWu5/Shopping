@@ -25,30 +25,16 @@ namespace Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Product> GetProductById(int id)
+        public async Task<Product?> GetProductById(int id)
         {
             var result = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
-            if (result == null)
-            {
-                throw new KeyNotFoundException("The product doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            return result;
         }
 
-        public async Task<Product> GetProductByName(string name)
+        public async Task<Product?> GetProductByName(string name)
         {
             var result = await _context.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Name == name);
-            if (result == null)
-            {
-                throw new KeyNotFoundException("The product doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            return result;
         }
 
         public async Task<IEnumerable<Product>> AllProduct()
@@ -59,8 +45,8 @@ namespace Data.Repository
 
         public async Task ReduceProductQuantity(Product product, int quantity)
         {
-            var result = await GetProductById(product.Id);
-            result.Quantity -= quantity;
+            var productResult = await GetProductById(product.Id) ?? throw new ProductNotFoundException("The product doesn't exist.");
+            productResult.Quantity -= quantity;
             await _context.SaveChangesAsync();
         }
     }

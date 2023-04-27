@@ -19,14 +19,14 @@ namespace Service
 
         public async Task AddOrderAndReduceProductQuantity(Order order)
         {
-            var product = await _productRepository.GetProductById(order.Product.Id);
-            var quantity = product.Quantity;
-            if (order.Quantity > quantity)
+            var product = await _productRepository.GetProductById(order.Product.Id) ?? throw new ProductNotFoundException("The product doesn't exist.");
+            var inventory = product.Quantity;
+            if (order.Quantity > inventory)
             {
                 throw new ArgumentException("Quantity not sufficient. Order creation failed.");
             }
-            await _orderRepository.AddOrder(order);
             await _productRepository.ReduceProductQuantity(order.Product, order.Quantity);
+            await _orderRepository.AddOrder(order);
         }
 
         public async Task<Order> GetOrderById(int id)

@@ -23,10 +23,6 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
-            Assert.NotNull(user);
-            _userServiceMock
-                .Setup(service => service.AddUser(user))
-                .ReturnsAsync(user);
             // Act
             var result = await _userController.AddUser(user);
             // Assert
@@ -38,10 +34,10 @@ namespace UnitTest.ControllerTest
         public async Task CreateUser_ShouldReturnBadRequest_WhenUserNameExists()
         {
             // Arrange
-            var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
             _userServiceMock
-                .Setup(service => service.AddUser(user))
+                .Setup(service => service.AddUser(It.IsAny<User>()))
                 .Throws(new DuplicateUserNameException("User name 'test' already exists."));
+            var user = new User { Name = "test", Password = "test123123", Type = UserType.BUYER };
             // Act
             var result = await _userController.AddUser(user);
             // Assert

@@ -38,9 +38,9 @@ namespace UnitTest.ServiceTest
             User? nullUser = null;
             _userRepositoryMock.Setup(x => x.GetUserByName(user.Name)).ReturnsAsync(nullUser);
             // Act
-            var savedUser = await _userService.AddUser(user);
+            await _userService.AddUser(user);
             // Assert
-            Assert.Equal(UserType.BUYER, savedUser.Type);
+            _userRepositoryMock.Verify(repository => repository.AddUser(user), Times.Once);
         }
 
         [Fact]
@@ -149,7 +149,7 @@ namespace UnitTest.ServiceTest
             User? user = null;
             _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(user);
             // Act & Assert
-            await Assert.ThrowsAsync<SellerNotFoundException>(async () => await _userService.GetSellerById(id));
+            await Assert.ThrowsAsync<SellerNotFoundException>(async () => await _userService.ValidateIfSellerExist(id));
         }
 
         [Fact]

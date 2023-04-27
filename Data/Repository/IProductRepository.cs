@@ -6,8 +6,8 @@ namespace Data.Repository
     {
         Task<IEnumerable<Product>> GetProductListBySellerId(int sellerId);
         Task AddProduct(Product product);
-        Task<Product> GetProductById(int id);
-        Task<Product> GetProductByName(string name);
+        Task<Product?> GetProductById(int id);
+        Task<Product?> GetProductByName(string name);
         Task<IEnumerable<Product>> AllProduct();
         Task ReduceProductQuantity(Product product, int quantity);
     }

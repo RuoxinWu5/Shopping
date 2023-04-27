@@ -21,8 +21,8 @@ namespace Shopping.Controller
         {
             try
             {
-                var result = await _userService.AddUser(user);
-                return CreatedAtAction(nameof(GetUserById), new { userId = user.Id }, result);
+                await _userService.AddUser(user);
+                return CreatedAtAction(nameof(GetUserById), new { userId = user.Id }, user);
             }
             catch (DuplicateUserNameException exception)
             {
