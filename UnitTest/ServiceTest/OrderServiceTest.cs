@@ -51,14 +51,29 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task GetOrderById_ShouldCallGetOrderByIdMethodOfRepository()
+        public async Task GetOrderById_ShouldReturnOrder_WhenOrderExist()
         {
             // Arrange
             var id = 1;
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 51, Status = OrderState.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             // Act
-            await _orderService.GetOrderById(id);
+            var result = await _orderService.GetOrderById(id);
             // Assert
-            _orderRepositoryMock.Verify(repository => repository.GetOrderById(id), Times.Once);
+            Assert.Equal(order, result);
+        }
+
+        [Fact]
+        public async Task GetOrderById_ShouldThrowOrderNotFoundException_WhenOrderNotExist()
+        {
+            // Arrange
+            var id = 1;
+            Order? nullOrder = null;
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(nullOrder);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderNotFoundException>(async () => await _orderService.GetOrderById(id));
         }
 
         [Fact]

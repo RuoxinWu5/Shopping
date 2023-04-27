@@ -74,7 +74,7 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task GetOrderById_ShouldReturnOrder_WhenOrderIsfound()
+        public async Task GetOrderById_ShouldReturnOrder()
         {
             // Arrange
             var users = await AddUsers();
@@ -83,17 +83,7 @@ namespace UnitTest.RepositoryTest
             // Act
             var result = await _repository.GetOrderById(order[0].Id);
             // Assert
-            Assert.Equal(order[0].ToString(), result.ToString());
-        }
-
-        [Fact]
-        public async Task GetOrderById_ShouldReturnNotFoundException_WhenOrderIsNotfound()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetOrderById(1));
+            Assert.Equal(order[0], result);
         }
 
         [Fact]

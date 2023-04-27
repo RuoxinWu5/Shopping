@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,22 +18,15 @@ namespace Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Order> GetOrderById(int id)
+        public async Task<Order?> GetOrderById(int id)
         {
             var result = await _context.Orders.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Id == id);
-            if (result == null)
-            {
-                throw new KeyNotFoundException("The order doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            return result;
         }
 
         public async Task UpdateOrderState(int orderId, OrderState state)
         {
-            var order = await GetOrderById(orderId);
+            var order = await GetOrderById(orderId) ?? throw new OrderNotFoundException("The order doesn't exist.");
             order.Status = state;
             await _context.SaveChangesAsync();
         }

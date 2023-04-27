@@ -33,7 +33,12 @@ namespace Service
 
         public async Task<Order> GetOrderById(int id)
         {
-            return await _orderRepository.GetOrderById(id);
+            var order = await _orderRepository.GetOrderById(id);
+            if (order != null)
+            {
+                return order;
+            }
+            throw new OrderNotFoundException("The order doesn't exist.");
         }
 
         public async Task UpdateOrderState(int orderId, OrderState state)
