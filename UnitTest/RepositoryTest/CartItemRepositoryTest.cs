@@ -74,7 +74,7 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task GetCartItemById_ShouldReturnCart_WhenCartIsfound()
+        public async Task GetCartItemById_ShouldReturnCart()
         {
             // Arrange
             var users = await AddUsers();
@@ -84,18 +84,7 @@ namespace UnitTest.RepositoryTest
             var result = await _repository.GetCartItemById(cart[0].Id);
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(cart[0].ToString(), result.ToString());
-        }
-
-        [Fact]
-        public async Task GetCartItemById_ShouldReturnNotFoundException_WhenCartIsNotfound()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            var cart = await AddCarts();
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _repository.GetCartItemById(3));
+            Assert.Equal(cart[0], result);
         }
     }
 }

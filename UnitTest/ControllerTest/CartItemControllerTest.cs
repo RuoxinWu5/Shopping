@@ -78,16 +78,16 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task AddCartItem_ShouldReturnNotFound_WhenProductIdNotExists()
+        public async Task AddCartItem_ShouldReturnBadRequest_WhenProductIdNotExists()
         {
             // Arrange
             var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).Throws(new KeyNotFoundException("The product doesn't exist."));
+            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).Throws(new ProductNotFoundException("The product doesn't exist."));
             // Act
             var result = await _cartController.AddCartItem(addProductToCartRequestModel);
             // Assert
-            var createdResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("The product doesn't exist.", createdResult.Value);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The product doesn't exist.", badRequestObjectResult.Value);
         }
 
         [Fact]
@@ -111,14 +111,15 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task GetCartItemById_ShouldReturnNotFoundException_WhenCartItemIsNotfound()
+        public async Task GetCartItemById_ShouldReturnBadRequest_WhenCartItemIsNotfound()
         {
             // Arrange
-            _cartServiceMock.Setup(x => x.GetCartItemById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            _cartServiceMock.Setup(x => x.GetCartItemById(It.IsAny<int>())).ThrowsAsync(new CartItemNotFoundException("The cart item doesn't exist."));
             // Act
             var result = await _cartController.GetCartItemById(1);
             // Assert
-            Assert.IsType<NotFoundObjectResult>(result);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The cart item doesn't exist.", badRequestObjectResult.Value);
         }
     }
 }

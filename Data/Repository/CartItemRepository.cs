@@ -17,17 +17,10 @@ namespace Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<CartItem> GetCartItemById(int id)
+        public async Task<CartItem?> GetCartItemById(int id)
         {
-            var result = await _context.CartItems.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Id == id);
-            if (result == null)
-            {
-                throw new KeyNotFoundException("The cartItem doesn't exist.");
-            }
-            else
-            {
-                return result;
-            }
+            var CartItem = await _context.CartItems.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Id == id);
+            return CartItem;
         }
     }
 }

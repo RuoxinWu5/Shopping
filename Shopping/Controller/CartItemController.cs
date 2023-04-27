@@ -36,9 +36,9 @@ namespace Shopping.Controller
                 var result = await _cartService.AddCartItem(cartItem);
                 return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = result.Id }, result);
             }
-            catch (KeyNotFoundException exception)
+            catch (ProductNotFoundException exception)
             {
-                return NotFound(exception.Message);
+                return BadRequest(exception.Message);
             }
             catch (BuyerNotFoundException exception)
             {
@@ -66,9 +66,9 @@ namespace Shopping.Controller
                 };
                 return Ok(result);
             }
-            catch (KeyNotFoundException ex)
+            catch (CartItemNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 

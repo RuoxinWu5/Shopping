@@ -1,3 +1,4 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
 
@@ -28,7 +29,12 @@ namespace Service
 
         public async Task<CartItem> GetCartItemById(int id)
         {
-            return await _cartRepository.GetCartItemById(id);
+            var CartItem = await _cartRepository.GetCartItemById(id);
+            if (CartItem != null)
+            {
+                return CartItem;
+            }
+            throw new CartItemNotFoundException("The cart item doesn't exist.");
         }
     }
 }
