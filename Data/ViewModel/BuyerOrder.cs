@@ -9,6 +9,6 @@ namespace Data.ViewModel
         public int Quantity { get; set; }
         public string SellerName { get; set; } = null!;
         public string BuyerName { get; set; } = null!;
-        public OrderState Status { get; set; }
+        public OrderStatus Status { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace Service
     {
         Task AddOrderAndReduceProductQuantity(Order order);
         Task<Order> GetOrderById(int id);
-        Task UpdateOrderState(int orderId, OrderState state);
+        Task UpdateOrderState(int orderId, OrderStatus status);
         Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId);
     }
 }

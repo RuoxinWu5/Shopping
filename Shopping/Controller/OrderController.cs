@@ -31,7 +31,7 @@ namespace Shopping.Controller
                 var order = new Order
                 {
                     Quantity = orderRequestModel.Quantity,
-                    Status = OrderState.TO_BE_PAID,
+                    Status = OrderStatus.TO_BE_PAID,
                     Product = await _productService.GetProductById(orderRequestModel.ProductId),
                     User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
@@ -89,9 +89,9 @@ namespace Shopping.Controller
                 {
                     return BadRequest("This order is not yours.");
                 }
-                if (order.Status == OrderState.TO_BE_PAID)
+                if (order.Status == OrderStatus.TO_BE_PAID)
                 {
-                    await _orderService.UpdateOrderState(orderId, OrderState.PAID);
+                    await _orderService.UpdateOrderState(orderId, OrderStatus.PAID);
                     return Ok("Payment successful.");
                 }
                 else
@@ -117,9 +117,9 @@ namespace Shopping.Controller
                 {
                     return BadRequest("This order is not yours.");
                 }
-                if (order.Status == OrderState.SHIPPED)
+                if (order.Status == OrderStatus.SHIPPED)
                 {
-                    await _orderService.UpdateOrderState(orderId, OrderState.RECEIVED);
+                    await _orderService.UpdateOrderState(orderId, OrderStatus.RECEIVED);
                     return Ok("Received the goods successfully.");
                 }
                 else
@@ -145,9 +145,9 @@ namespace Shopping.Controller
                 {
                     return BadRequest("This order is not yours.");
                 }
-                if (order.Status == OrderState.PAID)
+                if (order.Status == OrderStatus.PAID)
                 {
-                    await _orderService.UpdateOrderState(orderId, OrderState.SHIPPED);
+                    await _orderService.UpdateOrderState(orderId, OrderStatus.SHIPPED);
                     return Ok("Delivery successful.");
                 }
                 else

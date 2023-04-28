@@ -37,10 +37,10 @@ namespace Service
             throw new OrderNotFoundException("The order doesn't exist.");
         }
 
-        public async Task UpdateOrderState(int orderId, OrderState state)
+        public async Task UpdateOrderState(int orderId, OrderStatus status)
         {
             var order = await _orderRepository.GetOrderById(orderId) ?? throw new OrderNotFoundException("The order doesn't exist.");
-            order.Status = state;
+            order.Status = status;
             await _orderRepository.UpdateOrder(order);
         }
 
