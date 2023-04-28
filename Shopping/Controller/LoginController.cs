@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service;
 using Data.RequestModel;
+using Data.Exceptions;
 
 namespace Shopping.Controller
 {
@@ -26,9 +27,9 @@ namespace Shopping.Controller
                 var tokenString = _jwtTokenService.GenerateJwtToken(user);
                 return Ok(tokenString);
             }
-            catch (KeyNotFoundException ex)
+            catch (UserNotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

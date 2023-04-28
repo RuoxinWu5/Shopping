@@ -1,7 +1,7 @@
+using Data.Exceptions;
 using Data.Model;
 using Data.RequestModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Service;
 using Shopping.Controller;
@@ -22,7 +22,7 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task Login_ValidCredentials_ReturnsTokenString()
+        public async Task Login_ReturnsTokenString_WhenUserFound()
         {
             // Arrange
             var user = new User { Id = 1, Name = "testuser", Password = "password", Type = UserType.BUYER };
@@ -36,19 +36,16 @@ namespace UnitTest.ControllerTest
         }
 
         [Fact]
-        public async Task Login_UserNotFound_ReturnsNotFound()
+        public async Task Login_ReturnsBadRequest_WhenUserNotFound()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.GetUserByUserNameAndPassword("nonexistentuser", "password")).ThrowsAsync(new KeyNotFoundException("User not found"));
+            _userServiceMock.Setup(x => x.GetUserByUserNameAndPassword("nonexistentuser", "password")).ThrowsAsync(new UserNotFoundException("The user doesn't exist."));
             var request = new LoginRequestModel { Name = "nonexistentuser", Password = "password" };
-
             // Act
-            var result = await _userLoginController.Login(request) as NotFoundObjectResult;
-
+            var result = await _userLoginController.Login(request);
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(404, result.StatusCode);
-            Assert.Equal("User not found", result.Value);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The user doesn't exist.", badRequestObjectResult.Value);
         }
     }
 }
