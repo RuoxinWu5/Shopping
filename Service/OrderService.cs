@@ -39,7 +39,9 @@ namespace Service
 
         public async Task UpdateOrderState(int orderId, OrderState state)
         {
-            await _orderRepository.UpdateOrderState(orderId, state);
+            var order = await _orderRepository.GetOrderById(orderId) ?? throw new OrderNotFoundException("The order doesn't exist.");
+            order.Status = state;
+            await _orderRepository.UpdateOrder(order);
         }
 
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)

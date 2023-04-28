@@ -123,7 +123,7 @@ namespace UnitTest.RepositoryTest
             // Assert
             var savedProduct = await _context.Products.FirstOrDefaultAsync(u => u.Name == product.Name);
             Assert.NotNull(savedProduct);
-            Assert.Equal(savedProduct.Quantity, 30);
+            Assert.Equal(30, savedProduct.Quantity);
         }
     }
 }

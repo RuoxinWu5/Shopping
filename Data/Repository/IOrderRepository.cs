@@ -6,7 +6,7 @@ namespace Data.Repository
     {
         Task AddOrder(Order order);
         Task<Order?> GetOrderById(int id);
-        Task UpdateOrderState(int orderId, OrderState state);
+        Task UpdateOrder(Order order);
         Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId);
     }
 }

@@ -24,10 +24,9 @@ namespace Data.Repository
             return result;
         }
 
-        public async Task UpdateOrderState(int orderId, OrderState state)
+        public async Task UpdateOrder(Order order)
         {
-            var order = await GetOrderById(orderId) ?? throw new OrderNotFoundException("The order doesn't exist.");
-            order.Status = state;
+            _context.Orders.Update(order);
             await _context.SaveChangesAsync();
         }
 

@@ -46,7 +46,7 @@ namespace UnitTest.ServiceTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 50, User = user };
             var order = new Order { Quantity = 51, Status = OrderState.TO_BE_PAID, Product = product, User = user };
-            _productServiceMock.Setup(repository => repository.ReduceProductQuantity(It.IsAny<Product>(),It.IsAny<int>())).ThrowsAsync(new ArgumentException("Quantity not sufficient. Order creation failed."));
+            _productServiceMock.Setup(repository => repository.ReduceProductQuantity(It.IsAny<Product>(), It.IsAny<int>())).ThrowsAsync(new ArgumentException("Quantity not sufficient. Order creation failed."));
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrderAndReduceProductQuantity(order));
         }
@@ -82,10 +82,14 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var id = 1;
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 51, Status = OrderState.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             // Act
-            await _orderService.UpdateOrderState(id, OrderState.TO_BE_PAID);
+            await _orderService.UpdateOrderState(id, OrderState.PAID);
             // Assert
-            _orderRepositoryMock.Verify(repository => repository.UpdateOrderState(id, OrderState.TO_BE_PAID), Times.Once);
+            _orderRepositoryMock.Verify(repository => repository.UpdateOrder(order), Times.Once);
         }
 
         [Fact]

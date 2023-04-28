@@ -87,22 +87,6 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task UpdateOrderState_ShouldChangeOrderStateToPaid_WhenOrderIsValid()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            var orders = await AddOrder();
-            var order = orders[0];
-            // Act
-            await _repository.UpdateOrderState(order.Id, OrderState.PAID);
-            // Assert
-            var result = await _context.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
-            Assert.NotNull(result);
-            Assert.Equal(OrderState.PAID, result.Status);
-        }
-
-        [Fact]
         public async Task GetOrderListBySellerId_ShouldReturnOrderList_WhenOrdersIsfound()
         {
             // Arrange
@@ -114,6 +98,21 @@ namespace UnitTest.RepositoryTest
             var result = await _repository.GetOrderListBySellerId(sellerId);
             // Assert
             Assert.Equal(orders, result);
+        }
+
+        [Fact]
+        public async Task AddOrder_ShouldUpdateOrder()
+        {
+            // Arrange
+            var users = await AddUsers();
+            var products = await AddProducts();
+            var order = new Order { Quantity = 10, Status = OrderState.PAID, Product = products[0], User = users[0] };
+            // Act
+            await _repository.UpdateOrder(order);
+            // Assert
+            var savedOrder = await _context.Orders.FirstOrDefaultAsync(u => u.Product.Id == order.Product.Id && u.User.Id == order.User.Id);
+            Assert.NotNull(savedOrder);
+            Assert.Equal(OrderState.PAID, savedOrder.Status);
         }
     }
 }
