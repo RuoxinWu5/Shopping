@@ -8,5 +8,6 @@ namespace Service
         Task AddProduct(Product product);
         Task<Product> GetProductById(int id);
         Task<IEnumerable<Product>> AllProduct();
+        Task ReduceProductQuantity(Product product, int quantity);
     }
 }

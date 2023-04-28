@@ -92,6 +92,7 @@ namespace UnitTest.ServiceTest
         [Fact]
         public async Task AllProduct_ShouldReturnProductList_WhenProductsIsfound()
         {
+            // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var resultItem = new List<Product>
             {
@@ -104,6 +105,30 @@ namespace UnitTest.ServiceTest
             // Assert
             Assert.Equal(resultItem[0].Name, result.First().Name);
             Assert.Equal(resultItem[0].Quantity, result.First().Quantity);
+        }
+
+        [Fact]
+        public async Task ReduceProductQuantity_ShouldCallUpdateProductMethodOfRepository_WhenQuantityIsValidate()
+        {
+            // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Banana", Quantity = 100, User = user };
+            var quantity = 10;
+            // Act
+            await _productService.ReduceProductQuantity(product, quantity);
+            // Assert
+            _productRepositoryMock.Verify(repository => repository.UpdateProduct(product), Times.Once);
+        }
+
+        [Fact]
+        public async Task ReduceProductQuantity_ShouldThrowArgumentException_WhenQuantityIsNotValidate()
+        {
+            // Arrange
+            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Banana", Quantity = 100, User = user };
+            var quantity = 1000;
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.ReduceProductQuantity(product, quantity));
         }
     }
 }

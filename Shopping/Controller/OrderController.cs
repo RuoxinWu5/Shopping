@@ -36,8 +36,7 @@ namespace Shopping.Controller
                     User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
                 await _orderService.AddOrderAndReduceProductQuantity(order);
-                var addOrderResult = await _orderService.GetOrderById(order.Id);
-                return CreatedAtAction(nameof(GetOrderById), new { orderId = addOrderResult.Id }, addOrderResult);
+                return CreatedAtAction(nameof(GetOrderById), new { orderId = order.Id }, order);
             }
             catch (ProductNotFoundException exception)
             {

@@ -46,5 +46,15 @@ namespace Service
             var filteredResult = result.Where(p => p.Quantity != 0);
             return filteredResult;
         }
+
+        public async Task ReduceProductQuantity(Product product, int quantity)
+        {
+            if (quantity > product.Quantity)
+            {
+                throw new ArgumentException("Quantity not sufficient. Order creation failed.");
+            }
+            product.Quantity -= quantity;
+            await _repository.UpdateProduct(product);
+        }
     }
 }

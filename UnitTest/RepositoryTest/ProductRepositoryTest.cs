@@ -113,25 +113,17 @@ namespace UnitTest.RepositoryTest
         }
 
         [Fact]
-        public async Task ReduceProductQuantity_ShouldReduceQuantity_WhenProductsIsfound()
+        public async Task UpdateProduct_ShouldUpdateProduct()
         {
             // Arrange
             var users = await AddUsers();
-            var products = await AddProducts();
+            var product = new Product { Name = "Banana", Quantity = 30, User = users[1] };
             // Act
-            await _repository.ReduceProductQuantity(products[0], 10);
+            await _repository.UpdateProduct(product);
             // Assert
-            Assert.Equal(90, products[0].Quantity);
-        }
-
-        [Fact]
-        public async Task ReduceProductQuantity_ShouldThrowProductNotFoundException_WhenProductsIsNotfound()
-        {
-            // Arrange
-            var users = await AddUsers();
-            var product = new Product { Id = 100, Name = "melon", Quantity = 90, User = users[1] };
-            // Act & Assert
-            await Assert.ThrowsAsync<ProductNotFoundException>(async () => await _repository.ReduceProductQuantity(product, 10));
+            var savedProduct = await _context.Products.FirstOrDefaultAsync(u => u.Name == product.Name);
+            Assert.NotNull(savedProduct);
+            Assert.Equal(savedProduct.Quantity, 30);
         }
     }
 }

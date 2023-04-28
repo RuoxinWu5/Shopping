@@ -1,4 +1,3 @@
-using Data.Exceptions;
 using Data.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,10 +42,9 @@ namespace Data.Repository
             return result;
         }
 
-        public async Task ReduceProductQuantity(Product product, int quantity)
+        public async Task UpdateProduct(Product product)
         {
-            var productResult = await GetProductById(product.Id) ?? throw new ProductNotFoundException("The product doesn't exist.");
-            productResult.Quantity -= quantity;
+            _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }
     }

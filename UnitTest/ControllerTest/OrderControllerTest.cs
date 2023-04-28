@@ -23,6 +23,7 @@ namespace UnitTest.ControllerTest
             _userServiceMock = new Mock<IUserService>();
             _orderController = new OrdersController(_orderServiceMock.Object, _productServiceMock.Object, _userServiceMock.Object);
         }
+
         [Fact]
         public async Task AddOrder_ShouldReturnOk_WhenOrderIsValid()
         {
@@ -31,14 +32,14 @@ namespace UnitTest.ControllerTest
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
             _userServiceMock.Setup(repository => repository.GetBuyerById(It.IsAny<int>())).ReturnsAsync(user);
-            var expectedOrder = new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(expectedOrder);
             var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
+            var expectedOrder = new Order { Id = 1, Quantity = 10, Status = OrderState.TO_BE_PAID, Product = product, User = user };
             // Act
             var result = await _orderController.AddOrder(orderRequest);
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-            Assert.Equal(expectedOrder, createdResult.Value);
+            Assert.NotNull(createdResult.Value);
+            Assert.Equal(expectedOrder.ToString(), createdResult.Value.ToString());
         }
 
         [Fact]

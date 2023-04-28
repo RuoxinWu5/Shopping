@@ -10,24 +10,20 @@ namespace Service
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly IProductService _productService;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository, IUserService userService)
+        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository, IUserService userService, IProductService productService)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
             _userService = userService;
+            _productService = productService;
         }
 
         public async Task AddOrderAndReduceProductQuantity(Order order)
         {
-            var product = await _productRepository.GetProductById(order.Product.Id) ?? throw new ProductNotFoundException("The product doesn't exist.");
-            var inventory = product.Quantity;
-            if (order.Quantity > inventory)
-            {
-                throw new ArgumentException("Quantity not sufficient. Order creation failed.");
-            }
-            await _productRepository.ReduceProductQuantity(order.Product, order.Quantity);
+            await _productService.ReduceProductQuantity(order.Product, order.Quantity);
             await _orderRepository.AddOrder(order);
         }
 
