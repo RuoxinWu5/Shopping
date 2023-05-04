@@ -37,10 +37,21 @@ namespace Service
             throw new OrderNotFoundException("The order doesn't exist.");
         }
 
-        public async Task UpdateOrderState(int orderId, OrderStatus status)
+        public async Task UpdateOrderState(int orderId)
         {
-            var order = await _orderRepository.GetOrderById(orderId) ?? throw new OrderNotFoundException("The order doesn't exist.");
-            order.Status = status;
+            var order = await GetOrderById(orderId);
+            switch (order.Status)
+            {
+                case OrderStatus.TO_BE_PAID:
+                    order.Status = OrderStatus.PAID;
+                    break;
+                case OrderStatus.PAID:
+                    order.Status = OrderStatus.SHIPPED;
+                    break;
+                case OrderStatus.SHIPPED:
+                    order.Status = OrderStatus.RECEIVED;
+                    break;
+            }
             await _orderRepository.UpdateOrder(order);
         }
 
@@ -54,7 +65,8 @@ namespace Service
         public async Task<bool> IsOrderOwnedByUser(int orderId, int userId)
         {
             var order = await GetOrderById(orderId);
-            if (order.User.Id == userId){
+            if (order.User.Id == userId)
+            {
                 return true;
             }
             return false;
@@ -63,7 +75,8 @@ namespace Service
         public async Task<bool> IsExpectedOrderStatus(int orderId, OrderStatus status)
         {
             var order = await GetOrderById(orderId);
-            if (order.Status == status){
+            if (order.Status == status)
+            {
                 return true;
             }
             return false;

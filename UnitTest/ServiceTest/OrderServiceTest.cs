@@ -77,18 +77,22 @@ namespace UnitTest.ServiceTest
             await Assert.ThrowsAsync<OrderNotFoundException>(async () => await _orderService.GetOrderById(id));
         }
 
-        [Fact]
-        public async Task UpdateOrderState_ShouldCallUpdateOrderStateMethodOfRepository()
+        [Theory]
+        [InlineData(OrderStatus.TO_BE_PAID, OrderStatus.PAID)]
+        [InlineData(OrderStatus.PAID, OrderStatus.SHIPPED)]
+        [InlineData(OrderStatus.SHIPPED, OrderStatus.RECEIVED)]
+        public async Task UpdateOrderState_ShouldUpdateStatusToExpectedStatus(OrderStatus initialStatus, OrderStatus expectedStatus)
         {
             // Arrange
             var id = 1;
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 50, User = user };
-            var order = new Order { Quantity = 51, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            var order = new Order { Quantity = 10, Status = initialStatus, Product = product, User = user };
             _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             // Act
-            await _orderService.UpdateOrderState(id, OrderStatus.PAID);
+            await _orderService.UpdateOrderState(id);
             // Assert
+            Assert.Equal(expectedStatus, order.Status);
             _orderRepositoryMock.Verify(repository => repository.UpdateOrder(order), Times.Once);
         }
 
