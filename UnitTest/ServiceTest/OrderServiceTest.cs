@@ -152,7 +152,7 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task IsOrderOwnedByUser_ShouldThrowOrderNotFoundException_WhenOrderNotExistr()
+        public async Task IsOrderOwnedByUser_ShouldThrowOrderNotFoundException_WhenOrderNotExist()
         {
             // Arrange
             var orderId = 1;
@@ -163,5 +163,48 @@ namespace UnitTest.ServiceTest
             await Assert.ThrowsAsync<OrderNotFoundException>(async () => await _orderService.IsOrderOwnedByUser(orderId, userId));
         }
 
+        [Fact]
+        public async Task IsExpectedOrderStatus_ShouldReturnTrue_WhenThisOrderIsTheStatus()
+        {
+            // Arrange
+            var orderId = 1;
+            var expectStatus = OrderStatus.TO_BE_PAID;
+            var user = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Id = 1, Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            var result = await _orderService.IsExpectedOrderStatus(orderId, expectStatus);
+            // Assert
+            Assert.Equal(true, result);
+        }
+
+        [Fact]
+        public async Task IsExpectedOrderStatus_ShouldReturnFalse_WhenThisOrderIsNotTheStatus()
+        {
+            // Arrange
+            var orderId = 1;
+            var expectStatus = OrderStatus.PAID;
+            var user = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Id = 1, Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            var result = await _orderService.IsExpectedOrderStatus(orderId, expectStatus);
+            // Assert
+            Assert.Equal(false, result);
+        }
+
+        [Fact]
+        public async Task IsExpectedOrderStatus_ShouldThrowOrderNotFoundException_WhenOrderNotExistr()
+        {
+            // Arrange
+            var orderId = 1;
+            var expectStatus = OrderStatus.TO_BE_PAID;
+            Order? nullOrder = null;
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(nullOrder);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderNotFoundException>(async () => await _orderService.IsExpectedOrderStatus(orderId, expectStatus));
+        }
     }
 }

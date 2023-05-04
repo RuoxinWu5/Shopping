@@ -59,5 +59,14 @@ namespace Service
             }
             return false;
         }
+
+        public async Task<bool> IsExpectedOrderStatus(int orderId, OrderStatus status)
+        {
+            var order = await GetOrderById(orderId);
+            if (order.Status == status){
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace Service
         Task UpdateOrderState(int orderId, OrderStatus status);
         Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId);
         Task<bool> IsOrderOwnedByUser(int orderId, int userId);
+        Task<bool> IsExpectedOrderStatus(int orderId, OrderStatus status);
     }
 }
