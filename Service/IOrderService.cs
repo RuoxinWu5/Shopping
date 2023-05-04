@@ -8,5 +8,6 @@ namespace Service
         Task<Order> GetOrderById(int id);
         Task UpdateOrderState(int orderId, OrderStatus status);
         Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId);
+        Task<bool> IsOrderOwnedByUser(int orderId, int userId);
     }
 }

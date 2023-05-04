@@ -50,5 +50,14 @@ namespace Service
             var orderLists = await _orderRepository.GetOrderListBySellerId(sellerId);
             return orderLists;
         }
+
+        public async Task<bool> IsOrderOwnedByUser(int orderId, int userId)
+        {
+            var order = await GetOrderById(orderId);
+            if (order.User.Id == userId){
+                return true;
+            }
+            return false;
+        }
     }
 }

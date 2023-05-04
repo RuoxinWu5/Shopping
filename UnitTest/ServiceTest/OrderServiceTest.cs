@@ -118,5 +118,50 @@ namespace UnitTest.ServiceTest
             // Act & Assert
             await Assert.ThrowsAsync<SellerNotFoundException>(async () => await _orderService.GetOrderListBySellerId(id));
         }
+
+        [Fact]
+        public async Task IsOrderOwnedByUser_ShouldReturnTrue_WhenThisOrderBelongsToThisUser()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 1;
+            var user = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Id = 1, Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            var result = await _orderService.IsOrderOwnedByUser(orderId, userId);
+            // Assert
+            Assert.Equal(true, result);
+        }
+
+        [Fact]
+        public async Task IsOrderOwnedByUser_ShouldReturnFalse_WhenThisOrderNotBelongsToThisUser()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Id = 1, Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            var result = await _orderService.IsOrderOwnedByUser(orderId, userId);
+            // Assert
+            Assert.Equal(false, result);
+        }
+
+        [Fact]
+        public async Task IsOrderOwnedByUser_ShouldThrowOrderNotFoundException_WhenOrderNotExistr()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 1;
+            Order? nullOrder = null;
+            _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(nullOrder);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderNotFoundException>(async () => await _orderService.IsOrderOwnedByUser(orderId, userId));
+        }
+
     }
 }
