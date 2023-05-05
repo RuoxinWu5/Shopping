@@ -23,6 +23,16 @@ namespace Shopping.Controller
             _userService = userService;
         }
 
+        private int GetUserId()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                throw new UserNotFoundException("You are not authorized to perform this action.");
+            }
+            return int.Parse(userId);
+        }
+
         [HttpPost]
         public async Task<ActionResult> AddOrder(AddOrderRequestModel orderRequestModel)
         {
@@ -83,23 +93,23 @@ namespace Shopping.Controller
         {
             try
             {
-                var order = await _orderService.GetOrderById(orderId);
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (order.User.Id.ToString() != userId)
-                {
-                    return BadRequest("This order is not yours.");
-                }
-                if (order.Status == OrderStatus.TO_BE_PAID)
-                {
-                    await _orderService.UpdateOrderState(orderId, OrderStatus.PAID);
-                    return Ok("Payment successful.");
-                }
-                else
-                {
-                    return BadRequest("Current order is not payable.");
-                }
+                var userId = GetUserId();
+                await _orderService.PayOrder(orderId, userId);
+                return Ok("Payment successful.");
+            }
+            catch (UserNotFoundException)
+            {
+                return BadRequest("You are not authorized to pay for this order.");
             }
             catch (OrderNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (OrderOwnershipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (OrderStatusModificationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -111,23 +121,23 @@ namespace Shopping.Controller
         {
             try
             {
-                var order = await _orderService.GetOrderById(orderId);
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (order.User.Id.ToString() != userId)
-                {
-                    return BadRequest("This order is not yours.");
-                }
-                if (order.Status == OrderStatus.SHIPPED)
-                {
-                    await _orderService.UpdateOrderState(orderId, OrderStatus.RECEIVED);
-                    return Ok("Received the goods successfully.");
-                }
-                else
-                {
-                    return BadRequest("Current order is not receivable.");
-                }
+                var userId = GetUserId();
+                await _orderService.ConfirmReceipt(orderId, userId);
+                return Ok("Received the goods successfully.");
+            }
+            catch (UserNotFoundException)
+            {
+                return BadRequest("You are not authorized to confirm the receipt of this order.");
             }
             catch (OrderNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (OrderOwnershipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (OrderStatusModificationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -139,23 +149,23 @@ namespace Shopping.Controller
         {
             try
             {
-                var order = await _orderService.GetOrderById(orderId);
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (order.Product.User.Id.ToString() != userId)
-                {
-                    return BadRequest("This order is not yours.");
-                }
-                if (order.Status == OrderStatus.PAID)
-                {
-                    await _orderService.UpdateOrderState(orderId, OrderStatus.SHIPPED);
-                    return Ok("Delivery successful.");
-                }
-                else
-                {
-                    return BadRequest("Current order is not shippable.");
-                }
+                var userId = GetUserId();
+                await _orderService.ShipOrder(orderId, userId);
+                return Ok("Delivery successful.");
+            }
+            catch (UserNotFoundException)
+            {
+                return BadRequest("You are not authorized to ship this order.");
             }
             catch (OrderNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (OrderOwnershipException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (OrderStatusModificationException ex)
             {
                 return BadRequest(ex.Message);
             }

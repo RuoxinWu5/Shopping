@@ -24,6 +24,38 @@ namespace UnitTest.ControllerTest
             _orderController = new OrdersController(_orderServiceMock.Object, _productServiceMock.Object, _userServiceMock.Object);
         }
 
+        private void CreateUserIdentity(int userId, string userName, string userRole)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.Name, userName),
+                new Claim(ClaimTypes.Role, userRole)
+            };
+            var identity = new ClaimsIdentity(claims);
+            var principal = new ClaimsPrincipal(identity);
+            _orderController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = principal
+                }
+            };
+        }
+
+        private void CreateNullUserIdentity()
+        {
+            var identity = new ClaimsIdentity();
+            var principal = new ClaimsPrincipal(identity);
+            _orderController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = principal
+                }
+            };
+        }
+
         [Fact]
         public async Task AddOrder_ShouldReturnOk_WhenOrderIsValid()
         {
@@ -124,43 +156,37 @@ namespace UnitTest.ControllerTest
         public async Task PayOrder_ShouldReturnOk_WhenOrderStateIsToBePaid()
         {
             // Arrange
-            var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            _orderServiceMock
-                .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderStatus>()))
-                .Returns(Task.CompletedTask);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "Lisa"),
-                new Claim(ClaimTypes.Role, "Buyer")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            CreateUserIdentity(1, "Lisa", "Buyer");
             // Act
-            var result = await _orderController.PayOrder(order.Id);
+            var result = await _orderController.PayOrder(orderId);
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal("Payment successful.", okObjectResult.Value);
         }
 
         [Fact]
-        public async Task PayOrder_ShouldReturnBadRequest_WhenOrderIsNotfound()
+        public async Task PayOrder_ShouldReturnBadRequest_WhenUserIsNotAuthenticated()
         {
             // Arrange
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
+            var orderId = 1;
+            CreateNullUserIdentity();
             // Act
-            var result = await _orderController.PayOrder(1);
+            var result = await _orderController.PayOrder(orderId);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("You are not authorized to pay for this order.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task PayOrder_ShouldReturnBadRequest_WhenOrderIsNotFound()
+        {
+            // Arrange
+            var orderId = 1;
+            _orderServiceMock.Setup(x => x.PayOrder(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
+            CreateUserIdentity(1, "Lisa", "Buyer");
+            // Act
+            var result = await _orderController.PayOrder(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("The order doesn't exist.", badRequestObjectResult.Value);
@@ -170,28 +196,11 @@ namespace UnitTest.ControllerTest
         public async Task PayOrder_ShouldReturnBadRequest_WhenThisOrderIsNotForThisClaim()
         {
             // Arrange
-            var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "2"),
-                new Claim(ClaimTypes.Name, "Rose"),
-                new Claim(ClaimTypes.Role, "Buyer")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            _orderServiceMock.Setup(service => service.PayOrder(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderOwnershipException("This order is not yours."));
+            CreateUserIdentity(1, "Lisa", "Buyer");
             // Act
-            var result = await _orderController.PayOrder(order.Id);
+            var result = await _orderController.PayOrder(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("This order is not yours.", badRequestObjectResult.Value);
@@ -201,28 +210,11 @@ namespace UnitTest.ControllerTest
         public async Task PayOrder_ShouldReturnBadRequest_WhenOrderStateIsNotToBePaid()
         {
             // Arrange
-            var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "Lisa"),
-                new Claim(ClaimTypes.Role, "Buyer")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            _orderServiceMock.Setup(service => service.PayOrder(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderStatusModificationException("Current order is not payable."));
+            CreateUserIdentity(1, "Lisa", "Buyer");
             // Act
-            var result = await _orderController.PayOrder(order.Id);
+            var result = await _orderController.PayOrder(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Current order is not payable.", badRequestObjectResult.Value);
@@ -232,43 +224,37 @@ namespace UnitTest.ControllerTest
         public async Task ConfirmReceipt_ShouldReturnOk_WhenOrderStateIsShipped()
         {
             // Arrange
-            var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.SHIPPED, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            _orderServiceMock
-                .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderStatus>()))
-                .Returns(Task.CompletedTask);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "Lisa"),
-                new Claim(ClaimTypes.Role, "Buyer")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            CreateUserIdentity(1, "Lisa", "Buyer");
             // Act
-            var result = await _orderController.ConfirmReceipt(order.Id);
+            var result = await _orderController.ConfirmReceipt(orderId);
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal("Received the goods successfully.", okObjectResult.Value);
         }
 
         [Fact]
+        public async Task ConfirmReceipt_ShouldReturnBadRequest_WhenUserIsNotAuthenticated()
+        {
+            // Arrange
+            var orderId = 1;
+            CreateNullUserIdentity();
+            // Act
+            var result = await _orderController.ConfirmReceipt(orderId);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("You are not authorized to confirm the receipt of this order.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
         public async Task ConfirmReceipt_ShouldReturnBadRequest_WhenOrderIsNotfound()
         {
             // Arrange
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
+            var orderId = 1;
+            _orderServiceMock.Setup(x => x.ConfirmReceipt(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
+            CreateUserIdentity(1, "Lisa", "Buyer");
             // Act
-            var result = await _orderController.ConfirmReceipt(1);
+            var result = await _orderController.ConfirmReceipt(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("The order doesn't exist.", badRequestObjectResult.Value);
@@ -278,28 +264,11 @@ namespace UnitTest.ControllerTest
         public async Task ConfirmReceipt_ShouldReturnBadRequest_WhenThisOrderIsNotForThisClaim()
         {
             // Arrange
-            var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.SHIPPED, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "2"),
-                new Claim(ClaimTypes.Name, "Rose"),
-                new Claim(ClaimTypes.Role, "Buyer")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            _orderServiceMock.Setup(service => service.ConfirmReceipt(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderOwnershipException("This order is not yours."));
+            CreateUserIdentity(1, "Lisa", "Buyer");
             // Act
-            var result = await _orderController.ConfirmReceipt(order.Id);
+            var result = await _orderController.ConfirmReceipt(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("This order is not yours.", badRequestObjectResult.Value);
@@ -309,28 +278,11 @@ namespace UnitTest.ControllerTest
         public async Task ConfirmReceipt_ShouldReturnBadRequest_WhenOrderStateIsNotShipped()
         {
             // Arrange
-            var buyer = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "Lisa"),
-                new Claim(ClaimTypes.Role, "Buyer")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            _orderServiceMock.Setup(service => service.ConfirmReceipt(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderStatusModificationException("Current order is not receivable."));
+            CreateUserIdentity(1, "Lisa", "Buyer");
             // Act
-            var result = await _orderController.ConfirmReceipt(order.Id);
+            var result = await _orderController.ConfirmReceipt(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Current order is not receivable.", badRequestObjectResult.Value);
@@ -340,43 +292,37 @@ namespace UnitTest.ControllerTest
         public async Task ShipOrder_ShouldReturnOk_WhenOrderStateIsPaid()
         {
             // Arrange
-            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            _orderServiceMock
-                .Setup(service => service.UpdateOrderState(It.IsAny<int>(), It.IsAny<OrderStatus>()))
-                .Returns(Task.CompletedTask);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "2"),
-                new Claim(ClaimTypes.Name, "Jack"),
-                new Claim(ClaimTypes.Role, "Seller")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            CreateUserIdentity(1, "Jack", "Seller");
             // Act
-            var result = await _orderController.ShipOrder(order.Id);
+            var result = await _orderController.ShipOrder(orderId);
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal("Delivery successful.", okObjectResult.Value);
         }
 
         [Fact]
+        public async Task ShipOrder_ShouldReturnBadRequest_WhenUserIsNotAuthenticated()
+        {
+            // Arrange
+            var orderId = 1;
+            CreateNullUserIdentity();
+            // Act
+            var result = await _orderController.ShipOrder(orderId);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("You are not authorized to ship this order.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
         public async Task ShipOrder_ShouldReturnBadRequest_WhenOrderIsNotfound()
         {
             // Arrange
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
+            var orderId = 1;
+            _orderServiceMock.Setup(service => service.ShipOrder(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderNotFoundException("The order doesn't exist."));
+            CreateUserIdentity(1, "Jack", "Seller");
             // Act
-            var result = await _orderController.ShipOrder(1);
+            var result = await _orderController.ShipOrder(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("The order doesn't exist.", badRequestObjectResult.Value);
@@ -386,28 +332,11 @@ namespace UnitTest.ControllerTest
         public async Task ShipOrder_ShouldReturnBadRequest_WhenThisOrderIsNotForThisClaim()
         {
             // Arrange
-            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "Lisa"),
-                new Claim(ClaimTypes.Role, "Buyer")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            _orderServiceMock.Setup(service => service.ShipOrder(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderOwnershipException("This order is not yours."));
+            CreateUserIdentity(1, "Jack", "Seller");
             // Act
-            var result = await _orderController.ShipOrder(order.Id);
+            var result = await _orderController.ShipOrder(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("This order is not yours.", badRequestObjectResult.Value);
@@ -417,28 +346,11 @@ namespace UnitTest.ControllerTest
         public async Task ShipOrder_ShouldReturnBadRequest_WhenOrderStateIsNotPaid()
         {
             // Arrange
-            var buyer = new User { Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
-            var seller = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 100, User = seller };
-            var order = new Order() { Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = buyer };
-            _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, "2"),
-                new Claim(ClaimTypes.Name, "Jack"),
-                new Claim(ClaimTypes.Role, "Seller")
-            };
-            var identity = new ClaimsIdentity(claims);
-            var principal = new ClaimsPrincipal(identity);
-            _orderController.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = principal
-                }
-            };
+            var orderId = 1;
+            _orderServiceMock.Setup(service => service.ShipOrder(It.IsAny<int>(), It.IsAny<int>())).ThrowsAsync(new OrderStatusModificationException("Current order is not shippable."));
+            CreateUserIdentity(1, "Jack", "Seller");
             // Act
-            var result = await _orderController.ShipOrder(order.Id);
+            var result = await _orderController.ShipOrder(orderId);
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Current order is not shippable.", badRequestObjectResult.Value);
