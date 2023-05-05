@@ -23,7 +23,7 @@ namespace Service
             {
                 throw new ArgumentException("Quantity not sufficient. CartItem creation failed.");
             }
-            await _cartRepository.AddCartItem(cartItem);
+                await _cartRepository.AddCartItem(cartItem);
             return cartItem;
         }
 
@@ -35,6 +35,11 @@ namespace Service
                 return CartItem;
             }
             throw new CartItemNotFoundException("The cart item doesn't exist.");
+        }
+
+        public async Task<CartItem?> GetCartItemByProductIdAndBuyerId(int productId, int buyerId)
+        {
+            return await _cartRepository.GetCartItemByProductIdAndBuyerId(productId, buyerId);
         }
     }
 }

@@ -70,5 +70,17 @@ namespace UnitTest.ServiceTest
             // Act & Assert
             await Assert.ThrowsAsync<CartItemNotFoundException>(async () => await _cartService.GetCartItemById(id));
         }
+
+        [Fact]
+        public async Task GetCartItemByProductIdAndBuyerId_ShouldCallGetCartItemByProductIdAndBuyerIdMethodOfRepository()
+        {
+            // Arrange
+            var productId = 1;
+            var buyerId = 1;
+            // Act
+            await _cartService.GetCartItemByProductIdAndBuyerId(productId, buyerId);
+            // Assert
+            _cartRepositoryMock.Verify(repository => repository.GetCartItemByProductIdAndBuyerId(productId, buyerId), Times.Once);
+        }
     }
 }
