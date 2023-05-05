@@ -55,6 +55,39 @@ namespace Service
             await _orderRepository.UpdateOrder(order);
         }
 
+        public async Task PayOrder(int orderId, int userId)
+        {
+            await IsOrderOwnedByUser(orderId, userId);
+            var isExpectedOrderStatus = await IsExpectedOrderStatus(orderId, OrderStatus.TO_BE_PAID);
+            if (!isExpectedOrderStatus)
+            {
+                throw new OrderStatusModificationException("Current order is not payable.");
+            }
+            await UpdateOrderState(orderId);
+        }
+
+        public async Task ConfirmReceipt(int orderId, int userId)
+        {
+            await IsOrderOwnedByUser(orderId, userId);
+            var isExpectedOrderStatus = await IsExpectedOrderStatus(orderId, OrderStatus.SHIPPED);
+            if (!isExpectedOrderStatus)
+            {
+                throw new OrderStatusModificationException("Current order is not receivable.");
+            }
+            await UpdateOrderState(orderId);
+        }
+
+        public async Task ShipOrder(int orderId, int userId)
+        {
+            await IsOrderOwnedByUser(orderId, userId);
+            var isExpectedOrderStatus = await IsExpectedOrderStatus(orderId, OrderStatus.PAID);
+            if (!isExpectedOrderStatus)
+            {
+                throw new OrderStatusModificationException("Current order is not shippable.");
+            }
+            await UpdateOrderState(orderId);
+        }
+
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
         {
             await _userService.ValidateIfSellerExist(sellerId);
@@ -62,14 +95,13 @@ namespace Service
             return orderLists;
         }
 
-        public async Task<bool> IsOrderOwnedByUser(int orderId, int userId)
+        public async Task IsOrderOwnedByUser(int orderId, int userId)
         {
             var order = await GetOrderById(orderId);
-            if (order.User.Id == userId)
+            if (order.User.Id != userId)
             {
-                return true;
+                throw new OrderOwnershipException("This order is not yours.");
             }
-            return false;
         }
 
         public async Task<bool> IsExpectedOrderStatus(int orderId, OrderStatus status)

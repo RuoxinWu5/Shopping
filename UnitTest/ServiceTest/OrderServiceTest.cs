@@ -97,6 +97,138 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
+        public async Task PayOrder_UpdatesOrderState_WhenOrderIsOwnedByUserAndIsPayable()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            await _orderService.PayOrder(orderId, userId);
+            // Assert
+            _orderRepositoryMock.Verify(repository => repository.UpdateOrder(order), Times.Once);
+        }
+
+        [Fact]
+        public async Task PayOrder_ThrowsOrderOwnershipException_WhenOrderIsNotBelongToUser()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 3, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderOwnershipException>(() => _orderService.PayOrder(orderId, userId));
+        }
+
+        [Fact]
+        public async Task PayOrder_ThrowsOrderStatusModificationException_WhenOrderIsNotPayable()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderStatusModificationException>(() => _orderService.ConfirmReceipt(orderId, userId));
+        }
+
+        [Fact]
+        public async Task ConfirmReceipt_UpdatesOrderState_WhenOrderIsOwnedByUserAndIsReceivable()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.SHIPPED, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            await _orderService.ConfirmReceipt(orderId, userId);
+            // Assert
+            _orderRepositoryMock.Verify(repository => repository.UpdateOrder(order), Times.Once);
+        }
+
+        [Fact]
+        public async Task ConfirmReceipt_ThrowsOrderOwnershipException_WhenOrderIsNotBelongToUser()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 3, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.SHIPPED, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderOwnershipException>(() => _orderService.ConfirmReceipt(orderId, userId));
+        }
+
+        [Fact]
+        public async Task ConfirmReceipt_ThrowsOrderStatusModificationException_WhenOrderIsNotReceivable()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderStatusModificationException>(() => _orderService.PayOrder(orderId, userId));
+        }
+
+        [Fact]
+        public async Task ShipOrder_UpdatesOrderState_WhenOrderIsOwnedByUserAndIsShippable()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act
+            await _orderService.ShipOrder(orderId, userId);
+            // Assert
+            _orderRepositoryMock.Verify(repository => repository.UpdateOrder(order), Times.Once);
+        }
+
+        [Fact]
+        public async Task ShipOrder_ThrowsOrderOwnershipException_WhenOrderIsNotBelongToUser()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 3, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderOwnershipException>(() => _orderService.ShipOrder(orderId, userId));
+        }
+
+        [Fact]
+        public async Task ShipOrder_ThrowsOrderStatusModificationException_WhenOrderIsNotShippable()
+        {
+            // Arrange
+            var orderId = 1;
+            var userId = 2;
+            var user = new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Name = "Apple", Quantity = 50, User = user };
+            var order = new Order { Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
+            _orderRepositoryMock.Setup(x => x.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderStatusModificationException>(() => _orderService.ShipOrder(orderId, userId));
+        }
+
+        [Fact]
         public async Task GetOrderListBySellerId_ShouldReturnOrderLists_WhenSellerExist()
         {
             // Arrange
@@ -124,7 +256,7 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
-        public async Task IsOrderOwnedByUser_ShouldReturnTrue_WhenThisOrderBelongsToThisUser()
+        public async Task IsOrderOwnedByUser_ShouldCallGetOrderByIdMethodOfRepository_WhenThisOrderBelongsToThisUser()
         {
             // Arrange
             var orderId = 1;
@@ -134,13 +266,13 @@ namespace UnitTest.ServiceTest
             var order = new Order { Id = 1, Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
             _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
             // Act
-            var result = await _orderService.IsOrderOwnedByUser(orderId, userId);
+            await _orderService.IsOrderOwnedByUser(orderId, userId);
             // Assert
-            Assert.Equal(true, result);
+            _orderRepositoryMock.Verify(x => x.GetOrderById(orderId), Times.Once);
         }
 
         [Fact]
-        public async Task IsOrderOwnedByUser_ShouldReturnFalse_WhenThisOrderNotBelongsToThisUser()
+        public async Task IsOrderOwnedByUser_ShouldThrowOrderOwnershipException_WhenThisOrderNotBelongsToThisUser()
         {
             // Arrange
             var orderId = 1;
@@ -149,10 +281,8 @@ namespace UnitTest.ServiceTest
             var product = new Product { Name = "Apple", Quantity = 50, User = user };
             var order = new Order { Id = 1, Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = user };
             _orderRepositoryMock.Setup(repository => repository.GetOrderById(It.IsAny<int>())).ReturnsAsync(order);
-            // Act
-            var result = await _orderService.IsOrderOwnedByUser(orderId, userId);
-            // Assert
-            Assert.Equal(false, result);
+            // Act & Assert
+            await Assert.ThrowsAsync<OrderOwnershipException>(async () => await _orderService.IsOrderOwnedByUser(orderId, userId));
         }
 
         [Fact]
