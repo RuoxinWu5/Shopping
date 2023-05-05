@@ -19,8 +19,14 @@ namespace Data.Repository
 
         public async Task<CartItem?> GetCartItemById(int id)
         {
-            var CartItem = await _context.CartItems.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Id == id);
-            return CartItem;
+            var cartItem = await _context.CartItems.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Id == id);
+            return cartItem;
+        }
+
+        public async Task<CartItem?> GetCartItemByProductIdAndBuyerId(int productId, int buyerId)
+        {
+            var cartItem = await _context.CartItems.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Product.Id == productId && o.User.Id == buyerId);
+            return cartItem;
         }
     }
 }

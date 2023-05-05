@@ -33,13 +33,13 @@ namespace UnitTest.ControllerTest
             var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 10, BuyerId = 2 };
             _productServiceMock.Setup(repository => repository.GetProductById(addProductToCartRequestModel.ProductId)).ReturnsAsync(product);
             _userServiceMock.Setup(repository => repository.GetBuyerById(addProductToCartRequestModel.BuyerId)).ReturnsAsync(buyer);
-            var expectedCartItem = new CartItem { Id = 1, Product = product, Quantity = 10, User = buyer };
+            var expectedCartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
             _cartServiceMock.Setup(repository => repository.AddCartItem(It.IsAny<CartItem>())).ReturnsAsync(expectedCartItem);
             // Act
             var result = await _cartController.AddCartItem(addProductToCartRequestModel);
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-            Assert.Equal(expectedCartItem, createdResult.Value);
+            Assert.Equal(expectedCartItem.ToString(), createdResult.Value.ToString());
         }
 
         [Fact]

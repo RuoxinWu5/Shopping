@@ -33,8 +33,8 @@ namespace Shopping.Controller
                     Product = await _productService.GetProductById(orderRequestModel.ProductId),
                     User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
                 };
-                var result = await _cartService.AddCartItem(cartItem);
-                return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = result.Id }, result);
+                await _cartService.AddCartItem(cartItem);
+                return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = cartItem.Id }, cartItem);
             }
             catch (ProductNotFoundException exception)
             {
