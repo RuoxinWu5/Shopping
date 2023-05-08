@@ -13,8 +13,6 @@ namespace Service
         private readonly string _issuer;
         private readonly string _audience;
         private readonly string _secretKey;
-        private const string BuyerRoleName = "Buyer";
-        private const string SellerRoleName = "Seller";
 
         public JwtTokenService(IConfiguration configuration)
         {
@@ -31,7 +29,7 @@ namespace Service
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name),
-                    new Claim(ClaimTypes.Role, user.Type == UserType.BUYER ? BuyerRoleName : SellerRoleName)
+                    new Claim(ClaimTypes.Role, user.Type == UserType.BUYER ? nameof(UserType.BUYER) : nameof(UserType.SELLER))
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 Issuer = _issuer,

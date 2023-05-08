@@ -54,8 +54,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("BuyerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Buyer"));
-    options.AddPolicy("SellerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Seller"));
+    options.AddPolicy("BuyerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, nameof(UserType.BUYER)));
+    options.AddPolicy("SellerPolicy", policy => policy.RequireClaim(ClaimTypes.Role, nameof(UserType.BUYER)));
 });
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
