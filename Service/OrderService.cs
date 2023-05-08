@@ -51,6 +51,8 @@ namespace Service
                 case OrderStatus.SHIPPED:
                     order.Status = OrderStatus.RECEIVED;
                     break;
+                default:
+                    break;
             }
             await _orderRepository.UpdateOrder(order);
         }
@@ -68,7 +70,7 @@ namespace Service
 
         public async Task ConfirmReceipt(int orderId, int userId)
         {
-            await IsOrderOwnedByUser(orderId, userId);
+            await IsOrderOwnedByUser(orderId, userId);//order
             var isExpectedOrderStatus = await IsExpectedOrderStatus(orderId, OrderStatus.SHIPPED);
             if (!isExpectedOrderStatus)
             {
