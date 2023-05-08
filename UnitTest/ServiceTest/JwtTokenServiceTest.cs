@@ -35,7 +35,7 @@ namespace UnitTest.ServiceTest
             var claims = decodedToken.Claims.ToList();
             Assert.Equal("1", claims[0].Value);
             Assert.Equal("Test User", claims[1].Value);
-            Assert.Equal("Buyer", claims[2].Value);
+            Assert.Equal("BUYER", claims[2].Value);
         }
     }
 }

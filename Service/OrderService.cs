@@ -37,9 +37,8 @@ namespace Service
             throw new OrderNotFoundException("The order doesn't exist.");
         }
 
-        public async Task UpdateOrderState(int orderId)
+        public async Task UpdateOrderState(Order order)
         {
-            var order = await GetOrderById(orderId);
             switch (order.Status)
             {
                 case OrderStatus.TO_BE_PAID:
@@ -59,35 +58,38 @@ namespace Service
 
         public async Task PayOrder(int orderId, int userId)
         {
-            await IsOrderOwnedByUser(orderId, userId);
-            var isExpectedOrderStatus = await IsExpectedOrderStatus(orderId, OrderStatus.TO_BE_PAID);
+            var order = await GetOrderById(orderId);
+            IsOrderOwnedByUser(order, userId);
+            var isExpectedOrderStatus = IsExpectedOrderStatus(order, OrderStatus.TO_BE_PAID);
             if (!isExpectedOrderStatus)
             {
                 throw new OrderStatusModificationException("Current order is not payable.");
             }
-            await UpdateOrderState(orderId);
+            await UpdateOrderState(order);
         }
 
         public async Task ConfirmReceipt(int orderId, int userId)
         {
-            await IsOrderOwnedByUser(orderId, userId);//order
-            var isExpectedOrderStatus = await IsExpectedOrderStatus(orderId, OrderStatus.SHIPPED);
+            var order = await GetOrderById(orderId);
+            IsOrderOwnedByUser(order, userId);
+            var isExpectedOrderStatus = IsExpectedOrderStatus(order, OrderStatus.SHIPPED);
             if (!isExpectedOrderStatus)
             {
                 throw new OrderStatusModificationException("Current order is not receivable.");
             }
-            await UpdateOrderState(orderId);
+            await UpdateOrderState(order);
         }
 
         public async Task ShipOrder(int orderId, int userId)
         {
-            await IsOrderOwnedByUser(orderId, userId);
-            var isExpectedOrderStatus = await IsExpectedOrderStatus(orderId, OrderStatus.PAID);
+            var order = await GetOrderById(orderId);
+            IsOrderOwnedByUser(order, userId);
+            var isExpectedOrderStatus = IsExpectedOrderStatus(order, OrderStatus.PAID);
             if (!isExpectedOrderStatus)
             {
                 throw new OrderStatusModificationException("Current order is not shippable.");
             }
-            await UpdateOrderState(orderId);
+            await UpdateOrderState(order);
         }
 
         public async Task<IEnumerable<Order>> GetOrderListBySellerId(int sellerId)
@@ -97,18 +99,16 @@ namespace Service
             return orderLists;
         }
 
-        public async Task IsOrderOwnedByUser(int orderId, int userId)
+        public void IsOrderOwnedByUser(Order order, int userId)
         {
-            var order = await GetOrderById(orderId);
             if (order.User.Id != userId)
             {
                 throw new OrderOwnershipException("This order is not yours.");
             }
         }
 
-        public async Task<bool> IsExpectedOrderStatus(int orderId, OrderStatus status)
+        public bool IsExpectedOrderStatus(Order order, OrderStatus status)
         {
-            var order = await GetOrderById(orderId);
             if (order.Status == status)
             {
                 return true;
