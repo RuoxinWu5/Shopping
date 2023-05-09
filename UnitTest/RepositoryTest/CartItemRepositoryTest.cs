@@ -21,49 +21,24 @@ namespace UnitTest.RepositoryTest
 
         private async Task<List<CartItem>> AddCartItems()
         {
-            var user = _context.Users.Single(u => u.Id == 1);
-            var product = _context.Products.Single(p => p.Id == 1);
+            var user = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = user };
             var carts = new List<CartItem>
             {
-                new CartItem { Product = product, Quantity = 10, User = user }
+                new CartItem { Id = 1, Product = product, Quantity = 10, User = user }
             };
             await _context.AddRangeAsync(carts);
             await _context.SaveChangesAsync();
             return carts;
         }
 
-        private async Task<List<Product>> AddProducts()
-        {
-            var user = _context.Users.Single(u => u.Id == 1);
-            var products = new List<Product>
-            {
-                new Product { Id = 1, Name = "Apple", Quantity = 100, User = user },
-                new Product { Id = 2, Name = "Banana", Quantity = 50, User = user }
-            };
-            await _context.AddRangeAsync(products);
-            await _context.SaveChangesAsync();
-            return products;
-        }
-
-        private async Task<List<User>> AddUsers()
-        {
-            var users = new List<User>
-        {
-            new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER } ,
-            new User { Id = 2, Name = "Jack", Password = "Jack123", Type = UserType.SELLER }
-        };
-            await _context.AddRangeAsync(users);
-            await _context.SaveChangesAsync();
-            return users;
-        }
-
         [Fact]
         public async Task AddCartItem_ShouldCreateNewCartItem_WhenCartItemIsValid()
         {
             // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
-            var cart = new CartItem { Product = products[0], Quantity = 10, User = users[0] };
+            var user = new User { Id = 1, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = user };
+            var cart = new CartItem { Product = product, Quantity = 10, User = user };
             // Act
             await _repository.AddCartItem(cart);
             // Assert
@@ -77,11 +52,9 @@ namespace UnitTest.RepositoryTest
         public async Task GetCartItemById_ShouldReturnCartItem()
         {
             // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
             var cart = await AddCartItems();
             // Act
-            var result = await _repository.GetCartItemById(cart[0].Id);
+            var result = await _repository.GetCartItemById(1);
             // Assert
             Assert.NotNull(result);
             Assert.Equal(cart[0], result);
@@ -91,8 +64,6 @@ namespace UnitTest.RepositoryTest
         public async Task GetCartItemByProductIdAndBuyerId_ShouldReturnCartItem()
         {
             // Arrange
-            var users = await AddUsers();
-            var products = await AddProducts();
             var carts = await AddCartItems();
             // Act
             var result = await _repository.GetCartItemByProductIdAndBuyerId(1, 1);

@@ -21,17 +21,37 @@ namespace UnitTest.ServiceTest
             _cartService = new CartItemService(_cartRepositoryMock.Object, _productRepositoryMock.Object, _userRepositoryMock.Object);
         }
 
-        [Fact]
-        public async Task AddCartItem_ShouldCallAddCartItemMethodOfRepository_WhenQuantityIsEnough()
+        private CartItem AddCartItems()
         {
-            // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             var cartItem = new CartItem { Product = product, Quantity = 10, User = user };
+            return cartItem;
+        }
+
+        [Fact]
+        public async Task AddCartItem_ShouldCallAddCartItemMethodOfRepository_WhenQuantityIsEnoughAndCartItemIsNotExist()
+        {
+            // Arrange
+            var cartItem = AddCartItems();
+            CartItem? nullCartItem = null;
+            _cartRepositoryMock.Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(nullCartItem);
             // Act
-            var result = await _cartService.AddCartItem(cartItem);
+            await _cartService.AddCartItem(cartItem);
             // Assert
-            _cartRepositoryMock.Verify(repository => repository.AddCartItem(result), Times.Once);
+            _cartRepositoryMock.Verify(repository => repository.AddCartItem(cartItem), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddCartItem_ShouldCallUpdateCartItemMethodOfRepository_WhenQuantityIsEnoughAndCartItemIsExist()
+        {
+            // Arrange
+            var cartItem = AddCartItems();
+            _cartRepositoryMock.Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(cartItem);
+            // Act
+            await _cartService.AddCartItem(cartItem);
+            // Assert
+            _cartRepositoryMock.Verify(repository => repository.UpdateCartItem(cartItem), Times.Once);
         }
 
         [Fact]
@@ -41,6 +61,8 @@ namespace UnitTest.ServiceTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 10, User = user };
             var cartItem = new CartItem { Product = product, Quantity = 100, User = user };
+            CartItem? nullCartItem = null;
+            _cartRepositoryMock.Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(nullCartItem);
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _cartService.AddCartItem(cartItem));
         }
@@ -50,9 +72,7 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var id = 1;
-            var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Name = "Apple", Quantity = 10, User = user };
-            var cartItem = new CartItem { Product = product, Quantity = 100, User = user };
+            var cartItem = AddCartItems();
             _cartRepositoryMock.Setup(repository => repository.GetCartItemById(It.IsAny<int>())).ReturnsAsync(cartItem);
             // Act
             var result = await _cartService.GetCartItemById(id);
@@ -69,18 +89,6 @@ namespace UnitTest.ServiceTest
             _cartRepositoryMock.Setup(repository => repository.GetCartItemById(It.IsAny<int>())).ReturnsAsync(nullCartItem);
             // Act & Assert
             await Assert.ThrowsAsync<CartItemNotFoundException>(async () => await _cartService.GetCartItemById(id));
-        }
-
-        [Fact]
-        public async Task GetCartItemByProductIdAndBuyerId_ShouldCallGetCartItemByProductIdAndBuyerIdMethodOfRepository()
-        {
-            // Arrange
-            var productId = 1;
-            var buyerId = 1;
-            // Act
-            await _cartService.GetCartItemByProductIdAndBuyerId(productId, buyerId);
-            // Assert
-            _cartRepositoryMock.Verify(repository => repository.GetCartItemByProductIdAndBuyerId(productId, buyerId), Times.Once);
         }
     }
 }

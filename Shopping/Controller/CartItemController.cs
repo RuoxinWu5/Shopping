@@ -23,15 +23,15 @@ namespace Shopping.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddCartItem(AddProductToCartRequestModel orderRequestModel)
+        public async Task<ActionResult> AddCartItem(AddProductToCartRequestModel cartItemRequestModel)
         {
             try
             {
                 var cartItem = new CartItem
                 {
-                    Quantity = orderRequestModel.Quantity,
-                    Product = await _productService.GetProductById(orderRequestModel.ProductId),
-                    User = await _userService.GetBuyerById(orderRequestModel.BuyerId)
+                    Quantity = cartItemRequestModel.Quantity,
+                    Product = await _productService.GetProductById(cartItemRequestModel.ProductId),
+                    User = await _userService.GetBuyerById(cartItemRequestModel.BuyerId)
                 };
                 await _cartService.AddCartItem(cartItem);
                 return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = cartItem.Id }, cartItem);
@@ -56,15 +56,7 @@ namespace Shopping.Controller
             try
             {
                 var cartItem = await _cartService.GetCartItemById(cartItemId);
-                var product = await _productService.GetProductById(cartItem.Product.Id);
-                var buyer = await _userService.GetBuyerById(cartItem.User.Id);
-                var result = new BuyerCartItem
-                {
-                    ProductName = product.Name,
-                    Quantity = cartItem.Quantity,
-                    BuyerName = buyer.Name,
-                };
-                return Ok(result);
+                return Ok(cartItem);
             }
             catch (CartItemNotFoundException ex)
             {

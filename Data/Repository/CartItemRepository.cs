@@ -28,5 +28,11 @@ namespace Data.Repository
             var cartItem = await _context.CartItems.Include(p => p.User).Include(p => p.Product).FirstOrDefaultAsync(o => o.Product.Id == productId && o.User.Id == buyerId);
             return cartItem;
         }
+
+        public async Task UpdateCartItem(CartItem cartItem)
+        {
+            _context.CartItems.Update(cartItem);
+            await _context.SaveChangesAsync();
+        }
     }
 }

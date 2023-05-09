@@ -16,15 +16,22 @@ namespace Service
             _productRepository = productRepository;
             _userRepository = userRepository;
         }
-        public async Task<CartItem> AddCartItem(CartItem cartItem)
+
+        public async Task AddCartItem(CartItem cartItem)
         {
-            var quantity = cartItem.Product.Quantity;
-            if (cartItem.Quantity > quantity)
+            var inventory = cartItem.Product.Quantity;
+            var findCartItem = await _cartRepository.GetCartItemByProductIdAndBuyerId(cartItem.Product.Id, cartItem.User.Id);
+            if (findCartItem == null)
             {
-                throw new ArgumentException("Quantity not sufficient. CartItem creation failed.");
-            }
+                CartItemInventoryCheck(cartItem, inventory);
                 await _cartRepository.AddCartItem(cartItem);
-            return cartItem;
+            }
+            else
+            {
+                findCartItem.Quantity += cartItem.Quantity;
+                CartItemInventoryCheck(findCartItem, inventory);
+                await _cartRepository.UpdateCartItem(findCartItem);
+            }
         }
 
         public async Task<CartItem> GetCartItemById(int id)
@@ -37,9 +44,12 @@ namespace Service
             throw new CartItemNotFoundException("The cart item doesn't exist.");
         }
 
-        public async Task<CartItem?> GetCartItemByProductIdAndBuyerId(int productId, int buyerId)
+        private void CartItemInventoryCheck(CartItem cartItem, int inventory)
         {
-            return await _cartRepository.GetCartItemByProductIdAndBuyerId(productId, buyerId);
+            if (cartItem.Quantity > inventory)
+            {
+                throw new ArgumentException("Quantity not sufficient. CartItem creation failed.");
+            }
         }
     }
 }
