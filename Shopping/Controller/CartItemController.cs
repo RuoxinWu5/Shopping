@@ -1,7 +1,5 @@
 using Data.Exceptions;
-using Data.Model;
 using Data.RequestModel;
-using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 
@@ -27,13 +25,7 @@ namespace Shopping.Controller
         {
             try
             {
-                var cartItem = new CartItem
-                {
-                    Quantity = cartItemRequestModel.Quantity,
-                    Product = await _productService.GetProductById(cartItemRequestModel.ProductId),
-                    User = await _userService.GetBuyerById(cartItemRequestModel.BuyerId)
-                };
-                await _cartService.AddCartItem(cartItem);
+                var cartItem = await _cartService.AddCartItem(cartItemRequestModel);
                 return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = cartItem.Id }, cartItem);
             }
             catch (ProductNotFoundException exception)

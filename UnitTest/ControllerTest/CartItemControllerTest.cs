@@ -1,7 +1,6 @@
 using Data.Exceptions;
 using Data.Model;
 using Data.RequestModel;
-using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Service;
@@ -31,28 +30,22 @@ namespace UnitTest.ControllerTest
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 10, BuyerId = 2 };
-            _productServiceMock.Setup(service => service.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
-            _userServiceMock.Setup(service => service.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
             var expectedCartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+            _cartServiceMock.Setup(service => service.AddCartItem(It.IsAny<AddProductToCartRequestModel>())).ReturnsAsync(expectedCartItem);
             // Act
             var result = await _cartController.AddCartItem(addProductToCartRequestModel);
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
             Assert.NotNull(createdResult.Value);
-            Assert.Equal(expectedCartItem.ToString(), createdResult.Value.ToString());
+            Assert.Equal(expectedCartItem, createdResult.Value);
         }
 
         [Fact]
         public async Task AddCartItem_ShouldReturnBadRequest_WhenQuantityIsNotEnough()
         {
             // Arrange
-            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
-            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 10, BuyerId = 2 };
-            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
-            _userServiceMock.Setup(repository => repository.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
-            _cartServiceMock.Setup(repository => repository.AddCartItem(It.IsAny<CartItem>())).Throws(new ArgumentException("Quantity not sufficient. CartItem creation failed."));
+            _cartServiceMock.Setup(repository => repository.AddCartItem(It.IsAny<AddProductToCartRequestModel>())).Throws(new ArgumentException("Quantity not sufficient. CartItem creation failed."));
             // Act
             var result = await _cartController.AddCartItem(addProductToCartRequestModel);
             // Assert
@@ -64,12 +57,8 @@ namespace UnitTest.ControllerTest
         public async Task AddCartItem_ShouldReturnNotFound_WhenUserIdNotExists()
         {
             // Arrange
-            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
-            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
-            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 10, BuyerId = 2 };
-            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
-            _userServiceMock.Setup(repository => repository.GetBuyerById(It.IsAny<int>())).Throws(new BuyerNotFoundException("The buyer doesn't exist."));
+            _cartServiceMock.Setup(service => service.AddCartItem(It.IsAny<AddProductToCartRequestModel>())).Throws(new BuyerNotFoundException("The buyer doesn't exist."));
             // Act
             var result = await _cartController.AddCartItem(addProductToCartRequestModel);
             // Assert
@@ -82,7 +71,7 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
-            _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).Throws(new ProductNotFoundException("The product doesn't exist."));
+            _cartServiceMock.Setup(service => service.AddCartItem(It.IsAny<AddProductToCartRequestModel>())).Throws(new ProductNotFoundException("The product doesn't exist."));
             // Act
             var result = await _cartController.AddCartItem(addProductToCartRequestModel);
             // Assert

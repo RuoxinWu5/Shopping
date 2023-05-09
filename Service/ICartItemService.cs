@@ -1,10 +1,11 @@
 using Data.Model;
+using Data.RequestModel;
 
 namespace Service
 {
     public interface ICartItemService
     {
-        Task AddCartItem(CartItem cartItem);
+        Task<CartItem> AddCartItem(AddProductToCartRequestModel cartItemRequestModel);
         Task<CartItem> GetCartItemById(int id);
     }
 }

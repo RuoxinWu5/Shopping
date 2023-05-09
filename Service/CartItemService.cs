@@ -1,6 +1,7 @@
 using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
+using Data.RequestModel;
 
 namespace Service
 {
@@ -9,28 +10,40 @@ namespace Service
         private readonly ICartItemRepository _cartRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IProductService _productService;
+        private readonly IUserService _userService;
 
-        public CartItemService(ICartItemRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository)
+        public CartItemService(ICartItemRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IProductService productService, IUserService userService)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
+            _productService = productService;
+            _userService = userService;
         }
 
-        public async Task AddCartItem(CartItem cartItem)
+        public async Task<CartItem> AddCartItem(AddProductToCartRequestModel cartItemRequestModel)
         {
-            var inventory = cartItem.Product.Quantity;
-            var findCartItem = await _cartRepository.GetCartItemByProductIdAndBuyerId(cartItem.Product.Id, cartItem.User.Id);
-            if (findCartItem == null)
+            var findCartItem = await _cartRepository.GetCartItemByProductIdAndBuyerId(cartItemRequestModel.ProductId, cartItemRequestModel.BuyerId);
+            if (findCartItem != null)
             {
-                CartItemInventoryCheck(cartItem, inventory);
-                await _cartRepository.AddCartItem(cartItem);
+                findCartItem.Quantity += cartItemRequestModel.Quantity;
+                CartItemInventoryCheck(cartItemRequestModel.Quantity, findCartItem.Product.Quantity);
+                await _cartRepository.UpdateCartItem(findCartItem);
+                return findCartItem;
             }
             else
             {
-                findCartItem.Quantity += cartItem.Quantity;
-                CartItemInventoryCheck(findCartItem, inventory);
-                await _cartRepository.UpdateCartItem(findCartItem);
+                var product = await _productService.GetProductById(cartItemRequestModel.ProductId);
+                CartItemInventoryCheck(cartItemRequestModel.Quantity, product.Quantity);
+                var cartItem = new CartItem
+                {
+                    Quantity = cartItemRequestModel.Quantity,
+                    Product = product,
+                    User = await _userService.GetBuyerById(cartItemRequestModel.BuyerId)
+                };
+                await _cartRepository.AddCartItem(cartItem);
+                return cartItem;
             }
         }
 
@@ -44,9 +57,9 @@ namespace Service
             throw new CartItemNotFoundException("The cart item doesn't exist.");
         }
 
-        private void CartItemInventoryCheck(CartItem cartItem, int inventory)
+        private void CartItemInventoryCheck(int quantity, int inventory)
         {
-            if (cartItem.Quantity > inventory)
+            if (quantity > inventory)
             {
                 throw new ArgumentException("Quantity not sufficient. CartItem creation failed.");
             }
