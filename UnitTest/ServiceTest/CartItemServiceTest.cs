@@ -140,5 +140,18 @@ namespace UnitTest.ServiceTest
             // Act & Assert
             await Assert.ThrowsAsync<BuyerNotFoundException>(async () => await _cartService.GetCartItemListByBuyerId(id));
         }
+
+        [Fact]
+        public void IsCartItemOwnedByUser_ShouldThrowCartItemOwnershipException_WhenThisCartItemNotBelongsToThisUser()
+        {
+            // Arrange
+            var userId = 1;
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
+            var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+            // Act & Assert
+            Assert.Throws<CartItemOwnershipException>(() => _cartService.IsCartItemOwnedByUser(cartItem, userId));
+        }
     }
 }

@@ -1,6 +1,7 @@
 using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
+using Data.RequestModel;
 
 namespace Service
 {
@@ -11,14 +12,16 @@ namespace Service
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IProductService _productService;
+        private readonly ICartItemService _cartItemService;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository, IUserService userService, IProductService productService)
+        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IUserRepository userRepository, IUserService userService, IProductService productService, ICartItemService cartItemService)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
             _userService = userService;
             _productService = productService;
+            _cartItemService = cartItemService;
         }
 
         public async Task AddOrderAndReduceProductQuantity(Order order)
@@ -99,6 +102,7 @@ namespace Service
             return orderLists;
         }
 
+
         public void IsOrderOwnedByUser(Order order, int userId)
         {
             if (order.User.Id != userId)
@@ -114,6 +118,20 @@ namespace Service
                 return true;
             }
             return false;
+        }
+        public async Task<Order> AddOrderFromCartItem(AddOrderFromCartItemRequestModel addOrderFromCartItemRequestModel)
+        {
+            var cartItem = await _cartItemService.GetCartItemById(addOrderFromCartItemRequestModel.CartItemId);
+            _cartItemService.IsCartItemOwnedByUser(cartItem,addOrderFromCartItemRequestModel.BuyerId);
+            var order = new Order
+            {
+                Quantity = cartItem.Quantity,
+                Status = OrderStatus.TO_BE_PAID,
+                Product = cartItem.Product,
+                User = cartItem.User
+            };
+            await AddOrderAndReduceProductQuantity(order);
+            return order;
         }
     }
 }

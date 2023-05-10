@@ -1,6 +1,7 @@
 using Data.Exceptions;
 using Data.Model;
 using Data.Repository;
+using Data.RequestModel;
 using Moq;
 using Service;
 
@@ -14,6 +15,7 @@ namespace UnitTest.ServiceTest
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IUserService> _userServiceMock;
         private readonly Mock<IProductService> _productServiceMock;
+        private readonly Mock<ICartItemService> _cartItemServiceMock;
 
         public OrderServiceTest()
         {
@@ -22,7 +24,8 @@ namespace UnitTest.ServiceTest
             _userRepositoryMock = new Mock<IUserRepository>();
             _userServiceMock = new Mock<IUserService>();
             _productServiceMock = new Mock<IProductService>();
-            _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _userRepositoryMock.Object, _userServiceMock.Object, _productServiceMock.Object);
+            _cartItemServiceMock = new Mock<ICartItemService>();
+            _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _userRepositoryMock.Object, _userServiceMock.Object, _productServiceMock.Object, _cartItemServiceMock.Object);
         }
 
         [Fact]
@@ -293,6 +296,24 @@ namespace UnitTest.ServiceTest
             var result = _orderService.IsExpectedOrderStatus(order, expectStatus);
             // Assert
             Assert.Equal(false, result);
+        }
+
+        [Fact]
+        public async Task AddOrderFromCartItem_ShouldAddOrderAndReduceProductQuantity()
+        {
+            // Arrange
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
+            var cartItem = new CartItem { Id = 1, Product = product, Quantity = 10, User = buyer };
+            _cartItemServiceMock.Setup(x => x.GetCartItemById(It.IsAny<int>())).ReturnsAsync(cartItem);
+            var addOrderFromCartItemRequestModel = new AddOrderFromCartItemRequestModel { CartItemId = 1, BuyerId = 2 };
+            // Act
+            var result = await _orderService.AddOrderFromCartItem(addOrderFromCartItemRequestModel);
+            // Assert
+            Assert.NotNull(result);
+            _productServiceMock.Verify(x => x.ReduceProductQuantity(product, result.Quantity), Times.Once);
+            _orderRepositoryMock.Verify(repository => repository.AddOrder(result), Times.Once);
         }
     }
 }

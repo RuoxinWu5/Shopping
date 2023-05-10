@@ -1,5 +1,6 @@
 using Data.Exceptions;
 using Data.Model;
+using Data.RequestModel;
 using Data.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -199,6 +200,28 @@ namespace Shopping.Controller
             catch (SellerNotFoundException ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddOrderFromCartItem(AddOrderFromCartItemRequestModel addOrderFromCartItemRequestModel)
+        {
+            try
+            {
+                var order = await _orderService.AddOrderFromCartItem(addOrderFromCartItemRequestModel);
+                return CreatedAtAction(nameof(GetOrderById), new { orderId = order.Id }, order);
+            }
+            catch (CartItemNotFoundException exception)
+            {
+                return BadRequest(exception.Message);
+            }
+            catch (CartItemOwnershipException exception)
+            {
+                return BadRequest(exception.Message);
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(exception.Message);
             }
         }
     }

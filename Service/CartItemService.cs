@@ -71,5 +71,13 @@ namespace Service
                 throw new ArgumentException("Quantity not sufficient. CartItem creation failed.");
             }
         }
+
+        public void IsCartItemOwnedByUser(CartItem cartItem, int userId)
+        {
+            if (cartItem.User.Id != userId)
+            {
+                throw new CartItemOwnershipException("This cart item is not yours.");
+            }
+        }
     }
 }

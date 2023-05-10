@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Data.Exceptions;
 using Data.Model;
+using Data.RequestModel;
 using Data.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -111,7 +112,7 @@ namespace UnitTest.ControllerTest
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
             _productServiceMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
             _userServiceMock.Setup(repository => repository.GetBuyerById(It.IsAny<int>())).ReturnsAsync(user);
-            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).Throws(new ArgumentException("Quantity not sufficient. Order creation failed."));
+            _orderServiceMock.Setup(x => x.AddOrderAndReduceProductQuantity(It.IsAny<Order>())).ThrowsAsync(new ArgumentException("Quantity not sufficient. Order creation failed."));
             var orderRequest = new AddOrderRequestModel { ProductId = 1, Quantity = 10, BuyerId = 1 };
             // Act
             var result = await _orderController.AddOrder(orderRequest);
@@ -390,6 +391,63 @@ namespace UnitTest.ControllerTest
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Result);
             Assert.Equal("The seller doesn't exist.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task AddOrderFromCartItem_ShouldReturnOk_WhenCartItemIsValid()
+        {
+            // Arrange
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "lisa123", Type = UserType.BUYER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var expectedOrder = new Order { Id = 1, Quantity = 10, Status = OrderStatus.TO_BE_PAID, Product = product, User = buyer };
+            _orderServiceMock.Setup(service => service.AddOrderFromCartItem(It.IsAny<AddOrderFromCartItemRequestModel>())).ReturnsAsync(expectedOrder);
+            var addOrderFromCartItemRequestModel = new AddOrderFromCartItemRequestModel { BuyerId = 2, CartItemId = 1 };
+            // Act
+            var result = await _orderController.AddOrderFromCartItem(addOrderFromCartItemRequestModel);
+            // Assert
+            var createdResult = Assert.IsType<CreatedAtActionResult>(result);
+            Assert.NotNull(createdResult.Value);
+            Assert.Equal(expectedOrder.ToString(), createdResult.Value.ToString());
+        }
+
+        [Fact]
+        public async Task AddOrderFromCartItem_ShouldReturnBadRequest_WhenCartItemNotFound()
+        {
+            // Arrange
+            _orderServiceMock.Setup(service => service.AddOrderFromCartItem(It.IsAny<AddOrderFromCartItemRequestModel>())).ThrowsAsync(new CartItemNotFoundException("The cart item doesn't exist."));
+            var addOrderFromCartItemRequestModel = new AddOrderFromCartItemRequestModel { BuyerId = 2, CartItemId = 1 };
+            // Act
+            var result = await _orderController.AddOrderFromCartItem(addOrderFromCartItemRequestModel);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("The cart item doesn't exist.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task AddOrderFromCartItem_ShouldReturnBadRequest_WhenCartItemIsNotForThisUser()
+        {
+            // Arrange
+            _orderServiceMock.Setup(service => service.AddOrderFromCartItem(It.IsAny<AddOrderFromCartItemRequestModel>())).ThrowsAsync(new CartItemOwnershipException("This cart item is not yours."));
+            var addOrderFromCartItemRequestModel = new AddOrderFromCartItemRequestModel { BuyerId = 2, CartItemId = 1 };
+            // Act
+            var result = await _orderController.AddOrderFromCartItem(addOrderFromCartItemRequestModel);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("This cart item is not yours.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task AddOrderFromCartItem_ShouldReturnBadRequest_WhenQuantityIsNotEnough()
+        {
+            // Arrange
+            _orderServiceMock.Setup(service => service.AddOrderFromCartItem(It.IsAny<AddOrderFromCartItemRequestModel>())).ThrowsAsync(new ArgumentException("Quantity not sufficient. Order creation failed."));
+            var addOrderFromCartItemRequestModel = new AddOrderFromCartItemRequestModel { BuyerId = 2, CartItemId = 1 };
+            // Act
+            var result = await _orderController.AddOrderFromCartItem(addOrderFromCartItemRequestModel);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Quantity not sufficient. Order creation failed.", badRequestObjectResult.Value);
         }
     }
 }
