@@ -1,5 +1,7 @@
 using Data.Exceptions;
+using Data.Model;
 using Data.RequestModel;
+using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 
@@ -56,5 +58,28 @@ namespace Shopping.Controller
             }
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BuyerCartItem>>> GetCartItemListByBuyerId(int buyerId)
+        {
+            try
+            {
+                var cartItems = await _cartService.GetCartItemListByBuyerId(buyerId);
+                List<BuyerCartItem> buyerCartItems = new List<BuyerCartItem>();
+                foreach (CartItem cartItem in cartItems)
+                {
+                    var buyerCartItem = new BuyerCartItem
+                    {
+                        ProductName=cartItem.Product.Name,
+                        Quantity=cartItem.Quantity
+                    };
+                    buyerCartItems.Add(buyerCartItem);
+                }
+                return Ok(buyerCartItems);
+            }
+            catch (BuyerNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -4,6 +4,5 @@ namespace Data.ViewModel
     {
         public string ProductName { get; set; } = null!;
         public int Quantity { get; set; }
-        public string BuyerName { get; set; } = null!;
     }
 }

@@ -1,6 +1,7 @@
 using Data.Exceptions;
 using Data.Model;
 using Data.RequestModel;
+using Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Service;
@@ -106,6 +107,44 @@ namespace UnitTest.ControllerTest
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("The cart item doesn't exist.", badRequestObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task GetCartItemListByBuyerId_ShouldReturnCartItemList_WhenCartItemListIsFound()
+        {
+            // Arrange
+            int id = 1;
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
+            var cartItemList = new List<CartItem>
+            {
+                new CartItem { Product = product, Quantity = 10, User = buyer }
+            };
+            _cartServiceMock.Setup(service => service.GetCartItemListByBuyerId(It.IsAny<int>())).ReturnsAsync(cartItemList);
+            var cartItemListResult = new List<BuyerCartItem>
+            {
+                new BuyerCartItem { ProductName = "Apple", Quantity = 10 }
+            };
+            // Act
+            var result = await _cartController.GetCartItemListByBuyerId(id);
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result.Result);
+            Assert.NotNull(okObjectResult.Value);
+            Assert.Equal(cartItemListResult.ToString(), okObjectResult.Value.ToString());
+        }
+
+        [Fact]
+        public async Task GetCartItemListByBuyerId_ShouldReturnBadRequest_WhenBuyerIsNotFound()
+        {
+            // Arrange
+            int id = 1;
+            _cartServiceMock.Setup(service => service.GetCartItemListByBuyerId(It.IsAny<int>())).ThrowsAsync(new BuyerNotFoundException("The buyer doesn't exist."));
+            // Act
+            var result = await _cartController.GetCartItemListByBuyerId(id);
+            // Assert
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("The buyer doesn't exist.", badRequestObjectResult.Value);
         }
     }
 }
