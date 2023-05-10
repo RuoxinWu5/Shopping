@@ -100,5 +100,18 @@ namespace UnitTest.RepositoryTest
             Assert.NotNull(result);
             Assert.Equal(carts, result);
         }
+
+        [Fact]
+        public async Task DeleteCartItem_ShouldReturnCartItemList()
+        {
+            // Arrange
+            var carts = await AddCartItems();
+            // Act
+            await _repository.DeleteCartItem(carts[0]);
+            // Assert
+            Assert.NotNull(_context.CartItems);
+            var savedCartItem = await _context.CartItems.FirstOrDefaultAsync(c => c.Id == carts[0].Id);
+            Assert.Null(savedCartItem);
+        }
     }
 }

@@ -79,5 +79,11 @@ namespace Service
                 throw new CartItemOwnershipException("This cart item is not yours.");
             }
         }
+
+        public async Task DeleteCartItemById(int id)
+        {
+            var cartItem = await GetCartItemById(id);
+            await _cartRepository.DeleteCartItem(cartItem);
+        }
     }
 }

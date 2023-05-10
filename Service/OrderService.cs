@@ -122,7 +122,7 @@ namespace Service
         public async Task<Order> AddOrderFromCartItem(AddOrderFromCartItemRequestModel addOrderFromCartItemRequestModel)
         {
             var cartItem = await _cartItemService.GetCartItemById(addOrderFromCartItemRequestModel.CartItemId);
-            _cartItemService.IsCartItemOwnedByUser(cartItem,addOrderFromCartItemRequestModel.BuyerId);
+            _cartItemService.IsCartItemOwnedByUser(cartItem, addOrderFromCartItemRequestModel.BuyerId);
             var order = new Order
             {
                 Quantity = cartItem.Quantity,
@@ -131,6 +131,7 @@ namespace Service
                 User = cartItem.User
             };
             await AddOrderAndReduceProductQuantity(order);
+            await _cartItemService.DeleteCartItemById(cartItem.Id);
             return order;
         }
     }

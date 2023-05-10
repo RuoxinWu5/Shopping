@@ -314,6 +314,7 @@ namespace UnitTest.ServiceTest
             Assert.NotNull(result);
             _productServiceMock.Verify(x => x.ReduceProductQuantity(product, result.Quantity), Times.Once);
             _orderRepositoryMock.Verify(repository => repository.AddOrder(result), Times.Once);
+            _cartItemServiceMock.Verify(service => service.DeleteCartItemById(cartItem.Id), Times.Once);
         }
     }
 }

@@ -153,5 +153,21 @@ namespace UnitTest.ServiceTest
             // Act & Assert
             Assert.Throws<CartItemOwnershipException>(() => _cartService.IsCartItemOwnedByUser(cartItem, userId));
         }
+
+        [Fact]
+        public async Task DeleteCartItemById_ShouldCallDeleteCartItemMethodOfRepository_WhenCartItemIsFound()
+        {
+            // Arrange
+            var id = 1;
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
+            var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+            _cartRepositoryMock.Setup(repository => repository.GetCartItemById(It.IsAny<int>())).ReturnsAsync(cartItem);
+            // Act
+            await _cartService.DeleteCartItemById(id);
+            // Assert
+            _cartRepositoryMock.Verify(repository => repository.DeleteCartItem(cartItem), Times.Once);
+        }
     }
 }

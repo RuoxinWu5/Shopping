@@ -40,5 +40,11 @@ namespace Data.Repository
             var cartItemList = await _context.CartItems.Include(c => c.User).Include(c => c.Product).Where(cartItem => cartItem.User.Id == buyerId).ToListAsync();
             return cartItemList;
         }
+
+        public async Task DeleteCartItem(CartItem cartItem)
+        {
+            _context.CartItems.Remove(cartItem);
+            await _context.SaveChangesAsync();
+        }
     }
 }
