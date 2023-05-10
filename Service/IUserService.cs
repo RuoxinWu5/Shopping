@@ -9,6 +9,7 @@ namespace Service
         Task<User> GetBuyerById(int id);
         Task<User> GetUserById(int userId);
         Task ValidateIfSellerExist(int id);
+        Task ValidateIfBuyerExist(int id);
         Task<User> GetUserByUserNameAndPassword(string username, string password);
     }
 }

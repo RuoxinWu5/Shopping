@@ -57,9 +57,11 @@ namespace Service
             throw new CartItemNotFoundException("The cart item doesn't exist.");
         }
 
-        public Task<IEnumerable<CartItem>> GetCartItemListByBuyerId(int buyerId)
+        public async Task<IEnumerable<CartItem>> GetCartItemListByBuyerId(int buyerId)
         {
-            throw new NotImplementedException();
+            await _userService.ValidateIfBuyerExist(buyerId);
+            var cartItemList = await _cartRepository.GetCartItemListByBuyerId(buyerId);
+            return cartItemList;
         }
 
         private void CartItemInventoryCheck(int quantity, int inventory)

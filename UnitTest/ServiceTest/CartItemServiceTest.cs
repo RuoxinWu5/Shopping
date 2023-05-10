@@ -111,5 +111,34 @@ namespace UnitTest.ServiceTest
             // Act & Assert
             await Assert.ThrowsAsync<CartItemNotFoundException>(async () => await _cartService.GetCartItemById(id));
         }
+
+        [Fact]
+        public async Task GetCartItemListByBuyerId_ShouldReturnCartItemList_WhenCartItemListIsFound()
+        {
+            // Arrange
+            int id = 1;
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
+            var cartItemList = new List<CartItem>
+            {
+                new CartItem { Product = product, Quantity = 10, User = buyer }
+            };
+            _cartRepositoryMock.Setup(repository => repository.GetCartItemListByBuyerId(It.IsAny<int>())).ReturnsAsync(cartItemList);
+            // Act
+            var result = await _cartService.GetCartItemListByBuyerId(id);
+            // Assert
+            Assert.Equal(cartItemList, result);
+        }
+
+        [Fact]
+        public async Task GetCartItemListByBuyerId_ShouldThrowBuyerNotFoundException_WhenBuyerNotExist()
+        {
+            // Arrange
+            int id = 1;
+            _userServiceMock.Setup(service => service.ValidateIfBuyerExist(It.IsAny<int>())).ThrowsAsync(new BuyerNotFoundException("The buyer doesn't exist."));
+            // Act & Assert
+            await Assert.ThrowsAsync<BuyerNotFoundException>(async () => await _cartService.GetCartItemListByBuyerId(id));
+        }
     }
 }

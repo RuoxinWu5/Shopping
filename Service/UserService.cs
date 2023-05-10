@@ -56,6 +56,13 @@ namespace Service
                 throw new SellerNotFoundException("The seller doesn't exist.");
         }
 
+        public async Task ValidateIfBuyerExist(int id)
+        {
+            var user = await _userRepository.GetUserById(id);
+            if (user == null || user.Type != UserType.BUYER)
+                throw new BuyerNotFoundException("The buyer doesn't exist.");
+        }
+
         public async Task<User> GetUserByUserNameAndPassword(string username, string password)
         {
             var user = await _userRepository.GetUserByName(username);

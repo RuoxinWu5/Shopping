@@ -153,6 +153,30 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
+        public async Task ValidateIfBuyererExit_ShouldCallGetUserByIdMethodOfRepository_WhenBuyerIsfound()
+        {
+            // Arrange
+            var id = 1;
+            var user = new User { Id = 1, Name = "testuser", Password = "testpassword", Type = UserType.BUYER };
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(user);
+            // Act
+            await _userService.ValidateIfBuyerExist(id);
+            // Assert
+            _userRepositoryMock.Verify(repository => repository.GetUserById(id), Times.Once);
+        }
+
+        [Fact]
+        public async Task ValidateIfBuyererExit_ShouldThrowBuyerNotFoundException_WhenBuyerIsNotfound()
+        {
+            // Arrange
+            var id = 1;
+            User? user = null;
+            _userRepositoryMock.Setup(repository => repository.GetUserById(It.IsAny<int>())).ReturnsAsync(user);
+            // Act & Assert
+            await Assert.ThrowsAsync<BuyerNotFoundException>(async () => await _userService.ValidateIfBuyerExist(id));
+        }
+
+        [Fact]
         public async Task GetUserByUserNameAndPassword_ShouldReturnUserInfo_WhenUserIsfound()
         {
             // Arrange

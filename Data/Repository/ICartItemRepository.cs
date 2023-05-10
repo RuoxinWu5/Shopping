@@ -8,5 +8,6 @@ namespace Data.Repository
         Task<CartItem?> GetCartItemById(int id);
         Task<CartItem?> GetCartItemByProductIdAndBuyerId(int productId, int buyerId);
         Task UpdateCartItem(CartItem cartItem);
+        Task<IEnumerable<CartItem>> GetCartItemListByBuyerId(int buyerId);
     }
 }
