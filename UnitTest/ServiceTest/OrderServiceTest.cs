@@ -312,9 +312,30 @@ namespace UnitTest.ServiceTest
             var result = await _orderService.AddOrderFromCartItem(addOrderFromCartItemRequestModel);
             // Assert
             Assert.NotNull(result);
-            _productServiceMock.Verify(x => x.ReduceProductQuantity(product, result.Quantity), Times.Once);
+            _productServiceMock.Verify(service => service.ReduceProductQuantity(product, result.Quantity), Times.Once);
             _orderRepositoryMock.Verify(repository => repository.AddOrder(result), Times.Once);
             _cartItemServiceMock.Verify(service => service.DeleteCartItemById(cartItem.Id), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddOrderFromCartItem_ThrowsCartItemNotFoundException_WhenCartItemNotFound()
+        {
+            // Arrange
+            var mockCartItemService = new Mock<ICartItemService>();
+            _cartItemServiceMock.Setup(service => service.GetCartItemById(It.IsAny<int>())).ThrowsAsync(new CartItemNotFoundException("The cart item doesn't exist."));
+            var addOrderFromCartItemRequestModel = new AddOrderFromCartItemRequestModel { CartItemId = 1, BuyerId = 2 };
+            // Act & Assert
+            await Assert.ThrowsAsync<CartItemNotFoundException>(async () => await _orderService.AddOrderFromCartItem(addOrderFromCartItemRequestModel));
+        }
+
+        [Fact]
+        public async Task AddOrderFromCartItem_ThrowsCartItemOwnershipException_WhenCartItemOwnerDoesNotMatchBuyer()
+        {
+            // Arrange
+            _cartItemServiceMock.Setup(service => service.GetCartItemById(It.IsAny<int>())).ThrowsAsync(new CartItemOwnershipException("This cart item is not yours."));
+            var addOrderFromCartItemRequestModel = new AddOrderFromCartItemRequestModel { CartItemId = 1, BuyerId = 2 };
+            // Act & Assert
+            await Assert.ThrowsAsync<CartItemOwnershipException>(async () => await _orderService.AddOrderFromCartItem(addOrderFromCartItemRequestModel));
         }
     }
 }

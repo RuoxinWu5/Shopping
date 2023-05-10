@@ -27,8 +27,9 @@ namespace Service
             var findCartItem = await _cartRepository.GetCartItemByProductIdAndBuyerId(cartItemRequestModel.ProductId, cartItemRequestModel.BuyerId);
             if (findCartItem != null)
             {
-                findCartItem.Quantity += cartItemRequestModel.Quantity;
-                CartItemInventoryCheck(cartItemRequestModel.Quantity, findCartItem.Product.Quantity);
+                var totalQuantity = findCartItem.Quantity + cartItemRequestModel.Quantity;
+                CartItemInventoryCheck(totalQuantity, findCartItem.Product.Quantity);
+                findCartItem.Quantity = totalQuantity;
                 await _cartRepository.UpdateCartItem(findCartItem);
                 return findCartItem;
             }

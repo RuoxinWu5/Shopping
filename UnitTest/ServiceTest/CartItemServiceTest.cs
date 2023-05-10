@@ -62,10 +62,11 @@ namespace UnitTest.ServiceTest
             var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
             _cartRepositoryMock.Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(cartItem);
             var addProductToCartRequestModelItem = CreateAddProductToCartRequestModelItems();
+            var cartItemResult = new CartItem { Product = product, Quantity = 20, User = buyer };
             // Act
             var result = await _cartService.AddCartItem(addProductToCartRequestModelItem);
             // Assert
-            Assert.Equal(cartItem.ToString(), result.ToString());
+            Assert.Equal(cartItemResult.ToString(), result.ToString());
             _cartRepositoryMock.Verify(repository => repository.UpdateCartItem(It.IsAny<CartItem>()), Times.Once);
         }
 
