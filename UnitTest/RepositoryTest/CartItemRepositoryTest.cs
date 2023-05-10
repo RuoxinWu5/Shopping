@@ -87,5 +87,18 @@ namespace UnitTest.RepositoryTest
             Assert.NotNull(savedCartItem);
             Assert.Equal(cart.Quantity, savedCartItem.Quantity);
         }
+
+        [Fact]
+        public async Task GetCartItemListByBuyerId_ShouldReturnCartItemList()
+        {
+            // Arrange
+            int id = 2;
+            var carts = await AddCartItems();
+            // Act
+            var result = await _repository.GetCartItemListByBuyerId(id);
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(carts, result);
+        }
     }
 }

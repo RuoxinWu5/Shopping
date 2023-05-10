@@ -35,9 +35,10 @@ namespace Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<CartItem>> GetCartItemListByBuyerId(int buyerId)
+        public async Task<IEnumerable<CartItem>> GetCartItemListByBuyerId(int buyerId)
         {
-            throw new NotImplementedException();
+            var cartItemList = await _context.CartItems.Include(c => c.User).Include(c => c.Product).Where(cartItem => cartItem.User.Id == buyerId).ToListAsync();
+            return cartItemList;
         }
     }
 }
