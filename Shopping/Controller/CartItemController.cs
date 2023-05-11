@@ -30,15 +30,8 @@ namespace Shopping.Controller
                 var cartItem = await _cartService.AddCartItem(cartItemRequestModel);
                 return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = cartItem.Id }, cartItem);
             }
-            catch (ProductNotFoundException exception)
-            {
-                return BadRequest(exception.Message);
-            }
-            catch (BuyerNotFoundException exception)
-            {
-                return BadRequest(exception.Message);
-            }
-            catch (ArgumentException exception)
+            catch (Exception exception)
+            when (exception is ProductNotFoundException || exception is BuyerNotFoundException || exception is ArgumentException)
             {
                 return BadRequest(exception.Message);
             }
@@ -64,16 +57,11 @@ namespace Shopping.Controller
             try
             {
                 var cartItems = await _cartService.GetCartItemListByBuyerId(buyerId);
-                List<BuyerCartItem> buyerCartItems = new List<BuyerCartItem>();
-                foreach (CartItem cartItem in cartItems)
+                var buyerCartItems = cartItems.Select(cartItem => new BuyerCartItem
                 {
-                    var buyerCartItem = new BuyerCartItem
-                    {
-                        ProductName=cartItem.Product.Name,
-                        Quantity=cartItem.Quantity
-                    };
-                    buyerCartItems.Add(buyerCartItem);
-                }
+                    ProductName = cartItem.Product.Name,
+                    Quantity = cartItem.Quantity
+                }).ToList();
                 return Ok(buyerCartItems);
             }
             catch (BuyerNotFoundException ex)
