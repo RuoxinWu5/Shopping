@@ -24,14 +24,14 @@ namespace Service
 
         public async Task<CartItem> AddCartItem(AddProductToCartRequestModel cartItemRequestModel)
         {
-            var findCartItem = await _cartRepository.GetCartItemByProductIdAndBuyerId(cartItemRequestModel.ProductId, cartItemRequestModel.BuyerId);
-            if (findCartItem != null)
+            var existingCartItem = await _cartRepository.GetCartItemByProductIdAndBuyerId(cartItemRequestModel.ProductId, cartItemRequestModel.BuyerId);
+            if (existingCartItem != null)
             {
-                var totalQuantity = findCartItem.Quantity + cartItemRequestModel.Quantity;
-                CartItemInventoryCheck(totalQuantity, findCartItem.Product.Quantity);
-                findCartItem.Quantity = totalQuantity;
-                await _cartRepository.UpdateCartItem(findCartItem);
-                return findCartItem;
+                var totalQuantity = existingCartItem.Quantity + cartItemRequestModel.Quantity;
+                CartItemInventoryCheck(totalQuantity, existingCartItem.Product.Quantity);
+                existingCartItem.Quantity = totalQuantity;
+                await _cartRepository.UpdateCartItem(existingCartItem);
+                return existingCartItem;
             }
             else
             {
