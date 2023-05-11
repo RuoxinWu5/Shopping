@@ -26,11 +26,15 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var user = new User { Id = 1, Name = "testuser", Password = "password", Type = UserType.BUYER };
-            _userServiceMock.Setup(x => x.GetUserByUserNameAndPassword(user.Name, user.Password)).ReturnsAsync(user);
-            _jwtTokenServiceMock.Setup(x => x.GenerateJwtToken(It.IsAny<User>())).Returns("");
+            _userServiceMock
+                .Setup(x => x.GetUserByUserNameAndPassword(user.Name, user.Password))
+                .ReturnsAsync(user);
+
             var request = new LoginRequestModel { Name = user.Name, Password = user.Password };
+
             // Act
             var result = await _userLoginController.Login(request);
+
             // Assert
             Assert.IsType<OkObjectResult>(result);
         }
@@ -39,10 +43,15 @@ namespace UnitTest.ControllerTest
         public async Task Login_ReturnsBadRequest_WhenUserNotFound()
         {
             // Arrange
-            _userServiceMock.Setup(x => x.GetUserByUserNameAndPassword("nonexistentuser", "password")).ThrowsAsync(new UserNotFoundException("The user doesn't exist."));
+            _userServiceMock
+                .Setup(x => x.GetUserByUserNameAndPassword("nonexistentuser", "password"))
+                .ThrowsAsync(new UserNotFoundException("The user doesn't exist."));
+
             var request = new LoginRequestModel { Name = "nonexistentuser", Password = "password" };
+
             // Act
             var result = await _userLoginController.Login(request);
+
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("The user doesn't exist.", badRequestObjectResult.Value);

@@ -28,12 +28,16 @@ namespace UnitTest.ControllerTest
                 new Product{ Name = "Apple", Quantity = 100, User = user },
                 new Product{ Name = "Banana", Quantity = 50, User = user }
             };
-            var resultItem = new List<String> { "Apple", "Banana" };
-            _productServiceMock.Setup(x => x.AllProduct()).ReturnsAsync(resultServiceItem);
+            _productServiceMock
+                .Setup(x => x.AllProduct())
+                .ReturnsAsync(resultServiceItem);
+
             // Act
             var result = await _buyerController.AllProduct();
+
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            var resultItem = new List<String> { "Apple", "Banana" };
             Assert.Equal(resultItem, okObjectResult.Value);
         }
 
@@ -43,23 +47,31 @@ namespace UnitTest.ControllerTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            var resultItem = new BuyerProduct() { Id = 1, Name = "Apple", Quantity = 100, SellerName = "Jack" };
-            _productServiceMock.Setup(x => x.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _productServiceMock
+                .Setup(x => x.GetProductById(It.IsAny<int>()))
+                .ReturnsAsync(product);
+
             // Act
             var result = await _buyerController.GetProductByProductId(1);
+
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okObjectResult.Value);
-            Assert.Equal(resultItem.ToString(), okObjectResult.Value.ToString());
+            var resultItem = new BuyerProduct() { Id = 1, Name = "Apple", Quantity = 100, SellerName = "Jack" };
+            Assert.Equivalent(resultItem, okObjectResult.Value);
         }
 
         [Fact]
         public async Task GetProductByProductId_ShouldReturnNotFoundException_WhenProductsIsNotfound()
         {
             // Arrange
-            _productServiceMock.Setup(x => x.GetProductById(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
+            _productServiceMock
+                .Setup(x => x.GetProductById(It.IsAny<int>()))
+                .ThrowsAsync(new KeyNotFoundException());
+
             // Act
             var result = await _buyerController.GetProductByProductId(1);
+
             // Assert
             Assert.IsType<NotFoundObjectResult>(result);
         }

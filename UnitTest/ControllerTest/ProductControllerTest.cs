@@ -29,10 +29,14 @@ namespace UnitTest.ControllerTest
             var resultItem = new List<Product>{
                 new Product{ Name = "Apple", Quantity = 100, User = user },
                 new Product{ Name = "Banana", Quantity = 50, User = user }
-                };
-            _productServiceMock.Setup(x => x.GetProductListBySellerId(It.IsAny<int>())).ReturnsAsync(resultItem);
+            };
+            _productServiceMock
+                .Setup(x => x.GetProductListBySellerId(It.IsAny<int>()))
+                .ReturnsAsync(resultItem);
+
             // Act
             var result = await _productController.GetProductListBySellerId(1);
+
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(result.Result);
             Assert.Equal(resultItem, okObjectResult.Value);
@@ -46,10 +50,14 @@ namespace UnitTest.ControllerTest
             var resultItem = new List<Product>{
                 new Product{ Name = "Apple", Quantity = 100, User = user },
                 new Product{ Name = "Banana", Quantity = 50, User = user }
-                };
-            _productServiceMock.Setup(x => x.GetProductListBySellerId(It.IsAny<int>())).ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
+            };
+            _productServiceMock
+                .Setup(x => x.GetProductListBySellerId(It.IsAny<int>()))
+                .ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
+
             // Act
             var result = await _productController.GetProductListBySellerId(1);
+
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result.Result);
             Assert.Equal("The seller doesn't exist.", badRequestObjectResult.Value);
@@ -61,14 +69,19 @@ namespace UnitTest.ControllerTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            _userServiceMock.Setup(service => service.GetSellerById(It.IsAny<int>())).ReturnsAsync(user);
+            _userServiceMock
+                .Setup(service => service.GetSellerById(It.IsAny<int>()))
+                .ReturnsAsync(user);
+
             var productViewModel = new AddProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
+
             // Act
             var result = await _productController.AddProduct(productViewModel);
+
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
             Assert.NotNull(createdResult.Value);
-            Assert.Equal(product.ToString(), createdResult.Value.ToString());
+            Assert.Equivalent(product, createdResult.Value);
         }
 
         [Fact]
@@ -78,9 +91,12 @@ namespace UnitTest.ControllerTest
             _userServiceMock
                 .Setup(service => service.GetSellerById(It.IsAny<int>()))
                 .Throws(new SellerNotFoundException("The seller doesn't exist."));
+
             var productViewModel = new AddProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
+
             // Act
             var result = await _productController.AddProduct(productViewModel);
+
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("The seller doesn't exist.", badRequestObjectResult.Value);
@@ -91,14 +107,20 @@ namespace UnitTest.ControllerTest
         {
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            _userServiceMock
+                .Setup(service => service.GetSellerById(It.IsAny<int>()))
+                .ReturnsAsync(user);
+
             var product = new Product { Name = "Apple", Quantity = 100, User = user };
-            _userServiceMock.Setup(service => service.GetSellerById(It.IsAny<int>())).ReturnsAsync(user);
             _productServiceMock
                 .Setup(service => service.AddProduct(It.IsAny<Product>()))
                 .Throws(new DuplicateUserNameException($"Product name '{product.Name}' already exists."));
+
             var productViewModel = new AddProductRequestModel { Name = "Apple", Quantity = 100, SellerId = 1 };
+
             // Act
             var result = await _productController.AddProduct(productViewModel);
+
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
             Assert.Equal("Product name 'Apple' already exists.", conflictResult.Value);
@@ -113,8 +135,10 @@ namespace UnitTest.ControllerTest
             _productServiceMock
                 .Setup(service => service.GetProductById(It.IsAny<int>()))
                 .ReturnsAsync(product);
+
             // Act
             var result = await _productController.GetProductById(1);
+
             // Assert
             var createdResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(product, createdResult.Value);
@@ -127,8 +151,10 @@ namespace UnitTest.ControllerTest
             _productServiceMock
                 .Setup(service => service.GetProductById(It.IsAny<int>()))
                 .Throws(new ProductNotFoundException("The product doesn't exist."));
+
             // Act
             var result = await _productController.GetProductById(1);
+
             // Assert
             var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("The product doesn't exist.", badRequestObjectResult.Value);
