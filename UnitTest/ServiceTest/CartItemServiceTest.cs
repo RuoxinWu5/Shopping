@@ -37,18 +37,28 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             CartItem? nullCartItem = null;
-            _cartRepositoryMock.Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(nullCartItem);
+            _cartRepositoryMock
+                .Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(nullCartItem);
+
             var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
-            _productServiceMock.Setup(service => service.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+            _productServiceMock
+                .Setup(service => service.GetProductById(It.IsAny<int>()))
+                .ReturnsAsync(product);
+
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
-            _userServiceMock.Setup(service => service.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
+            _userServiceMock
+                .Setup(service => service.GetBuyerById(It.IsAny<int>()))
+                .ReturnsAsync(buyer);
             var addProductToCartRequestModelItem = CreateAddProductToCartRequestModelItems();
-            var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+
             // Act
             var result = await _cartService.AddCartItem(addProductToCartRequestModelItem);
+
             // Assert
-            Assert.Equal(cartItem.ToString(), result.ToString());
+            var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+            Assert.Equivalent(cartItem, result);
             _cartRepositoryMock.Verify(repository => repository.AddCartItem(It.IsAny<CartItem>()), Times.Once);
         }
 
@@ -60,13 +70,18 @@ namespace UnitTest.ServiceTest
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
-            _cartRepositoryMock.Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(cartItem);
+            _cartRepositoryMock
+                .Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(cartItem);
+
             var addProductToCartRequestModelItem = CreateAddProductToCartRequestModelItems();
-            var cartItemResult = new CartItem { Product = product, Quantity = 20, User = buyer };
+
             // Act
             var result = await _cartService.AddCartItem(addProductToCartRequestModelItem);
+
             // Assert
-            Assert.Equal(cartItemResult.ToString(), result.ToString());
+            var cartItemResult = new CartItem { Product = product, Quantity = 20, User = buyer };
+            Assert.Equivalent(cartItemResult, result);
             _cartRepositoryMock.Verify(repository => repository.UpdateCartItem(It.IsAny<CartItem>()), Times.Once);
         }
 
@@ -74,14 +89,20 @@ namespace UnitTest.ServiceTest
         public async Task AddCartItem_ShouldThrowArgumentException_WhenQuantityIsNotEnough()
         {
             // Arrange
-            var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 100, BuyerId = 1 };
             CartItem? nullCartItem = null;
-            _cartRepositoryMock.Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(nullCartItem);
+            _cartRepositoryMock
+                .Setup(repository => repository.GetCartItemByProductIdAndBuyerId(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(nullCartItem);
+
             var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 10, User = seller };
             _productServiceMock.Setup(service => service.GetProductById(It.IsAny<int>())).ReturnsAsync(product);
+
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             _userServiceMock.Setup(service => service.GetBuyerById(It.IsAny<int>())).ReturnsAsync(buyer);
+
+            var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 100, BuyerId = 1 };
+
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(async () => await _cartService.AddCartItem(addProductToCartRequestModel));
         }
@@ -90,14 +111,17 @@ namespace UnitTest.ServiceTest
         public async Task GetCartItemById_ShouldReturnCartItem_WhenCartItemExist()
         {
             // Arrange
-            var id = 1;
             var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
             _cartRepositoryMock.Setup(repository => repository.GetCartItemById(It.IsAny<int>())).ReturnsAsync(cartItem);
+
+            var id = 1;
+
             // Act
             var result = await _cartService.GetCartItemById(id);
+
             // Assert
             Assert.Equal(cartItem, result);
         }
@@ -106,9 +130,11 @@ namespace UnitTest.ServiceTest
         public async Task GetCartItemById_ShouldThrowCartItemNotFoundException_WhenCartItemNotExist()
         {
             // Arrange
-            var id = 1;
             CartItem? nullCartItem = null;
             _cartRepositoryMock.Setup(repository => repository.GetCartItemById(It.IsAny<int>())).ReturnsAsync(nullCartItem);
+
+            var id = 1;
+
             // Act & Assert
             await Assert.ThrowsAsync<CartItemNotFoundException>(async () => await _cartService.GetCartItemById(id));
         }
@@ -117,7 +143,6 @@ namespace UnitTest.ServiceTest
         public async Task GetCartItemListByBuyerId_ShouldReturnCartItemList_WhenCartItemListIsFound()
         {
             // Arrange
-            int id = 1;
             var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
@@ -125,9 +150,15 @@ namespace UnitTest.ServiceTest
             {
                 new CartItem { Product = product, Quantity = 10, User = buyer }
             };
-            _cartRepositoryMock.Setup(repository => repository.GetCartItemListByBuyerId(It.IsAny<int>())).ReturnsAsync(cartItemList);
+            _cartRepositoryMock
+                .Setup(repository => repository.GetCartItemListByBuyerId(It.IsAny<int>()))
+                .ReturnsAsync(cartItemList);
+
+            int id = 1;
+
             // Act
             var result = await _cartService.GetCartItemListByBuyerId(id);
+
             // Assert
             Assert.Equal(cartItemList, result);
         }
@@ -136,8 +167,12 @@ namespace UnitTest.ServiceTest
         public async Task GetCartItemListByBuyerId_ShouldThrowBuyerNotFoundException_WhenBuyerNotExist()
         {
             // Arrange
+            _userServiceMock
+                .Setup(service => service.ValidateIfBuyerExist(It.IsAny<int>()))
+                .ThrowsAsync(new BuyerNotFoundException("The buyer doesn't exist."));
+
             int id = 1;
-            _userServiceMock.Setup(service => service.ValidateIfBuyerExist(It.IsAny<int>())).ThrowsAsync(new BuyerNotFoundException("The buyer doesn't exist."));
+
             // Act & Assert
             await Assert.ThrowsAsync<BuyerNotFoundException>(async () => await _cartService.GetCartItemListByBuyerId(id));
         }
@@ -146,11 +181,12 @@ namespace UnitTest.ServiceTest
         public void IsCartItemOwnedByUser_ShouldThrowCartItemOwnershipException_WhenThisCartItemNotBelongsToThisUser()
         {
             // Arrange
-            var userId = 1;
             var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+            var userId = 1;
+
             // Act & Assert
             Assert.Throws<CartItemOwnershipException>(() => _cartService.IsCartItemOwnedByUser(cartItem, userId));
         }
@@ -159,13 +195,15 @@ namespace UnitTest.ServiceTest
         public void IsCartItemOwnedByUser_ShouldNotThrowException_WhenThisCartItemBelongsToThisUser()
         {
             // Arrange
-            var userId = 2;
             var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+            var userId = 2;
+
             // Act
             var exception = Record.Exception(() => _cartService.IsCartItemOwnedByUser(cartItem, userId));
+
             //Assert
             Assert.Null(exception);
         }
@@ -174,14 +212,17 @@ namespace UnitTest.ServiceTest
         public async Task DeleteCartItemById_ShouldCallDeleteCartItemMethodOfRepository_WhenCartItemIsFound()
         {
             // Arrange
-            var id = 1;
             var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
             var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
             var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
             _cartRepositoryMock.Setup(repository => repository.GetCartItemById(It.IsAny<int>())).ReturnsAsync(cartItem);
+
+            var id = 1;
+
             // Act
             await _cartService.DeleteCartItemById(id);
+
             // Assert
             _cartRepositoryMock.Verify(repository => repository.DeleteCartItem(cartItem), Times.Once);
         }
