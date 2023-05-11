@@ -51,6 +51,7 @@ namespace UnitTest.ServiceTest
             _userServiceMock
                 .Setup(service => service.GetBuyerById(It.IsAny<int>()))
                 .ReturnsAsync(buyer);
+
             var addProductToCartRequestModelItem = CreateAddProductToCartRequestModelItems();
 
             // Act
@@ -104,7 +105,7 @@ namespace UnitTest.ServiceTest
             var addProductToCartRequestModel = new AddProductToCartRequestModel { ProductId = 1, Quantity = 100, BuyerId = 1 };
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _cartService.AddCartItem(addProductToCartRequestModel));
+            await Assert.ThrowsAsync<ArgumentException>(() => _cartService.AddCartItem(addProductToCartRequestModel));
         }
 
         [Fact]
@@ -136,7 +137,7 @@ namespace UnitTest.ServiceTest
             var id = 1;
 
             // Act & Assert
-            await Assert.ThrowsAsync<CartItemNotFoundException>(async () => await _cartService.GetCartItemById(id));
+            await Assert.ThrowsAsync<CartItemNotFoundException>(() => _cartService.GetCartItemById(id));
         }
 
         [Fact]
@@ -174,7 +175,7 @@ namespace UnitTest.ServiceTest
             int id = 1;
 
             // Act & Assert
-            await Assert.ThrowsAsync<BuyerNotFoundException>(async () => await _cartService.GetCartItemListByBuyerId(id));
+            await Assert.ThrowsAsync<BuyerNotFoundException>(() => _cartService.GetCartItemListByBuyerId(id));
         }
 
         [Fact]

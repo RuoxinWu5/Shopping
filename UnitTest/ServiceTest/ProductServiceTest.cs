@@ -23,12 +23,17 @@ namespace UnitTest.ServiceTest
         public async Task AddProduct_ShouldAddProductSuccessfully_WhenProductNameNotExists()
         {
             // Arrange
+            Product? nullProduct = null;
+            _productRepositoryMock
+                .Setup(repository => repository.GetProductByName(It.IsAny<string>()))
+                .ReturnsAsync(nullProduct);
+
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Banana", Quantity = 100, User = user };
-            Product? nullProduct = null;
-            _productRepositoryMock.Setup(repository => repository.GetProductByName(It.IsAny<string>())).ReturnsAsync(nullProduct);
+
             // Act
             await _productService.AddProduct(product);
+
             // Assert
             _productRepositoryMock.Verify(repository => repository.AddProduct(product), Times.Once);
         }
@@ -39,9 +44,12 @@ namespace UnitTest.ServiceTest
             // Arrange
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Banana", Quantity = 100, User = user };
-            _productRepositoryMock.Setup(repository => repository.GetProductByName(It.IsAny<string>())).ReturnsAsync(product);
+            _productRepositoryMock
+                .Setup(repository => repository.GetProductByName(It.IsAny<string>()))
+                .ReturnsAsync(product);
+
             // Act & Assert
-            await Assert.ThrowsAsync<DuplicateUserNameException>(async () => await _productService.AddProduct(product));
+            await Assert.ThrowsAsync<DuplicateUserNameException>(() => _productService.AddProduct(product));
         }
 
         [Fact]
@@ -49,8 +57,10 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var id = 1;
+
             // Act
             await _productService.GetProductListBySellerId(id);
+
             // Assert
             _productRepositoryMock.Verify(repository => repository.GetProductListBySellerId(id), Times.Once);
         }
@@ -59,22 +69,31 @@ namespace UnitTest.ServiceTest
         public async Task GetProductListBySellerId_ShouldThrowSellerNotFoundException_WhenSellerNotExist()
         {
             // Arrange
+            _userServiceMock
+                .Setup(service => service.ValidateIfSellerExist(It.IsAny<int>()))
+                .ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
+
             var id = 1;
-            _userServiceMock.Setup(service => service.ValidateIfSellerExist(It.IsAny<int>())).ThrowsAsync(new SellerNotFoundException("The seller doesn't exist."));
+
             // Act & Assert
-            await Assert.ThrowsAsync<SellerNotFoundException>(async () => await _productService.GetProductListBySellerId(id));
+            await Assert.ThrowsAsync<SellerNotFoundException>(() => _productService.GetProductListBySellerId(id));
         }
 
         [Fact]
         public async Task GetProductById_ShouldReturnProduct_WhenProductIsfound()
         {
             // Arrange
-            var id = 1;
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var productResult = new Product { Name = "Apple", Quantity = 100, User = user };
-            _productRepositoryMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ReturnsAsync(productResult);
+            _productRepositoryMock
+                .Setup(repository => repository.GetProductById(It.IsAny<int>()))
+                .ReturnsAsync(productResult);
+
+            var id = 1;
+
             // Act
             var product = await _productService.GetProductById(id);
+
             // Assert
             Assert.Equal(productResult, product);
         }
@@ -83,8 +102,12 @@ namespace UnitTest.ServiceTest
         public async Task GetProductById_ShouldReturnProductNotFoundException_WhenProductIsfound()
         {
             // Arrange
+            _productRepositoryMock
+                .Setup(repository => repository.GetProductById(It.IsAny<int>()))
+                .ThrowsAsync(new ProductNotFoundException("The product doesn't exist."));
+
             var id = 1;
-            _productRepositoryMock.Setup(repository => repository.GetProductById(It.IsAny<int>())).ThrowsAsync(new ProductNotFoundException("The product doesn't exist."));
+
             // Act & Assert
             await Assert.ThrowsAsync<ProductNotFoundException>(async () => await _productService.GetProductById(id));
         }
@@ -99,9 +122,13 @@ namespace UnitTest.ServiceTest
                 new Product { Name = "Apple", Quantity = 100, User = user },
                 new Product { Name = "Banana", Quantity = 0, User = user }
             };
-            _productRepositoryMock.Setup(repository => repository.AllProduct()).ReturnsAsync(resultItem);
+            _productRepositoryMock
+                .Setup(repository => repository.AllProduct())
+                .ReturnsAsync(resultItem);
+
             // Act
             var result = await _productService.AllProduct();
+
             // Assert
             Assert.Equal(resultItem[0].Name, result.First().Name);
             Assert.Equal(resultItem[0].Quantity, result.First().Quantity);
@@ -114,8 +141,10 @@ namespace UnitTest.ServiceTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Banana", Quantity = 100, User = user };
             var quantity = 10;
+
             // Act
             await _productService.ReduceProductQuantity(product, quantity);
+
             // Assert
             _productRepositoryMock.Verify(repository => repository.UpdateProduct(product), Times.Once);
         }
@@ -127,8 +156,9 @@ namespace UnitTest.ServiceTest
             var user = new User { Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
             var product = new Product { Name = "Banana", Quantity = 100, User = user };
             var quantity = 1000;
+
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _productService.ReduceProductQuantity(product, quantity));
+            await Assert.ThrowsAsync<ArgumentException>(() => _productService.ReduceProductQuantity(product, quantity));
         }
     }
 }

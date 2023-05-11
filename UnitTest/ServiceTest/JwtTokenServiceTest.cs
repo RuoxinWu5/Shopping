@@ -25,13 +25,17 @@ namespace UnitTest.ServiceTest
         {
             // Arrange
             var user = new User { Id = 1, Name = "Test User", Type = UserType.BUYER };
+
             // Act
             var token = _jwtTokenService.GenerateJwtToken(user);
+
             // Assert
             Assert.NotNull(token);
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var decodedToken = tokenHandler.ReadJwtToken(token);
             Assert.Equal("testIssuer", decodedToken.Issuer);
+
             var claims = decodedToken.Claims.ToList();
             Assert.Equal("1", claims[0].Value);
             Assert.Equal("Test User", claims[1].Value);
