@@ -156,6 +156,21 @@ namespace UnitTest.ServiceTest
         }
 
         [Fact]
+        public void IsCartItemOwnedByUser_ShouldNotThrowException_WhenThisCartItemBelongsToThisUser()
+        {
+            // Arrange
+            var userId = 2;
+            var seller = new User { Id = 1, Name = "Jack", Password = "Jack123", Type = UserType.SELLER };
+            var product = new Product { Id = 1, Name = "Apple", Quantity = 100, User = seller };
+            var buyer = new User { Id = 2, Name = "Lisa", Password = "Lisa123", Type = UserType.BUYER };
+            var cartItem = new CartItem { Product = product, Quantity = 10, User = buyer };
+            // Act
+            var exception = Record.Exception(() => _cartService.IsCartItemOwnedByUser(cartItem, userId));
+            //Assert
+            Assert.Null(exception);
+        }
+
+        [Fact]
         public async Task DeleteCartItemById_ShouldCallDeleteCartItemMethodOfRepository_WhenCartItemIsFound()
         {
             // Arrange
